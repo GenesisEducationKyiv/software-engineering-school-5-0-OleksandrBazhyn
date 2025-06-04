@@ -1,0 +1,33 @@
+{
+  "name": "weather_api_app",
+  "version": "1.0.0",
+  "description": "",
+  "license": "ISC",
+  "author": "Oleksandr Bazhyn",
+  "type": "module",
+  "main": "app.js",
+  "scripts": {
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
+    "start": "node app.js",
+    "dev": "nodemon app.js",
+    "build": "echo \"Error: no build specified\" && exit 1"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.5.0",
+    "dotnet": "^1.1.4",
+    "express": "^5.1.0",
+    "knex": "^3.1.0",
+    "node-cron": "^4.0.5",
+    "nodemailer": "^7.0.3",
+    "nodemon": "^3.1.10",
+    "pg": "^8.16.0",
+    "uuid": "^11.1.0",
+    "uuidv4": "^6.2.13",
+    "ws": "^8.18.2"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "supertest": "^7.1.1"
+  }
+}
