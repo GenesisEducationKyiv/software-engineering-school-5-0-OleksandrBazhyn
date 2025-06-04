@@ -24,6 +24,7 @@ router.get('/weather', async (req, res) => {
         };        
         return res.status(200).json(data);
     } catch (error) {
+        console.error('Error fetching weather data:', error);
         return res.status(404).json({ error: 'City not found' });
     }
 });

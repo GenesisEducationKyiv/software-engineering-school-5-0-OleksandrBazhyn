@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 
 export default function App() {
   // --- REST: Subscription state ---
@@ -117,8 +117,9 @@ export default function App() {
       try {
         const msg = JSON.parse(event.data);
         if (msg.type === "weather") setWsWeather(msg.data);
-      } catch (e) {
-        // Ignore parse errors
+      } catch (error) {
+        console.error("Error parsing WebSocket message:", error);
+        setWsStatus("Error receiving live updates");
       }
     };
     ws.onclose = () => setWsStatus("Connection closed");

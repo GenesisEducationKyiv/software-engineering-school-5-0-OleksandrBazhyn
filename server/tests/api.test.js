@@ -7,7 +7,7 @@ let app;
 // Mock WeatherManager to avoid real API calls
 beforeAll(async () => {
   const { default: WeatherManager } = await import('../api/managers/WeatherManager.js');
-  WeatherManager.prototype.fetchWeatherData = async (city) => ({
+  WeatherManager.prototype.fetchWeatherData = async (/*city*/) => ({
     current: {
       temp_c: 15,
       humidity: 50,
@@ -37,7 +37,7 @@ describe('Weather API', () => {
 });
 
 describe('Subscription API', () => {
-  let testToken = null;
+  // let testToken = null;
   const testEmail = `test${Math.floor(Math.random() * 100000)}@mail.com`;
   const testCity = 'Kyiv';
   const testFrequency = 'daily';

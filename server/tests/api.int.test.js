@@ -16,7 +16,7 @@ Mailer.__getToken = () => Mailer.__token;
 let app;
 beforeAll(async () => {
   const { default: WeatherManager } = await import('../api/managers/WeatherManager.js');
-  WeatherManager.prototype.fetchWeatherData = async (city) => ({
+  WeatherManager.prototype.fetchWeatherData = async (/*city*/) => ({
     current: {
       temp_c: 15,
       humidity: 44,
@@ -90,7 +90,7 @@ describe('Advanced Subscription/Confirmation workflow', () => {
   it('Weather for unknown city returns 404', async () => {
     // Mock fetchWeatherData to simulate city not found
     const { default: WeatherManager } = await import('../api/managers/WeatherManager.js');
-    WeatherManager.prototype.fetchWeatherData = async (city) => { throw new Error('Not found'); };
+    WeatherManager.prototype.fetchWeatherData = async (/*city*/) => { throw new Error('Not found'); };
 
     const res = await request(app).get('/api/weather?city=UnknownCity');
     expect(res.statusCode).toBe(404);

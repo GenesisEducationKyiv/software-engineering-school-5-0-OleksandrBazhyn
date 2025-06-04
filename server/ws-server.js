@@ -23,8 +23,9 @@ export function setupWebSocket(server) {
           // Save this city as the client's subscription
           subscriptions.set(ws, msg.city.trim());
         }
-      } catch (e) {
-        // Ignore invalid messages
+      } catch (error) {
+        console.error("Error parsing WebSocket message:", error);
+        ws.send(JSON.stringify({ type: "error", message: "Invalid message format" }));
       }
     });
 
@@ -63,8 +64,9 @@ export function setupWebSocket(server) {
               })
             );
           }
-        } catch (err) {
-          // If weather fetching fails, silently skip this cycle
+        } catch (error) {
+          console.error(`Error fetching weather for ${city}:`, error);
+          ws.send(JSON.stringify({ type: "error", message: `Failed to fetch weather for ${city}` }));
         }
       }
     }
