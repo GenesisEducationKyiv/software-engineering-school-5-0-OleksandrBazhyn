@@ -10,7 +10,9 @@
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
     "start": "node app.js",
     "dev": "nodemon app.js",
-    "build": "echo \"Error: no build specified\" && exit 1"
+    "build": "echo \"Error: no build specified\" && exit 1",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
   },
   "dependencies": {
     "cors": "^2.8.5",
