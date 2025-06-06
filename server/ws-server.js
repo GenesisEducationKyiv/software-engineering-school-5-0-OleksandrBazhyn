@@ -19,13 +19,19 @@ export function setupWebSocket(server) {
     ws.on("message", (data) => {
       try {
         const msg = JSON.parse(data);
-        if (msg.city && typeof msg.city === "string" && msg.city.trim() !== "") {
+        if (
+          msg.city &&
+          typeof msg.city === "string" &&
+          msg.city.trim() !== ""
+        ) {
           // Save this city as the client's subscription
           subscriptions.set(ws, msg.city.trim());
         }
       } catch (error) {
         console.error("Error parsing WebSocket message:", error);
-        ws.send(JSON.stringify({ type: "error", message: "Invalid message format" }));
+        ws.send(
+          JSON.stringify({ type: "error", message: "Invalid message format" }),
+        );
       }
     });
 
@@ -61,12 +67,17 @@ export function setupWebSocket(server) {
                   humidity: weatherData.current.humidity,
                   description: weatherData.current.condition.text,
                 },
-              })
+              }),
             );
           }
         } catch (error) {
           console.error(`Error fetching weather for ${city}:`, error);
-          ws.send(JSON.stringify({ type: "error", message: `Failed to fetch weather for ${city}` }));
+          ws.send(
+            JSON.stringify({
+              type: "error",
+              message: `Failed to fetch weather for ${city}`,
+            }),
+          );
         }
       }
     }
