@@ -1,18 +1,18 @@
-import 'dotenv/config';
+import "dotenv/config";
 
 export default {
   development: {
-    client: 'pg',
+    client: "pg",
     connection: process.env.DATABASE_URL,
     migrations: {
-      directory: './migrations',
+      directory: "./migrations",
     },
   },
   test: {
-    client: 'pg',
+    client: "pg",
     connection: process.env.DATABASE_URL,
     migrations: {
-      directory: './migrations',
+      directory: "./migrations",
     },
   },
 };

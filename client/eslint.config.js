@@ -1,33 +1,48 @@
-import js from '@eslint/js'
-import globals from 'globals'
-import reactHooks from 'eslint-plugin-react-hooks'
-import reactRefresh from 'eslint-plugin-react-refresh'
+import js from "@eslint/js";
+import globals from "globals";
+import pluginReact from "eslint-plugin-react";
+import pluginReactHooks from "eslint-plugin-react-hooks";
+import prettier from "eslint-config-prettier";
+import { defineConfig } from "eslint/config";
 
-export default [
-  { ignores: ['dist'] },
+export default defineConfig([
   {
-    files: ['**/*.{js,jsx}'],
+    name: "client",
+    files: ["**/*.{js,mjs,cjs,jsx}"],
     languageOptions: {
-      ecmaVersion: 2020,
+      ecmaVersion: "latest",
+      sourceType: "module",
       globals: globals.browser,
-      parserOptions: {
-        ecmaVersion: 'latest',
-        ecmaFeatures: { jsx: true },
-        sourceType: 'module',
+    },
+    plugins: { js, react: pluginReact, "react-hooks": pluginReactHooks },
+    extends: ["js/recommended", pluginReact.configs.flat.recommended, prettier],
+    settings: {
+      react: {
+        version: "detect",
       },
     },
-    plugins: {
-      'react-hooks': reactHooks,
-      'react-refresh': reactRefresh,
-    },
     rules: {
-      ...js.configs.recommended.rules,
-      ...reactHooks.configs.recommended.rules,
-      'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
-      'react-refresh/only-export-components': [
-        'warn',
-        { allowConstantExport: true },
-      ],
+      "react/jsx-uses-react": "off",
+      "react/react-in-jsx-scope": "off",
+      "react/prop-types": "off",
+      "react/self-closing-comp": "warn",
+      "react/jsx-key": "error",
+      "react-hooks/rules-of-hooks": "error",
+      "react-hooks/exhaustive-deps": "warn",
+      "no-unused-vars": ["warn", { argsIgnorePattern: "^_" }],
+      "no-console": "warn",
+      eqeqeq: "error",
+      curly: "error",
+      "no-var": "error",
+      "prefer-const": "error",
+      "object-shorthand": "warn",
+      "arrow-body-style": ["warn", "as-needed"],
+      "no-duplicate-imports": "error",
+      "no-multiple-empty-lines": ["warn", { max: 1 }],
+      semi: ["error", "always"],
+      quotes: ["error", "double", { avoidEscape: true }],
+      "comma-dangle": ["error", "always-multiline"],
+      "new-cap": ["error", { newIsCap: true, capIsNew: false }],
     },
   },
-]
+]);

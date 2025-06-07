@@ -65,7 +65,9 @@ export default function App() {
       return;
     }
     try {
-      const res = await fetch(`/api/weather?city=${encodeURIComponent(weatherCity)}`);
+      const res = await fetch(
+        `/api/weather?city=${encodeURIComponent(weatherCity)}`,
+      );
       const data = await res.json();
       setWeather(data);
     } catch {
@@ -116,9 +118,12 @@ export default function App() {
     ws.onmessage = (event) => {
       try {
         const msg = JSON.parse(event.data);
-        if (msg.type === "weather") setWsWeather(msg.data);
-      } catch (e) {
-        // Ignore parse errors
+        if (msg.type === "weather") {
+          setWsWeather(msg.data);
+        }
+      } catch (error) {
+        console.error("Error parsing WebSocket message:", error);
+        setWsStatus("Error receiving live updates");
       }
     };
     ws.onclose = () => setWsStatus("Connection closed");
@@ -126,11 +131,14 @@ export default function App() {
   }
 
   // --- Cleanup WebSocket connection on component unmount (demoount) ---
-  useEffect(() => {
-    return () => {
-      if (wsRef.current) wsRef.current.close();
-    };
-  }, []);
+  useEffect(
+    () => () => {
+      if (wsRef.current) {
+        wsRef.current.close();
+      }
+    },
+    [],
+  );
 
   // --- Main UI ---
   return (
@@ -138,50 +146,80 @@ export default function App() {
       <h2 style={{ textAlign: "center" }}>Weather Subscription (SPA)</h2>
 
       {/* Subscription form */}
-      <section style={{ marginBottom: 30, padding: 10, border: "1px solid #ddd", borderRadius: 8 }}>
+      <section
+        style={{
+          marginBottom: 30,
+          padding: 10,
+          border: "1px solid #ddd",
+          borderRadius: 8,
+        }}
+      >
         <h4>Subscribe to Weather Updates</h4>
         <form onSubmit={handleSubscribe}>
           <input
-            required type="email" placeholder="Email"
+            required
+            type="email"
+            placeholder="Email"
             value={form.email}
-            onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
+            onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
             style={{ display: "block", marginBottom: 8, width: "100%" }}
           />
           <input
-            required type="text" placeholder="City"
+            required
+            type="text"
+            placeholder="City"
             value={form.city}
-            onChange={e => setForm(f => ({ ...f, city: e.target.value }))}
+            onChange={(e) => setForm((f) => ({ ...f, city: e.target.value }))}
             style={{ display: "block", marginBottom: 8, width: "100%" }}
           />
           <select
             value={form.frequency}
-            onChange={e => setForm(f => ({ ...f, frequency: e.target.value }))}
+            onChange={(e) =>
+              setForm((f) => ({ ...f, frequency: e.target.value }))
+            }
             style={{ display: "block", marginBottom: 8, width: "100%" }}
           >
             <option value="daily">Daily</option>
             <option value="hourly">Hourly</option>
           </select>
-          <button type="submit" style={{ width: "100%" }}>Subscribe</button>
+          <button type="submit" style={{ width: "100%" }}>
+            Subscribe
+          </button>
         </form>
-        <div style={{ marginTop: 10, color: subscribeStatus.includes("success") ? "green" : "red" }}>
+        <div
+          style={{
+            marginTop: 10,
+            color: subscribeStatus.includes("success") ? "green" : "red",
+          }}
+        >
           {subscribeStatus}
         </div>
       </section>
 
       {/* Weather fetch form */}
-      <section style={{ marginBottom: 30, padding: 10, border: "1px solid #ddd", borderRadius: 8 }}>
+      <section
+        style={{
+          marginBottom: 30,
+          padding: 10,
+          border: "1px solid #ddd",
+          borderRadius: 8,
+        }}
+      >
         <h4>Current Weather</h4>
         <form onSubmit={handleGetWeather}>
           <input
-            type="text" placeholder="City"
+            type="text"
+            placeholder="City"
             value={weatherCity}
-            onChange={e => setWeatherCity(e.target.value)}
+            onChange={(e) => setWeatherCity(e.target.value)}
             style={{ marginRight: 10 }}
           />
           <button type="submit">Show</button>
         </form>
         <div style={{ marginTop: 10 }}>
-          {weather && weather.error && <span style={{ color: "red" }}>{weather.error}</span>}
+          {weather && weather.error && (
+            <span style={{ color: "red" }}>{weather.error}</span>
+          )}
           {weather && !weather.error && (
             <ul>
               <li>Temperature: {weather.temperature}°C</li>
@@ -193,13 +231,16 @@ export default function App() {
       </section>
 
       {/* Unsubscribe form */}
-      <section style={{ padding: 10, border: "1px solid #ddd", borderRadius: 8 }}>
+      <section
+        style={{ padding: 10, border: "1px solid #ddd", borderRadius: 8 }}
+      >
         <h4>Unsubscribe from Updates</h4>
         <form onSubmit={handleUnsubscribe}>
           <input
-            type="text" placeholder="Token"
+            type="text"
+            placeholder="Token"
             value={unsubscribeToken}
-            onChange={e => setUnsubscribeToken(e.target.value)}
+            onChange={(e) => setUnsubscribeToken(e.target.value)}
             style={{ marginRight: 10, width: "80%" }}
           />
           <button type="submit">Unsubscribe</button>
@@ -208,14 +249,21 @@ export default function App() {
       </section>
 
       {/* Live Weather Updates (WebSocket) */}
-      <section style={{ marginTop: 30, padding: 10, border: "1px solid #99f", borderRadius: 8 }}>
+      <section
+        style={{
+          marginTop: 30,
+          padding: 10,
+          border: "1px solid #99f",
+          borderRadius: 8,
+        }}
+      >
         <h4>Live Weather Updates (WebSocket)</h4>
         <form onSubmit={handleWsSubscribe}>
           <input
             type="text"
             placeholder="City"
             value={wsCity}
-            onChange={e => setWsCity(e.target.value)}
+            onChange={(e) => setWsCity(e.target.value)}
             style={{ marginRight: 10 }}
           />
           <button type="submit">Subscribe (WS)</button>
