@@ -1,44 +1,33 @@
-name: Lint
+name: Lint & Format
 
 on: [push, pull_request]
 
 jobs:
-  lint-server:
+  lint-and-format:
     runs-on: ubuntu-latest
-    name: Lint server
-    defaults:
-      run:
-        working-directory: ./server
     steps:
       - uses: actions/checkout@v4
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '20'
 
-      - name: Install dependencies
+      - name: Install dependencies (server)
         run: npm ci
+        working-directory: ./server
+
+      - name: Install dependencies (client)
+        run: npm ci
+        working-directory: ./client
 
       - name: Run ESLint (server)
         run: npx eslint ./
-
-  lint-client:
-    runs-on: ubuntu-latest
-    name: Lint client
-    defaults:
-      run:
-        working-directory: ./client
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18'
-
-      - name: Install dependencies
-        run: npm ci
+        working-directory: ./server
 
       - name: Run ESLint (client)
         run: npx eslint ./
+        working-directory: ./client
+
+      - name: Run Prettier (all)
+        run: npx prettier --write ./
