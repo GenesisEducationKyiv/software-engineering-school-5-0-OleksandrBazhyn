@@ -42,6 +42,7 @@ export default defineConfig([
       semi: ["error", "always"],
       quotes: ["error", "double", { avoidEscape: true }],
       "comma-dangle": ["error", "always-multiline"],
+      "new-cap": ["error", { newIsCap: true, capIsNew: false }],
     },
   },
 ]);
