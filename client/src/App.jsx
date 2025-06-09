@@ -44,7 +44,7 @@ export default function App() {
 
     setSubscribeStatus("Submitting...");
     try {
-      const res = await fetch("/api/subscribe", {
+      const res = await fetch("/api/v1/subscribe", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
@@ -65,7 +65,7 @@ export default function App() {
       return;
     }
     try {
-      const res = await fetch(`/api/weather?city=${encodeURIComponent(weatherCity)}`);
+      const res = await fetch(`/api/v1/weather?city=${encodeURIComponent(weatherCity)}`);
       const data = await res.json();
       setWeather(data);
     } catch {
@@ -82,7 +82,7 @@ export default function App() {
     }
     setUnsubscribeStatus("Unsubscribing...");
     try {
-      const res = await fetch(`/api/unsubscribe/${unsubscribeToken}`);
+      const res = await fetch(`/api/v1/unsubscribe/${unsubscribeToken}`);
       const text = await res.text();
       setUnsubscribeStatus(text);
     } catch {
