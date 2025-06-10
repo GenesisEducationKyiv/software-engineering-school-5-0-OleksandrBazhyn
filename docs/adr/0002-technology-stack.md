@@ -34,5 +34,31 @@ The following technology stack has been selected for the Weather API App:
 8. **Task Scheduling**: 
    - **node-cron**: Used for scheduling tasks such as sending weather emails at specified intervals. It provides a simple syntax for defining cron jobs.
 
+## Comparison with Alternatives
+
+1. **Backend Framework**:  
+   - **Express.js** was chosen for its simplicity and flexibility. Alternatives considered included **Koa.js** (more modern but with a smaller ecosystem) and **Fastify** (faster performance but less middleware support). Express.js has the largest community and the most extensive documentation, making it easier to maintain and extend.
+
+2. **Database**:  
+   - **PostgreSQL** was selected over **MySQL** (less advanced support for complex queries) and **MongoDB** (NoSQL, which does not fit the relational data needs of the project). PostgreSQL offers advanced features and strong reliability.
+
+3. **ORM/Query Builder**:  
+   - **Knex.js** was chosen for its flexibility and ease of integration with PostgreSQL. Alternatives like **Sequelize** (full-featured ORM but more complex) and **TypeORM** (better for TypeScript projects) were considered, but Knex.js provides a simpler approach suitable for this project.
+
+4. **Email Service**:  
+   - **Nodemailer** was selected for its ease of use and popularity. Alternatives such as **SendGrid** (better for large-scale email delivery but requires external service setup) and **Mailgun** were also considered.
+
+5. **WebSocket Library**:  
+   - **ws** was chosen for its lightweight and efficient implementation. **Socket.io** was considered for its richer feature set, but it introduces more complexity and overhead.
+
+6. **Testing Framework**:  
+   - **Jest** was selected for its simplicity and powerful features. Alternatives like **Mocha** and **AVA** were considered, but Jest offers better integration and developer experience.
+
+7. **API Testing**:  
+   - **Supertest** was chosen for its seamless integration with Jest. **Chai HTTP** was considered as an alternative.
+
+8. **Task Scheduling**:  
+   - **node-cron** was selected for its simple syntax and ease of use. **Agenda** was considered for more advanced scheduling needs, but node-cron is sufficient for the current requirements.
+
 ## Consequences
 The chosen technology stack will facilitate rapid development and deployment of the Weather API App. It ensures that the application is built on reliable and well-supported technologies, which will help in maintaining the codebase and scaling the application in the future. However, the team must ensure that they are familiar with these technologies to avoid potential pitfalls during development.

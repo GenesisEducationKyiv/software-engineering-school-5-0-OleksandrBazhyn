@@ -13,7 +13,7 @@ I have decided to implement WebSocket for live weather updates. The WebSocket se
 ### Key Points:
 - **WebSocket Server**: A WebSocket server will be set up using the `ws` library, which will handle incoming connections and manage subscriptions for live weather updates.
 - **Client Subscription**: Clients can subscribe to weather updates for specific cities. The server will maintain a mapping of connected clients to their subscribed cities.
-- **Periodic Updates**: The server will periodically fetch weather data for subscribed cities and push updates to the respective clients every 15 seconds.
+- **Periodic Updates**: The server periodically fetches weather data for subscribed cities and pushes updates to respective clients every 15 seconds via WebSocket.
 - **Error Handling**: The WebSocket server will include error handling to manage connection issues and invalid messages from clients.
 
 ## Consequences
