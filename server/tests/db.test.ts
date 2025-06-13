@@ -8,8 +8,8 @@ describe("Database connection", () => {
       result && "rows" in result && Array.isArray(result.rows)
         ? result.rows[0].result
         : Array.isArray(result) && result.length > 0
-        ? result[0].result
-        : undefined;
+          ? result[0].result
+          : undefined;
     expect(value).toBe(2);
   });
 });

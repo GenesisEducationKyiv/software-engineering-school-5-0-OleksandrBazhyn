@@ -4,7 +4,7 @@ import type { Server } from "http";
 import type {
   WeatherData,
   WebSocketErrorMessage,
-  WebSocketMessage, 
+  WebSocketMessage,
   WebSocketInfoMessage,
   SubscriptionMessage,
 } from "./types.js";
@@ -69,7 +69,8 @@ export function setupWebSocket(server: Server): void {
         try {
           // Fetch weather for the city using WeatherManager
           const weatherManager = new WeatherManager();
-          const weatherData: WeatherData = await weatherManager.fetchWeatherData(city);
+          const weatherData: WeatherData =
+            await weatherManager.fetchWeatherData(city);
 
           // Send weather info if available
           if (weatherData && weatherData.current) {
@@ -86,12 +87,10 @@ export function setupWebSocket(server: Server): void {
         } catch (error) {
           console.error(`Error fetching weather for ${city}:`, error);
           const errMsg: WebSocketErrorMessage = {
-          type: "error",
-          message: `Failed to fetch weather for ${city}`,
+            type: "error",
+            message: `Failed to fetch weather for ${city}`,
           };
-          ws.send(
-            JSON.stringify(errMsg),
-          );
+          ws.send(JSON.stringify(errMsg));
         }
       }
     }

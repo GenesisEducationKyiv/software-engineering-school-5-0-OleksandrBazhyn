@@ -31,7 +31,9 @@ class Mailer {
   }
 
   async sendWeatherEmails(frequency = "daily"): Promise<void> {
-    const subscriptions: Subscription[] = await db<Subscription>("subscriptions")
+    const subscriptions: Subscription[] = await db<Subscription>(
+      "subscriptions",
+    )
       .where("is_active", true)
       .andWhere("frequency", frequency);
 

@@ -1,14 +1,14 @@
 export type SubscriptionFrequency = "daily" | "hourly";
 
 export interface Subscription {
-    id: number;
-    email: string;
-    city: string;
-    token: string;
-    is_active: boolean;
-    frequency: SubscriptionFrequency;
-    created_at?: string;
-    updated_at?: string;
+  id: number;
+  email: string;
+  city: string;
+  token: string;
+  is_active: boolean;
+  frequency: SubscriptionFrequency;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface WeatherData {

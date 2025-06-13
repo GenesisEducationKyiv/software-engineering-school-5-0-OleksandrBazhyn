@@ -1,34 +1,31 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, FormEvent } from "react";
+import type { WeatherData, WebSocketWeatherData, FormState } from "./types";
 
 export default function App() {
-  // --- REST: Subscription state ---
-  const [form, setForm] = useState({ email: "", city: "", frequency: "daily" });
-  const [subscribeStatus, setSubscribeStatus] = useState("");
+  const [form, setForm] = useState<FormState>({
+    email: "",
+    city: "",
+    frequency: "daily",
+  });
+  const [subscribeStatus, setSubscribeStatus] = useState<string>("");
 
-  // --- REST: Weather fetch state ---
-  const [weatherCity, setWeatherCity] = useState("");
-  const [weather, setWeather] = useState(null);
+  const [weatherCity, setWeatherCity] = useState<string>("");
+  const [weather, setWeather] = useState<WeatherData>(null);
 
-  // --- REST: Unsubscribe state ---
-  const [unsubscribeToken, setUnsubscribeToken] = useState("");
-  const [unsubscribeStatus, setUnsubscribeStatus] = useState("");
+  const [unsubscribeToken, setUnsubscribeToken] = useState<string>("");
+  const [unsubscribeStatus, setUnsubscribeStatus] = useState<string>("");
 
-  // --- WebSocket: Live weather state ---
-  const [wsCity, setWsCity] = useState("");
-  const [wsWeather, setWsWeather] = useState(null);
-  const [wsStatus, setWsStatus] = useState("");
-  const wsRef = useRef(null);
+  const [wsCity, setWsCity] = useState<string>("");
+  const [wsWeather, setWsWeather] = useState<WebSocketWeatherData>(null);
+  const [wsStatus, setWsStatus] = useState<string>("");
+  const wsRef = useRef<WebSocket | null>(null);
 
-  // --- Email validator (simple regex) ---
-  function validateEmail(email) {
+  function validateEmail(email: string): boolean {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   }
 
-  // --- Handle subscription form submission with validation ---
-  async function handleSubscribe(e) {
+  async function handleSubscribe(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-
-    // Client-side validation
     if (!validateEmail(form.email)) {
       setSubscribeStatus("Please enter a valid email address.");
       return;
@@ -41,7 +38,6 @@ export default function App() {
       setSubscribeStatus("Invalid frequency.");
       return;
     }
-
     setSubscribeStatus("Submitting...");
     try {
       const res = await fetch("/api/subscribe", {
@@ -56,8 +52,7 @@ export default function App() {
     }
   }
 
-  // --- Handle weather fetch form submission with validation ---
-  async function handleGetWeather(e) {
+  async function handleGetWeather(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setWeather(null);
     if (!weatherCity.trim()) {
@@ -75,8 +70,7 @@ export default function App() {
     }
   }
 
-  // --- Handle unsubscribe form submission with validation ---
-  async function handleUnsubscribe(e) {
+  async function handleUnsubscribe(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (!unsubscribeToken.trim()) {
       setUnsubscribeStatus("Please enter your unsubscribe token.");
@@ -92,24 +86,18 @@ export default function App() {
     }
   }
 
-  // --- Handle WebSocket live weather subscription with validation ---
-  function handleWsSubscribe(e) {
+  function handleWsSubscribe(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setWsWeather(null);
-
-    // Validate city for WebSocket subscription
     if (!wsCity.trim()) {
       setWsStatus("Please enter a city for live updates.");
       return;
     }
-
     setWsStatus("Connecting...");
-    // Close previous socket if open
     if (wsRef.current) {
       wsRef.current.close();
     }
-    // Create new WebSocket connection
-    const ws = new window.WebSocket("ws://localhost:3000"); // Change port if needed!
+    const ws = new window.WebSocket("ws://localhost:3000");
     wsRef.current = ws;
     ws.onopen = () => {
       ws.send(JSON.stringify({ city: wsCity }));
@@ -121,8 +109,7 @@ export default function App() {
         if (msg.type === "weather") {
           setWsWeather(msg.data);
         }
-      } catch (error) {
-        console.error("Error parsing WebSocket message:", error);
+      } catch {
         setWsStatus("Error receiving live updates");
       }
     };
@@ -130,7 +117,6 @@ export default function App() {
     ws.onerror = () => setWsStatus("WebSocket error");
   }
 
-  // --- Cleanup WebSocket connection on component unmount (demoount) ---
   useEffect(
     () => () => {
       if (wsRef.current) {
@@ -140,12 +126,15 @@ export default function App() {
     [],
   );
 
-  // --- Main UI ---
   return (
-    <div style={{ maxWidth: 500, margin: "0 auto", fontFamily: "sans-serif" }}>
+    <div
+      style={{
+        maxWidth: 500,
+        margin: "0 auto",
+        fontFamily: "sans-serif",
+      }}
+    >
       <h2 style={{ textAlign: "center" }}>Weather Subscription (SPA)</h2>
-
-      {/* Subscription form */}
       <section
         style={{
           marginBottom: 30,
@@ -175,7 +164,10 @@ export default function App() {
           <select
             value={form.frequency}
             onChange={(e) =>
-              setForm((f) => ({ ...f, frequency: e.target.value }))
+              setForm((f) => ({
+                ...f,
+                frequency: e.target.value as "daily" | "hourly",
+              }))
             }
             style={{ display: "block", marginBottom: 8, width: "100%" }}
           >
@@ -195,8 +187,6 @@ export default function App() {
           {subscribeStatus}
         </div>
       </section>
-
-      {/* Weather fetch form */}
       <section
         style={{
           marginBottom: 30,
@@ -217,10 +207,10 @@ export default function App() {
           <button type="submit">Show</button>
         </form>
         <div style={{ marginTop: 10 }}>
-          {weather && weather.error && (
+          {weather && "error" in weather && (
             <span style={{ color: "red" }}>{weather.error}</span>
           )}
-          {weather && !weather.error && (
+          {weather && !("error" in weather) && (
             <ul>
               <li>Temperature: {weather.temperature}°C</li>
               <li>Humidity: {weather.humidity}%</li>
@@ -229,8 +219,6 @@ export default function App() {
           )}
         </div>
       </section>
-
-      {/* Unsubscribe form */}
       <section
         style={{ padding: 10, border: "1px solid #ddd", borderRadius: 8 }}
       >
@@ -247,8 +235,6 @@ export default function App() {
         </form>
         <div style={{ marginTop: 10 }}>{unsubscribeStatus}</div>
       </section>
-
-      {/* Live Weather Updates (WebSocket) */}
       <section
         style={{
           marginTop: 30,

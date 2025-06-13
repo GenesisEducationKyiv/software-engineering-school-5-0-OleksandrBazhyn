@@ -2,18 +2,26 @@ import request from "supertest";
 import express, { Express } from "express";
 import apiRoutes from "../src/routes/api.js";
 import Mailer from "../src/managers/Mailer.js";
-import { beforeAll, describe, it, expect } from '@jest/globals';
+import { beforeAll, describe, it, expect } from "@jest/globals";
 
 type TestMailerType = typeof Mailer & {
   __token?: string;
-  sendConfirmationEmail: (_email: string, _city: string, token: string) => Promise<void>;
+  sendConfirmationEmail: (
+    _email: string,
+    _city: string,
+    token: string,
+  ) => Promise<void>;
   sendWeatherEmails: () => Promise<void>;
   __getToken: () => string | undefined;
 };
 
 const TestMailer = Mailer as TestMailerType;
 
-TestMailer.sendConfirmationEmail = async (_email: string, _city: string, token: string) => {
+TestMailer.sendConfirmationEmail = async (
+  _email: string,
+  _city: string,
+  token: string,
+) => {
   TestMailer.__token = token;
 };
 TestMailer.sendWeatherEmails = async () => {};
