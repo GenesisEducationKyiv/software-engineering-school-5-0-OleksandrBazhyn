@@ -22,12 +22,11 @@ server.listen(PORT, () => {
 });
 
 // Hourly (at the beginning of each hour)
-cron.schedule('0 * * * *', () => {
-    Mailer.sendWeatherEmails('hourly');
+cron.schedule("0 * * * *", () => {
+  Mailer.sendWeatherEmails("hourly");
 });
 
 // Every day at 8:00 am
-cron.schedule('0 8 * * *', () => {
-    Mailer.sendWeatherEmails('daily');
+cron.schedule("0 8 * * *", () => {
+  Mailer.sendWeatherEmails("daily");
 });
-
