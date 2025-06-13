@@ -1,8 +1,10 @@
 import db from "../../db/knex.js";
 import nodemailer from "nodemailer";
 import WeatherManager from "./WeatherManager.js";
+import { Subscription } from "../types.js";
 
 class Mailer {
+  private transporter: nodemailer.Transporter;
   constructor() {
     this.transporter = nodemailer.createTransport({
       service: "gmail",
@@ -13,7 +15,11 @@ class Mailer {
     });
   }
 
-  async sendConfirmationEmail(email, city, token) {
+  async sendConfirmationEmail(
+    email: string,
+    city: string,
+    token: string,
+  ): Promise<void> {
     console.log("Sending confirmation email to:", email);
     const link = `http://localhost:3000/api/confirm/${token}`;
     await this.transporter.sendMail({
@@ -24,11 +30,10 @@ class Mailer {
     });
   }
 
-  async sendWeatherEmails(frequency = "daily") {
-    const subscriptions = await db("subscriptions").where({
-      is_active: true,
-      frequency,
-    });
+  async sendWeatherEmails(frequency = "daily"): Promise<void> {
+    const subscriptions: Subscription[] = await db<Subscription>("subscriptions")
+      .where("is_active", true)
+      .andWhere("frequency", frequency);
 
     if (!subscriptions.length) {
       console.log("No active subscriptions for", frequency);

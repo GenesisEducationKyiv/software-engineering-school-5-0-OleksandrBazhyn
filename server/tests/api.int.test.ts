@@ -1,23 +1,30 @@
 import request from "supertest";
-import express from "express";
-import apiRoutes from "../api/routes/api.js";
+import express, { Express } from "express";
+import apiRoutes from "../src/routes/api.js";
+import Mailer from "../src/managers/Mailer.js";
+import { beforeAll, describe, it, expect } from '@jest/globals';
 
-import Mailer from "../api/managers/Mailer.js";
-
-// manually mock Mailer methods for ESM:
-Mailer.sendConfirmationEmail = async (email, city, token) => {
-  Mailer.__token = token;
-  return Promise.resolve();
+type TestMailerType = typeof Mailer & {
+  __token?: string;
+  sendConfirmationEmail: (_email: string, _city: string, token: string) => Promise<void>;
+  sendWeatherEmails: () => Promise<void>;
+  __getToken: () => string | undefined;
 };
-Mailer.sendWeatherEmails = async () => Promise.resolve();
-Mailer.__getToken = () => Mailer.__token;
 
-let app;
+const TestMailer = Mailer as TestMailerType;
+
+TestMailer.sendConfirmationEmail = async (_email: string, _city: string, token: string) => {
+  TestMailer.__token = token;
+};
+TestMailer.sendWeatherEmails = async () => {};
+TestMailer.__getToken = () => TestMailer.__token;
+
+let app: Express;
 beforeAll(async () => {
   const { default: WeatherManager } = await import(
-    "../api/managers/WeatherManager.js"
+    "../src/managers/WeatherManager.js"
   );
-  WeatherManager.prototype.fetchWeatherData = async (/*city*/) => ({
+  WeatherManager.prototype.fetchWeatherData = async (_city: string) => ({
     current: {
       temp_c: 15,
       humidity: 44,
@@ -34,7 +41,7 @@ describe("Advanced Subscription/Confirmation workflow", () => {
   const testEmail = `user${Math.floor(Math.random() * 100000)}@mail.com`;
   const testCity = "Kyiv";
   const testFrequency = "daily";
-  let token = null;
+  let token: string | null = null;
 
   it("Subscribes a new user, receives token via mock Mailer", async () => {
     const res = await request(app)
@@ -44,7 +51,7 @@ describe("Advanced Subscription/Confirmation workflow", () => {
     expect(res.body.message).toMatch(/confirmation email sent/i);
 
     // Get token from the mock Mailer
-    token = Mailer.__getToken();
+    token = TestMailer.__getToken() ?? null;
     expect(token).toBeTruthy();
   });
 
@@ -89,11 +96,10 @@ describe("Advanced Subscription/Confirmation workflow", () => {
   });
 
   it("Weather for unknown city returns 404", async () => {
-    // Mock fetchWeatherData to simulate city not found
     const { default: WeatherManager } = await import(
-      "../api/managers/WeatherManager.js"
+      "../src/managers/WeatherManager.js"
     );
-    WeatherManager.prototype.fetchWeatherData = async (/*city*/) => {
+    WeatherManager.prototype.fetchWeatherData = async (_city: string) => {
       throw new Error("Not found");
     };
 
