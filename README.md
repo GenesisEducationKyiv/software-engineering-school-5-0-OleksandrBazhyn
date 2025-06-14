@@ -6,14 +6,15 @@
 
 ## Як запустити локально
 
-1. Встановіть залежності:
+1. Встановіть залежності для бекенду та фронтенду:
    ```
-   npm install
+   cd server && npm install
+   cd ../client && npm install
    ```
-2. Створіть файл `.env` (див. приклад у репозиторії).
+2. Створіть файл `.env` у папці `server` (див. приклад у репозиторії).
 3. Запустіть міграції:
    ```
-   npx knex migrate:latest
+   npx knex --knexfile ./knexfile.cjs migrate:latest
    ```
 4. Запустіть сервер:
    ```
@@ -65,7 +66,8 @@
 - Для тестування email використовуйте [Mailtrap](https://mailtrap.io/).
 - Для тестування API використовуйте Postman або curl.
 
+## Структура проекту
 
-## Міграції
-
-Всі міграції знаходяться у папці `migrations/`.
+- `server/` — бекенд (Node.js, Express, Knex)
+- `client/` — фронтенд (React, Vite)
+- `db/migrations/` — міграції бази даних
