@@ -19,9 +19,7 @@ import apiRoutes from "../src/routes/api.js";
 
 let app: Express;
 beforeAll(async () => {
-  const { default: WeatherManager } = await import(
-    "../src/managers/WeatherManager.js"
-  );
+  const { default: WeatherManager } = await import("../src/managers/WeatherManager.js");
   WeatherManager.prototype.getWeatherData = async (_city: string) => ({
     current: {
       temp_c: 15,
@@ -93,9 +91,7 @@ describe("Advanced Subscription/Confirmation workflow", () => {
   });
 
   it("Weather for unknown city returns 404", async () => {
-    const { default: WeatherManager } = await import(
-      "../src/managers/WeatherManager.js"
-    );
+    const { default: WeatherManager } = await import("../src/managers/WeatherManager.js");
     WeatherManager.prototype.getWeatherData = async (_city: string) => {
       throw new Error("Not found");
     };

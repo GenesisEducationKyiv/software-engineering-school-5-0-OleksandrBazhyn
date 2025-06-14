@@ -15,9 +15,7 @@ jest.mock("../src/managers/GmailMailer.js", () => ({
 let app: Express;
 
 beforeAll(async () => {
-  const { default: WeatherManager } = await import(
-    "../src/managers/WeatherManager.js"
-  );
+  const { default: WeatherManager } = await import("../src/managers/WeatherManager.js");
   WeatherManager.prototype.getWeatherData = async (_city: string) => ({
     current: {
       temp_c: 15,

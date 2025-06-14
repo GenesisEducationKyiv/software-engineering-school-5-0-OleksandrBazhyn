@@ -44,11 +44,7 @@ export interface WebSocketInfoMessage {
 }
 
 export interface Mailer {
-  sendConfirmationEmail: (
-    email: string,
-    city: string,
-    token: string,
-  ) => Promise<void>;
+  sendConfirmationEmail: (email: string, city: string, token: string) => Promise<void>;
   sendWeatherEmail: (
     email: string,
     city: string,

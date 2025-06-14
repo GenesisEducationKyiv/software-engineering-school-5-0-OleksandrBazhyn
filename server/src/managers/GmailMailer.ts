@@ -6,9 +6,7 @@ class GmailMailer implements Mailer {
 
   constructor() {
     if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
-      console.warn(
-        "SMTP_USER or SMTP_PASS is not set in environment variables.",
-      );
+      console.warn("SMTP_USER or SMTP_PASS is not set in environment variables.");
     }
     this.transporter = nodemailer.createTransport({
       service: "gmail",
@@ -19,11 +17,7 @@ class GmailMailer implements Mailer {
     });
   }
 
-  async sendConfirmationEmail(
-    email: string,
-    city: string,
-    token: string,
-  ): Promise<void> {
+  async sendConfirmationEmail(email: string, city: string, token: string): Promise<void> {
     console.log("Sending confirmation email to:", email);
     const link = `http://localhost:3000/api/confirm/${token}`;
     await this.transporter.sendMail({

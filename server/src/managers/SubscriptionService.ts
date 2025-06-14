@@ -16,11 +16,7 @@ class SubscriptionService {
     const token = crypto.randomUUID();
     try {
       await DataProvider.insertSubscription(subscription, token, false);
-      await this.mailer.sendConfirmationEmail(
-        subscription.email,
-        subscription.city,
-        token,
-      );
+      await this.mailer.sendConfirmationEmail(subscription.email, subscription.city, token);
       return { token };
     } catch (error) {
       console.error("Error inserting subscription:", error);

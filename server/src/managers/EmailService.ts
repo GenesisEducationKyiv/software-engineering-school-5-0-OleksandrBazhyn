@@ -1,9 +1,4 @@
-import {
-  SubscriptionFrequency,
-  Subscription,
-  WeatherData,
-  Mailer,
-} from "../types.js";
+import { SubscriptionFrequency, Subscription, WeatherData, Mailer } from "../types.js";
 import WeatherManager from "./WeatherManager.js";
 import DataProvider from "./DataProvider.js";
 
@@ -16,11 +11,8 @@ class EmailService {
     this.mailer = mailer;
   }
 
-  async sendWeatherEmailsByFrequency(
-    frequency: SubscriptionFrequency,
-  ): Promise<void> {
-    const subscriptions: Subscription[] =
-      await DataProvider.getSubscriptionsByFrequency(frequency);
+  async sendWeatherEmailsByFrequency(frequency: SubscriptionFrequency): Promise<void> {
+    const subscriptions: Subscription[] = await DataProvider.getSubscriptionsByFrequency(frequency);
 
     if (subscriptions.length === 0) {
       console.log(`No active subscriptions for frequency: ${frequency}`);
@@ -29,24 +21,15 @@ class EmailService {
 
     for (const sub of subscriptions) {
       try {
-        const weather: WeatherData | null =
-          await this.weatherManager.getWeatherData(sub.city);
+        const weather: WeatherData | null = await this.weatherManager.getWeatherData(sub.city);
         if (!weather) {
           console.error(`No weather data found for city: ${sub.city}`);
           continue;
         }
-        await this.mailer.sendWeatherEmail(
-          sub.email,
-          sub.city,
-          weather,
-          sub.token,
-        );
+        await this.mailer.sendWeatherEmail(sub.email, sub.city, weather, sub.token);
         console.log(`Weather email sent to ${sub.email} for city ${sub.city}`);
       } catch (error) {
-        console.error(
-          `Failed to send weather email to ${sub.email} for city ${sub.city}:`,
-          error,
-        );
+        console.error(`Failed to send weather email to ${sub.email} for city ${sub.city}:`, error);
       }
     }
   }
