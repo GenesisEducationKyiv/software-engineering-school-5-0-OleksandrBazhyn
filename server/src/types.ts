@@ -42,3 +42,23 @@ export interface WebSocketInfoMessage {
   type: "info";
   message: string;
 }
+
+export interface Mailer {
+  sendConfirmationEmail: (
+    email: string,
+    city: string,
+    token: string,
+  ) => Promise<void>;
+  sendWeatherEmail: (
+    email: string,
+    city: string,
+    weather: WeatherData,
+    token: string,
+  ) => Promise<void>;
+}
+
+export interface SubscriptionInput {
+  email: string;
+  city: string;
+  frequency: SubscriptionFrequency;
+}

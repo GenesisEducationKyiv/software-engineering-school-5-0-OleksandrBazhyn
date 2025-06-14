@@ -10,7 +10,7 @@
     "build": "tsc",
     "start": "node dist/src/app.js",
     "dev": "tsx src/app.ts",
-    "test": "NODE_ENV=test jest",
+    "test": "cross-env NODE_ENV=test jest",
     "lint": "eslint . --ext .ts,.tsx,.cts,.mts,.js",
     "lint:fix": "eslint . --ext .ts,.tsx,.cts,.mts,.js --fix",
     "format": "prettier --write ."
@@ -25,6 +25,7 @@
     "nodemon": "^3.1.10",
     "pg": "^8.16.0",
     "uuid": "^11.1.0",
+    "vitest": "^3.2.3",
     "ws": "^8.18.2"
   },
   "devDependencies": {
@@ -41,6 +42,7 @@
     "@types/ws": "^8.18.1",
     "@typescript-eslint/eslint-plugin": "^8.34.0",
     "@typescript-eslint/parser": "^8.34.0",
+    "cross-env": "^7.0.3",
     "eslint": "^9.29.0",
     "eslint-config-prettier": "^10.1.5",
     "eslint-plugin-jest": "^28.13.5",

@@ -70,7 +70,7 @@ export function setupWebSocket(server: Server): void {
           // Fetch weather for the city using WeatherManager
           const weatherManager = new WeatherManager();
           const weatherData: WeatherData =
-            await weatherManager.fetchWeatherData(city);
+            await weatherManager.getWeatherData(city);
 
           // Send weather info if available
           if (weatherData && weatherData.current) {

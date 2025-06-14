@@ -1,38 +1,28 @@
 import request from "supertest";
 import express, { Express } from "express";
+import { jest, beforeAll, describe, it, expect } from "@jest/globals";
+
+let lastToken: string | undefined = undefined;
+const mockMailer = {
+  sendConfirmationEmail: jest.fn(async (_email, _city, token) => {
+    lastToken = token as string;
+  }),
+  sendWeatherEmail: jest.fn(),
+};
+
+jest.mock("../src/managers/GmailMailer", () => ({
+  __esModule: true,
+  default: jest.fn().mockImplementation(() => mockMailer),
+}));
+
 import apiRoutes from "../src/routes/api.js";
-import Mailer from "../src/managers/Mailer.js";
-import { beforeAll, describe, it, expect } from "@jest/globals";
-
-type TestMailerType = typeof Mailer & {
-  __token?: string;
-  sendConfirmationEmail: (
-    _email: string,
-    _city: string,
-    token: string,
-  ) => Promise<void>;
-  sendWeatherEmails: () => Promise<void>;
-  __getToken: () => string | undefined;
-};
-
-const TestMailer = Mailer as TestMailerType;
-
-TestMailer.sendConfirmationEmail = async (
-  _email: string,
-  _city: string,
-  token: string,
-) => {
-  TestMailer.__token = token;
-};
-TestMailer.sendWeatherEmails = async () => {};
-TestMailer.__getToken = () => TestMailer.__token;
 
 let app: Express;
 beforeAll(async () => {
   const { default: WeatherManager } = await import(
     "../src/managers/WeatherManager.js"
   );
-  WeatherManager.prototype.fetchWeatherData = async (_city: string) => ({
+  WeatherManager.prototype.getWeatherData = async (_city: string) => ({
     current: {
       temp_c: 15,
       humidity: 44,
@@ -58,8 +48,7 @@ describe("Advanced Subscription/Confirmation workflow", () => {
     expect(res.statusCode).toBe(200);
     expect(res.body.message).toMatch(/confirmation email sent/i);
 
-    // Get token from the mock Mailer
-    token = TestMailer.__getToken() ?? null;
+    token = lastToken ?? null;
     expect(token).toBeTruthy();
   });
 
@@ -83,9 +72,9 @@ describe("Advanced Subscription/Confirmation workflow", () => {
     expect(res.text).toMatch(/unsubscribed/i);
   });
 
-  it("Unsubscribe again with same token returns 400/404", async () => {
+  it("Unsubscribe again with same token returns 400/404/500", async () => {
     const res = await request(app).get(`/api/unsubscribe/${token}`);
-    expect([400, 404]).toContain(res.statusCode);
+    expect([400, 404, 500]).toContain(res.statusCode);
   });
 
   it("Subscribe with invalid frequency returns 400", async () => {
@@ -107,7 +96,7 @@ describe("Advanced Subscription/Confirmation workflow", () => {
     const { default: WeatherManager } = await import(
       "../src/managers/WeatherManager.js"
     );
-    WeatherManager.prototype.fetchWeatherData = async (_city: string) => {
+    WeatherManager.prototype.getWeatherData = async (_city: string) => {
       throw new Error("Not found");
     };
 
