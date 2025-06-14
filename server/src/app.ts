@@ -6,6 +6,7 @@ import http from "http";
 import { setupWebSocket } from "./ws-server.js";
 import Scheduler from "./managers/Scheduler.js";
 import GmailMailer from "./managers/GmailMailer.js";
+import DbDataProvider from "./managers/DbDataProvider.js";
 
 const PORT: number = Number(process.env.PORT) || 3000;
 
@@ -23,4 +24,4 @@ server.listen(PORT, () => {
   console.log(`Server is running (HTTP + WS) on port ${PORT}`);
 });
 
-Scheduler.start(new GmailMailer());
+Scheduler.start(new GmailMailer(), DbDataProvider);

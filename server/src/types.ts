@@ -58,3 +58,15 @@ export interface SubscriptionInput {
   city: string;
   frequency: SubscriptionFrequency;
 }
+
+export interface DataProvider {
+  getSubscriptionsByFrequency: (frequency: SubscriptionFrequency) => Promise<Subscription[]>;
+  checkSubscriptionExists: (subscription: SubscriptionInput) => Promise<boolean>;
+  insertSubscription: (
+    subscription: SubscriptionInput,
+    token: string,
+    is_active?: boolean,
+  ) => Promise<void>;
+  updateSubscriptionStatus: (token: string, isActive: boolean) => Promise<boolean>;
+  deleteSubscription: (token: string) => Promise<boolean>;
+}

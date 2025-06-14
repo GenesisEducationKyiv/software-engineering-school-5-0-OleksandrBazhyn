@@ -1,7 +1,7 @@
-import { SubscriptionFrequency, Subscription, SubscriptionInput } from "../types.js";
+import { SubscriptionFrequency, Subscription, SubscriptionInput, DataProvider } from "../types.js";
 import db from "../../db/knex.js";
 
-class DataProvider {
+class DbDataProvider implements DataProvider {
   async getSubscriptionsByFrequency(frequency: SubscriptionFrequency): Promise<Subscription[]> {
     const subscriptions: Subscription[] = await db<Subscription>("subscriptions")
       .where("frequency", frequency)
@@ -76,4 +76,4 @@ class DataProvider {
   }
 }
 
-export default new DataProvider();
+export default new DbDataProvider();

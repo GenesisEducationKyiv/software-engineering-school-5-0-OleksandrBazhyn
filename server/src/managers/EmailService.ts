@@ -1,18 +1,20 @@
-import { SubscriptionFrequency, Subscription, WeatherData, Mailer } from "../types.js";
+import { SubscriptionFrequency, Subscription, WeatherData, Mailer, DataProvider } from "../types.js";
 import WeatherManager from "./WeatherManager.js";
-import DataProvider from "./DataProvider.js";
 
 class EmailService {
   private weatherManager: WeatherManager;
   private mailer: Mailer;
+  private dataProvider: DataProvider;
 
-  constructor(mailer: Mailer) {
+  constructor(mailer: Mailer, dataProvider: DataProvider) {
     this.weatherManager = new WeatherManager();
     this.mailer = mailer;
+    this.dataProvider = dataProvider;
+
   }
 
   async sendWeatherEmailsByFrequency(frequency: SubscriptionFrequency): Promise<void> {
-    const subscriptions: Subscription[] = await DataProvider.getSubscriptionsByFrequency(frequency);
+    const subscriptions: Subscription[] = await this.dataProvider.getSubscriptionsByFrequency(frequency);
 
     if (subscriptions.length === 0) {
       console.log(`No active subscriptions for frequency: ${frequency}`);

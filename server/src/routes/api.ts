@@ -3,9 +3,10 @@ import WeatherManager from "../managers/WeatherManager.js";
 import SubscriptionService from "../managers/SubscriptionService.js";
 import { WeatherData, SubscriptionInput } from "../types.js";
 import GmailMailer from "../managers/GmailMailer.js";
+import DbDataProvider from "../managers/DbDataProvider.js";
 
 const router = express.Router();
-const subscriptionService = new SubscriptionService(new GmailMailer());
+const subscriptionService = new SubscriptionService(new GmailMailer(), DbDataProvider);
 
 router.get("/weather", async (req: express.Request, res: express.Response) => {
   const city = req.query.city as string | undefined;

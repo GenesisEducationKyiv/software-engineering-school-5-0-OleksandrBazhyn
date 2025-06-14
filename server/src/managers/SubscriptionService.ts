@@ -1,21 +1,22 @@
-import { SubscriptionInput, Mailer } from "../types.js";
-import DataProvider from "./DataProvider.js";
+import { SubscriptionInput, Mailer, DataProvider } from "../types.js";
 
 class SubscriptionService {
   private mailer: Mailer;
+  private dataProvider: DataProvider;
 
-  constructor(mailer: Mailer) {
+  constructor(mailer: Mailer, dataProvider: DataProvider) {
     this.mailer = mailer;
+    this.dataProvider = dataProvider;
   }
 
   async subscribe(subscription: SubscriptionInput): Promise<{ token: string }> {
-    const existing = await DataProvider.checkSubscriptionExists(subscription);
+    const existing = await this.dataProvider.checkSubscriptionExists(subscription);
     if (existing) {
       throw new Error("Email already subscribed");
     }
     const token = crypto.randomUUID();
     try {
-      await DataProvider.insertSubscription(subscription, token, false);
+      await this.dataProvider.insertSubscription(subscription, token, false);
       await this.mailer.sendConfirmationEmail(subscription.email, subscription.city, token);
       return { token };
     } catch (error) {
@@ -25,7 +26,7 @@ class SubscriptionService {
   }
 
   async confirm(token: string): Promise<boolean> {
-    const updated = await DataProvider.updateSubscriptionStatus(token, true);
+    const updated = await this.dataProvider.updateSubscriptionStatus(token, true);
     if (!updated) {
       throw new Error("Invalid token or subscription already confirmed");
     }
@@ -33,7 +34,7 @@ class SubscriptionService {
   }
 
   async unsubscribe(token: string): Promise<boolean> {
-    const deleted = await DataProvider.deleteSubscription(token);
+    const deleted = await this.dataProvider.deleteSubscription(token);
     if (!deleted) {
       throw new Error("Invalid token or subscription not found");
     }

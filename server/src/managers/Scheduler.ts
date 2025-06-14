@@ -1,10 +1,10 @@
 import cron from "node-cron";
 import EmailService from "./EmailService.js";
-import { Mailer } from "../types.js";
+import { Mailer, DataProvider } from "../types.js";
 
 class Scheduler {
-  start(mailer: Mailer) {
-    const emailService = new EmailService(mailer);
+  start(mailer: Mailer, dataProvider: DataProvider): void {
+    const emailService = new EmailService(mailer, dataProvider);
 
     // Hourly (at the beginning of each hour)
     cron.schedule("0 * * * *", async () => {
