@@ -1,18 +1,28 @@
 require("dotenv/config");
 
-export default {
+module.exports = {
   development: {
     client: "pg",
     connection: process.env.DATABASE_URL,
     migrations: {
-      directory: "./migrations",
+      directory: "./db/migrations",
+      extension: "ts",
+    },
+  },
+  production: {
+    client: "pg",
+    connection: process.env.DATABASE_URL,
+    migrations: {
+      directory: "./dist/db/migrations",
+      extension: "js",
     },
   },
   test: {
     client: "pg",
     connection: process.env.DATABASE_URL,
     migrations: {
-      directory: "./migrations",
+      directory: "./db/migrations",
+      extension: "ts",
     },
   },
 };

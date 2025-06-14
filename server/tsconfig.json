@@ -116,7 +116,7 @@
     "./src/**/*",
     "./tests/**/*",
     "./db/migrations/**/*",
-    "./jest.config.ts"
+    "jest.config.js"
   ],
   "exclude": [
     "node_modules",

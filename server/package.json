@@ -5,12 +5,12 @@
   "license": "ISC",
   "author": "Oleksandr Bazhyn",
   "type": "module",
-  "main": "dist/app.js",
+  "main": "dist/src/app.js",
   "scripts": {
     "build": "tsc",
-    "start": "node dist/app.js",
+    "start": "node dist/src/app.js",
     "dev": "tsx src/app.ts",
-    "test": "set NODE_ENV=test&& jest",
+    "test": "NODE_ENV=test jest",
     "lint": "eslint . --ext .ts,.tsx,.cts,.mts,.js",
     "lint:fix": "eslint . --ext .ts,.tsx,.cts,.mts,.js --fix",
     "format": "prettier --write ."
