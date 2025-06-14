@@ -6,15 +6,15 @@ module.exports = {
     connection: process.env.DATABASE_URL,
     migrations: {
       directory: "./db/migrations",
-      extension: "ts",
+      extension: "cjs",
     },
   },
   production: {
     client: "pg",
     connection: process.env.DATABASE_URL,
     migrations: {
-      directory: "./dist/db/migrations",
-      extension: "js",
+      directory: "./db/migrations",
+      extension: "cjs",
     },
   },
   test: {
@@ -22,7 +22,7 @@ module.exports = {
     connection: process.env.DATABASE_URL,
     migrations: {
       directory: "./db/migrations",
-      extension: "ts",
+      extension: "cjs",
     },
   },
 };

@@ -7,6 +7,8 @@ COPY tsconfig.json ./
 COPY knexfile.cjs ./
 COPY .env.docker ./
 
+RUN apt-get update && apt-get install -y netcat-openbsd
+
 RUN npm ci
 
 COPY src ./src
