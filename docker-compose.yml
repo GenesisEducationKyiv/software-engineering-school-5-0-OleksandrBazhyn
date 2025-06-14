@@ -26,9 +26,6 @@ services:
     depends_on:
       - db
     restart: unless-stopped
-    command: sh -c "npx knex migrate:latest && npm start"
-    # uncomment below if you want to run in development with live reload (nodemon)
-    # command: sh -c "npx knex migrate:latest && npm run dev"
 
   client:
     build:

@@ -1,24 +1,32 @@
-import { WebSocketServer } from "ws";
-import WeatherManager from "./api/managers/WeatherManager.js"; // Adjust the path if needed
+import { WebSocketServer, WebSocket } from "ws";
+import WeatherManager from "./managers/WeatherManager.js";
+import type { Server } from "http";
+import type {
+  WeatherData,
+  WebSocketErrorMessage,
+  WebSocketMessage,
+  WebSocketInfoMessage,
+  SubscriptionMessage,
+} from "./types.js";
 
 /**
  * Set up a WebSocket server using the given HTTP server.
  * Handles client subscriptions for live weather updates.
  * @param {http.Server} server - The HTTP server instance (from http.createServer)
  */
-export function setupWebSocket(server) {
+export function setupWebSocket(server: Server): void {
   // Create WebSocket server attached to the given HTTP server
   const wss = new WebSocketServer({ server });
 
   // In-memory map: each WebSocket client -> subscribed city
-  const subscriptions = new Map();
+  const subscriptions = new Map<WebSocket, string>();
 
   // Handle new WebSocket connections
-  wss.on("connection", (ws) => {
+  wss.on("connection", (ws: WebSocket) => {
     // Handle incoming messages (subscribe to a city)
-    ws.on("message", (data) => {
+    ws.on("message", (data: WebSocket.RawData) => {
       try {
-        const msg = JSON.parse(data);
+        const msg: SubscriptionMessage = JSON.parse(data.toString());
         if (
           msg.city &&
           typeof msg.city === "string" &&
@@ -29,9 +37,11 @@ export function setupWebSocket(server) {
         }
       } catch (error) {
         console.error("Error parsing WebSocket message:", error);
-        ws.send(
-          JSON.stringify({ type: "error", message: "Invalid message format" }),
-        );
+        const errMsg: WebSocketErrorMessage = {
+          type: "error",
+          message: "Invalid message format",
+        };
+        ws.send(JSON.stringify(errMsg));
       }
     });
 
@@ -41,7 +51,11 @@ export function setupWebSocket(server) {
     });
 
     // Optional: send a greeting/info message to the client
-    ws.send(JSON.stringify({ type: "info", message: "WebSocket connected!" }));
+    const infoMsg: WebSocketInfoMessage = {
+      type: "info",
+      message: "WebSocket connected!",
+    };
+    ws.send(JSON.stringify(infoMsg));
   });
 
   /**
@@ -49,35 +63,34 @@ export function setupWebSocket(server) {
    * Each client receives the weather for their chosen city.
    */
   setInterval(async () => {
-    for (const [ws, city] of subscriptions) {
+    for (const [ws, city] of subscriptions.entries()) {
       // Only send if the connection is open and city is defined
       if (ws.readyState === ws.OPEN && city) {
         try {
           // Fetch weather for the city using WeatherManager
           const weatherManager = new WeatherManager();
-          const weatherData = await weatherManager.fetchWeatherData(city);
+          const weatherData: WeatherData =
+            await weatherManager.fetchWeatherData(city);
 
           // Send weather info if available
           if (weatherData && weatherData.current) {
-            ws.send(
-              JSON.stringify({
-                type: "weather",
-                data: {
-                  temperature: weatherData.current.temp_c,
-                  humidity: weatherData.current.humidity,
-                  description: weatherData.current.condition.text,
-                },
-              }),
-            );
+            const weatherMsg: WebSocketMessage = {
+              type: "weather",
+              data: {
+                temperature: weatherData.current.temp_c,
+                humidity: weatherData.current.humidity,
+                description: weatherData.current.condition.text,
+              },
+            };
+            ws.send(JSON.stringify(weatherMsg));
           }
         } catch (error) {
           console.error(`Error fetching weather for ${city}:`, error);
-          ws.send(
-            JSON.stringify({
-              type: "error",
-              message: `Failed to fetch weather for ${city}`,
-            }),
-          );
+          const errMsg: WebSocketErrorMessage = {
+            type: "error",
+            message: `Failed to fetch weather for ${city}`,
+          };
+          ws.send(JSON.stringify(errMsg));
         }
       }
     }
