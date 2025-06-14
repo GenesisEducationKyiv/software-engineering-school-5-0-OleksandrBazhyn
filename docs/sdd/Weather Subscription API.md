@@ -45,7 +45,7 @@
 
 ## 4. Detailed Component Design
 
-### API Service (Node.js/Express)
+### API Service (Node.js/Express + TypeScript)
 
 **Responsibilities:**
 - REST API request processing

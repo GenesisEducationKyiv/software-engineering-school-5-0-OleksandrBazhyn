@@ -10,8 +10,8 @@ The technology stack for the Weather API App needs to be defined to ensure that 
 ## Decision
 The following technology stack has been selected for the Weather API App:
 
-1. **Backend Framework**: 
-   - **Express.js**: Chosen for its minimalistic and flexible nature, allowing for quick development of RESTful APIs. It has a large ecosystem of middleware and is widely adopted in the Node.js community.
+1. **Backend Framework & Language**: 
+   - **Express.js + TypeScript**: Chosen for its minimalistic and flexible nature, allowing for quick development of RESTful APIs. TypeScript adds static typing, improves maintainability, and reduces runtime errors. Express has a large ecosystem of middleware and is widely adopted in the Node.js community.
 
 2. **Database**: 
    - **PostgreSQL**: Selected for its robustness and strong community support. It is well-suited for handling relational data, which is essential for managing user subscriptions and weather data.
@@ -36,8 +36,8 @@ The following technology stack has been selected for the Weather API App:
 
 ## Comparison with Alternatives
 
-1. **Backend Framework**:  
-   - **Express.js** was chosen for its simplicity and flexibility. Alternatives considered included **Koa.js** (more modern but with a smaller ecosystem) and **Fastify** (faster performance but less middleware support). Express.js has the largest community and the most extensive documentation, making it easier to maintain and extend.
+1. **Backend Framework & Language**:  
+   - **Express.js + TypeScript** was chosen for its simplicity, flexibility, and the added benefits of static typing. Alternatives considered included **Koa.js** (more modern but with a smaller ecosystem) and **Fastify** (faster performance but less middleware support). Express.js has the largest community and the most extensive documentation, making it easier to maintain and extend.
 
 2. **Database**:  
    - **PostgreSQL** was selected over **MySQL** (less advanced support for complex queries) and **MongoDB** (NoSQL, which does not fit the relational data needs of the project). PostgreSQL offers advanced features and strong reliability.
