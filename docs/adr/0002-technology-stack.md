@@ -14,7 +14,7 @@ The following technology stack has been selected for the Weather API App:
    - **Express.js**: Chosen for its minimalistic and flexible nature, allowing for quick development of RESTful APIs. It has a large ecosystem of middleware and is widely adopted in the Node.js community.
 
 2. **Database**: 
-   - **PostgreSQL**: Selected for its robustness, support for complex queries, and strong community support. It is well-suited for handling relational data, which is essential for managing user subscriptions and weather data.
+   - **PostgreSQL**: Selected for its robustness and strong community support. It is well-suited for handling relational data, which is essential for managing user subscriptions and weather data.
 
 3. **ORM**: 
    - **Knex.js**: Used as a SQL query builder for Node.js, providing a flexible and powerful way to interact with the PostgreSQL database. It allows for migrations and schema management, which is crucial for maintaining the database structure.
