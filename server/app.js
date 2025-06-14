@@ -12,7 +12,7 @@ const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
-app.use("/api", apiRoutes);
+app.use("/api/v1", apiRoutes);
 
 const server = http.createServer(app);
 setupWebSocket(server);
