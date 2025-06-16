@@ -190,7 +190,7 @@ describe("EmailService (alternative setup)", () => {
     dataProvider.getSubscriptionsByFrequency.mockRejectedValue(new Error("DB error"));
 
     await expect(service.sendWeatherEmailsByFrequency("daily")).resolves.toBeUndefined();
-    expect(errorSpy).not.toHaveBeenCalled();
+    expect(errorSpy).toHaveBeenCalledWith("Failed to get subscriptions:", expect.any(Error));
     expect(mailer.sendWeatherEmail).not.toHaveBeenCalled();
   });
 

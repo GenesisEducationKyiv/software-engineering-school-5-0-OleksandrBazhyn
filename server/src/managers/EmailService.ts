@@ -19,10 +19,15 @@ class EmailService {
   }
 
   async sendWeatherEmailsByFrequency(frequency: SubscriptionFrequency): Promise<void> {
-    const subscriptions: Subscription[] =
-      await this.dataProvider.getSubscriptionsByFrequency(frequency);
+    let subscriptions: Subscription[] | null | undefined;
+    try {
+      subscriptions = await this.dataProvider.getSubscriptionsByFrequency(frequency);
+    } catch (err) {
+      console.error("Failed to get subscriptions:", err);
+      return;
+    }
 
-    if (subscriptions.length === 0) {
+    if (!subscriptions || subscriptions.length === 0) {
       console.log(`No active subscriptions for frequency: ${frequency}`);
       return;
     }
