@@ -6,29 +6,37 @@
 
 ## Як запустити локально
 
-1. Встановіть залежності:
+1. Встановіть залежності для бекенду та фронтенду:
+   ```sh
+   cd server && npm install
+   cd ../client && npm install
    ```
-   npm install
-   ```
-2. Створіть файл `.env` (див. приклад у репозиторії).
-3. Запустіть міграції:
-   ```
-   npx knex migrate:latest
+2. Створіть файл `.env` у папці `server` (див. приклад у репозиторії).
+3. Запустіть міграції для бази даних:
+   ```sh
+   cd ../server
+   npx knex --knexfile ./knexfile.cjs migrate:latest
    ```
 4. Запустіть сервер:
-   ```
+   ```sh
    npm run dev
    ```
+5. Запустіть клієнт у новому терміналі:
+   ```sh
+   cd ../client
+   npm run dev
+   ```
+6. API буде доступне на [http://localhost:3000](http://localhost:3000), фронтенд — на [http://localhost:5173](http://localhost:5173) (або порт, який вкаже Vite).
 
 ## Як запустити через Docker
 
-1. Впевніться, що у вас є Docker і Docker Compose.
-2. Створіть файл `.env.docker` (див. приклад у репозиторії).
+1. Впевніться, що у вас встановлені Docker і Docker Compose.
+2. Створіть файл `.env.docker` у папці `server` (див. приклад у репозиторії).
 3. Запустіть:
-   ```
+   ```sh
    docker-compose up --build
    ```
-4. API буде доступне на http://localhost:3000
+4. API буде доступне на [http://localhost:3000](http://localhost:3000), фронтенд — на [http://localhost:5180](http://localhost:5180).
 
 ## Основні ендпоінти
 
@@ -62,10 +70,15 @@
 
 ## Тестування
 
-- Для тестування email використовуйте [Mailtrap](https://mailtrap.io/).
-- Для тестування API використовуйте Postman або curl.
+- Для розсилки використовується Gmail.
+- Для тестування API та функціоналу використовуйте клієнтську частину (frontend) або інструменти на кшталт Postman чи curl.
+- Для запуску тестів у бекенді перейдіть у папку `server` та виконайте:
+  ```sh
+  npm test
+  ```
 
+## Структура проекту
 
-## Міграції
-
-Всі міграції знаходяться у папці `migrations/`.
+- `server/` — бекенд (Node.js, Express, Knex)
+- `client/` — фронтенд (React, Vite)
+- `db/migrations/` — міграції бази даних

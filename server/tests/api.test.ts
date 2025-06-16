@@ -1,15 +1,16 @@
 import request from "supertest";
-import express from "express";
-import apiRoutes from "../api/routes/api.js";
+import express, { Express } from "express";
+import apiRoutes from "../src/routes/api.js";
+import { beforeAll, describe, it, expect } from "@jest/globals";
 
-let app;
+let app: Express;
 
 // Mock WeatherManager to avoid real API calls
 beforeAll(async () => {
   const { default: WeatherManager } = await import(
-    "../api/managers/WeatherManager.js"
+    "../src/managers/WeatherManager.js"
   );
-  WeatherManager.prototype.fetchWeatherData = async (/*city*/) => ({
+  WeatherManager.prototype.fetchWeatherData = async (_city: string) => ({
     current: {
       temp_c: 15,
       humidity: 50,

@@ -1,20 +1,22 @@
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
-import apiRoutes from "./api/routes/api.js";
+import apiRoutes from "./routes/api.js";
 import cron from "node-cron";
-import Mailer from "./api/managers/Mailer.js";
+import Mailer from "./managers/Mailer.js";
 import http from "http";
 import { setupWebSocket } from "./ws-server.js";
 
+const PORT = Number(process.env.PORT) || 3000;
+
 const app = express();
-const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
 app.use("/api/v1", apiRoutes);
 
 const server = http.createServer(app);
+
 setupWebSocket(server);
 
 server.listen(PORT, () => {
@@ -23,10 +25,10 @@ server.listen(PORT, () => {
 
 // Hourly (at the beginning of each hour)
 cron.schedule("0 * * * *", () => {
-  Mailer.sendWeatherEmails("hourly");
+  void Mailer.sendWeatherEmails("hourly");
 });
 
 // Every day at 8:00 am
 cron.schedule("0 8 * * *", () => {
-  Mailer.sendWeatherEmails("daily");
+  void Mailer.sendWeatherEmails("daily");
 });

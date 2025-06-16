@@ -1,0 +1,44 @@
+export type SubscriptionFrequency = "daily" | "hourly";
+
+export interface Subscription {
+  id: number;
+  email: string;
+  city: string;
+  token: string;
+  is_active: boolean;
+  frequency: SubscriptionFrequency;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface WeatherData {
+  current: {
+    temp_c: number;
+    humidity: number;
+    condition: { text: string };
+  };
+}
+
+export interface SubscriptionMessage {
+  city?: string;
+  [key: string]: unknown;
+}
+
+export interface WebSocketMessage {
+  type: "weather";
+  data: {
+    temperature: number;
+    humidity: number;
+    description: string;
+  } | null;
+}
+
+export interface WebSocketErrorMessage {
+  type: "error";
+  message: string;
+}
+
+export interface WebSocketInfoMessage {
+  type: "info";
+  message: string;
+}
