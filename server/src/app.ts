@@ -7,7 +7,7 @@ import Mailer from "./managers/Mailer.js";
 import http from "http";
 import { setupWebSocket } from "./ws-server.js";
 
-const PORT: number = Number(process.env.PORT) || 3000;
+const PORT = Number(process.env.PORT) || 3000;
 
 const app = express();
 
@@ -15,7 +15,7 @@ app.use(cors());
 app.use(express.json());
 app.use("/api/v1", apiRoutes);
 
-const server: http.Server = http.createServer(app);
+const server = http.createServer(app);
 
 setupWebSocket(server);
 
