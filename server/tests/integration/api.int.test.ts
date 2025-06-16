@@ -10,16 +10,16 @@ const mockMailer = {
   sendWeatherEmail: jest.fn(),
 };
 
-jest.mock("../src/managers/GmailMailer", () => ({
+jest.mock("../../src/managers/GmailMailer.js", () => ({
   __esModule: true,
   default: jest.fn().mockImplementation(() => mockMailer),
 }));
 
-import apiRoutes from "../src/routes/api.js";
+import apiRoutes from "../../src/routes/api.js";
 
 let app: Express;
 beforeAll(async () => {
-  const { default: WeatherManager } = await import("../src/managers/WeatherManager.js");
+  const { default: WeatherManager } = await import("../../src/managers/WeatherManager.js");
   WeatherManager.prototype.getWeatherData = async (_city: string) => ({
     current: {
       temp_c: 15,
@@ -90,8 +90,16 @@ describe("Advanced Subscription/Confirmation workflow", () => {
     expect(res.statusCode).toBe(400);
   });
 
+  it("Weather for known city returns weather data", async () => {
+    const res = await request(app).get("/api/weather?city=Kyiv");
+    expect(res.statusCode).toBe(200);
+    expect(res.body).toHaveProperty("temperature");
+    expect(res.body).toHaveProperty("humidity");
+    expect(res.body).toHaveProperty("description");
+  });
+
   it("Weather for unknown city returns 404", async () => {
-    const { default: WeatherManager } = await import("../src/managers/WeatherManager.js");
+    const { default: WeatherManager } = await import("../../src/managers/WeatherManager.js");
     WeatherManager.prototype.getWeatherData = async (_city: string) => {
       throw new Error("Not found");
     };
@@ -99,5 +107,15 @@ describe("Advanced Subscription/Confirmation workflow", () => {
     const res = await request(app).get("/api/weather?city=UnknownCity");
     expect(res.statusCode).toBe(404);
     expect(res.body).toHaveProperty("error");
+  });
+
+  it("GET /api/confirm/:token with invalid token returns 400 or 404", async () => {
+    const res = await request(app).get("/api/confirm/invalidtoken");
+    expect([400, 404]).toContain(res.statusCode);
+  });
+
+  it("GET /api/unsubscribe/:token with invalid token returns 400, 404 or 500", async () => {
+    const res = await request(app).get("/api/unsubscribe/invalidtoken");
+    expect([400, 404, 500]).toContain(res.statusCode);
   });
 });
