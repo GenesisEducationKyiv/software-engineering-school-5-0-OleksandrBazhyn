@@ -18,6 +18,7 @@ jest.mock("../../src/managers/GmailMailer.js", () => ({
 import apiRoutes from "../../src/routes/api.js";
 
 let app: Express;
+let server: any;
 beforeAll(async () => {
   const { default: WeatherManager } = await import("../../src/managers/WeatherManager.js");
   WeatherManager.prototype.getWeatherData = async (_city: string) => ({
@@ -31,6 +32,14 @@ beforeAll(async () => {
   app = express();
   app.use(express.json());
   app.use("/api", apiRoutes);
+
+  server = app.listen(0);
+});
+
+afterAll(async () => {
+  if (server && server.close) {
+    await new Promise((resolve) => server.close(resolve));
+  }
 });
 
 describe("Advanced Subscription/Confirmation workflow", () => {
