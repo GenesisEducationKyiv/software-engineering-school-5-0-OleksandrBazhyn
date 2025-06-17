@@ -38,16 +38,6 @@ services:
       - app
     restart: unless-stopped
 
-  test:
-    build:
-      context: ./server
-      dockerfile: Dockerfile
-    command: npm test
-    env_file:
-      - ./server/.env.docker
-    depends_on:
-      - db
-
 volumes:
   db_data:
     driver: local

@@ -1,6 +1,7 @@
 import nodemailer from "nodemailer";
 import GmailMailer from "../../../src/managers/GmailMailer.js";
 import { WeatherData } from "../../../src/types.js";
+import { jest, describe, it, expect, afterEach, beforeEach } from "@jest/globals";
 
 jest.mock("nodemailer");
 

@@ -6,6 +6,7 @@ COPY package*.json ./
 COPY tsconfig.json ./
 COPY knexfile.cjs ./
 COPY .env.docker ./
+COPY jest.config.js ./
 
 RUN apt-get update && apt-get install -y netcat-openbsd
 
@@ -17,7 +18,4 @@ COPY tests ./tests
 
 RUN npm run build
 
-COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
-
-ENTRYPOINT ["/entrypoint.sh"]
+CMD ["npm", "run", "start"]
