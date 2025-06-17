@@ -20,15 +20,35 @@ jobs:
   integration-tests:
     name: Integration Tests
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15
+        ports: [5432:5432]
+        env:
+          POSTGRES_USER: testuser
+          POSTGRES_PASSWORD: testpass
+          POSTGRES_DB: testdb
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     defaults:
       run:
         working-directory: server
+    env:
+      PGUSER: testuser
+      PGPASSWORD: testpass
+      PGDATABASE: testdb
+      PGHOST: localhost
+      PGPORT: 5432
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 20
       - run: npm ci
+      - run: npx knex migrate:latest
       - run: npm run test:integration
 
   e2e-tests:
