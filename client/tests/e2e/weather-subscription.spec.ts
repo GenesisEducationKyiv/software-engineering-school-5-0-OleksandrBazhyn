@@ -28,7 +28,7 @@ test.describe("Weather Subscription SPA", () => {
     });
 
     // Mock GET /api/weather
-    await page.route("**/api/weather?**", async route => {
+    await page.route("**/v1/weather?**", async route => {
       const url = new URL(route.request().url());
       const city = url.searchParams.get("city");
       if (!city || !city.trim()) {
