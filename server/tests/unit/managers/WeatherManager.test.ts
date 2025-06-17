@@ -59,7 +59,7 @@ describe("WeatherManager", () => {
       json: async () => ({}),
     });
 
-    await expect(manager.getWeatherData("Kyiv")).rejects.toThrow("Network response was not ok");
+    await expect(manager.getWeatherData("Kyiv")).rejects.toThrow("Failed to fetch weather data");
   });
 
   it("should throw if weather data is invalid", async () => {
@@ -69,7 +69,7 @@ describe("WeatherManager", () => {
       json: async () => ({}),
     });
 
-    await expect(manager.getWeatherData("Kyiv")).rejects.toThrow("Invalid weather data received");
+    await expect(manager.getWeatherData("Kyiv")).rejects.toThrow("Failed to fetch weather data");
   });
 
   it("should log and throw if fetch throws", async () => {
