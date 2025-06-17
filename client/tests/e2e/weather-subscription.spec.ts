@@ -102,8 +102,8 @@ test.describe("Weather Subscription SPA", () => {
     await page.goto("http://localhost:5173/");
     await page.fill('section:has(h4:text("Current Weather")) input[placeholder="City"]', "Kyiv");
     await page.click('section:has(h4:text("Current Weather")) button:has-text("Show")');
-    await expect(page.locator('text=/Temperature: \\d+/')).toBeVisible({ timeout: 7000 });
-    await expect(page.locator('text=/Humidity: \\d+/')).toBeVisible();
+    await expect(page.locator('text=/Temperature: \\d+°C/')).toBeVisible({ timeout: 7000 });
+    await expect(page.locator('text=/Humidity: \\d+%/')).toBeVisible();
     await expect(page.locator('text=/Description:/i')).toBeVisible();
     });
 
