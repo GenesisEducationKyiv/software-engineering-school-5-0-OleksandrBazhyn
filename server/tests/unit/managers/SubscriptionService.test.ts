@@ -1,72 +1,123 @@
-import { test, expect } from "@playwright/test";
+import SubscriptionService from "../../../src/managers/SubscriptionService.js";
+import { Mailer, DataProvider, SubscriptionInput } from "../../../src/types.js";
 
-test.describe("Weather Subscription SPA", () => {
-  test("Subscribe with valid data shows confirmation", async ({ page }) => {
-    await page.goto("http://localhost:5173/");
-    await page.fill('input[placeholder="Email"]', "testuser@gmail.com");
-    await page.fill('input[placeholder="City"]', "Kyiv");
-    await page.selectOption('select[name="frequency"]', "daily");
-    await page.click('button:has-text("Subscribe")');
-    await expect(
-      page.getByTestId('subscribe-status')
-    ).toContainText(/success|confirmation email sent|subscription successful/i, { timeout: 7000 });
+describe("SubscriptionService", () => {
+  let mailer: jest.Mocked<Mailer>;
+  let dataProvider: jest.Mocked<DataProvider>;
+  let service: SubscriptionService;
+  const testInput: SubscriptionInput = {
+    email: "test@mail.com",
+    city: "Kyiv",
+    frequency: "daily",
+  };
+
+  beforeEach(() => {
+    mailer = {
+      sendConfirmationEmail: jest.fn().mockResolvedValue(undefined),
+    } as any;
+    dataProvider = {
+      checkSubscriptionExists: jest.fn(),
+      insertSubscription: jest.fn(),
+      updateSubscriptionStatus: jest.fn(),
+      deleteSubscription: jest.fn(),
+    } as any;
+    service = new SubscriptionService(mailer, dataProvider);
   });
 
-  test("Subscribe with invalid email shows error", async ({ page }) => {
-    await page.goto("http://localhost:5173/");
-    await page.fill('input[placeholder="Email"]', "bademail");
-    await page.fill('input[placeholder="City"]', "Kyiv");
-    await page.click('button:has-text("Subscribe")');
-    await expect(
-      page.getByTestId('subscribe-status')
-    ).toContainText(/please enter a valid email address/i);
+  describe("subscribe", () => {
+    it("should subscribe and send confirmation email", async () => {
+      dataProvider.checkSubscriptionExists.mockResolvedValue(false);
+      dataProvider.insertSubscription.mockResolvedValue(undefined);
+
+      const result = await service.subscribe(testInput);
+
+      expect(dataProvider.checkSubscriptionExists).toHaveBeenCalledWith(testInput);
+      expect(dataProvider.insertSubscription).toHaveBeenCalledWith(
+        testInput,
+        expect.any(String),
+        false,
+      );
+      expect(mailer.sendConfirmationEmail).toHaveBeenCalledWith(
+        testInput.email,
+        testInput.city,
+        expect.any(String),
+      );
+      expect(result).toHaveProperty("token");
+      expect(typeof result.token).toBe("string");
+    });
+
+    it("should throw if already subscribed", async () => {
+      dataProvider.checkSubscriptionExists.mockResolvedValue(true);
+
+      await expect(service.subscribe(testInput)).rejects.toThrow("Email already subscribed");
+      expect(dataProvider.insertSubscription).not.toHaveBeenCalled();
+      expect(mailer.sendConfirmationEmail).not.toHaveBeenCalled();
+    });
+
+    it("should throw if insertSubscription fails", async () => {
+      dataProvider.checkSubscriptionExists.mockResolvedValue(false);
+      dataProvider.insertSubscription.mockRejectedValue(new Error("DB error"));
+
+      await expect(service.subscribe(testInput)).rejects.toThrow("Failed to subscribe");
+      expect(mailer.sendConfirmationEmail).not.toHaveBeenCalled();
+    });
+
+    it("should throw if sendConfirmationEmail fails", async () => {
+      dataProvider.checkSubscriptionExists.mockResolvedValue(false);
+      dataProvider.insertSubscription.mockResolvedValue(undefined);
+      mailer.sendConfirmationEmail.mockRejectedValue(new Error("Mail error"));
+
+      await expect(service.subscribe(testInput)).rejects.toThrow("Failed to subscribe");
+    });
   });
 
-  test("Subscribe with empty city shows error", async ({ page }) => {
-    await page.goto("http://localhost:5173/");
-    await page.fill('input[placeholder="Email"]', "testuser@gmail.com");
-    await page.fill('input[placeholder="City"]', "");
-    await page.click('button:has-text("Subscribe")');
-    await expect(
-      page.getByTestId('subscribe-status')
-    ).toContainText(/please enter a city/i);
+  describe("confirm", () => {
+    it("should confirm subscription by token", async () => {
+      dataProvider.updateSubscriptionStatus.mockResolvedValue(true);
+
+      const result = await service.confirm("token123");
+
+      expect(dataProvider.updateSubscriptionStatus).toHaveBeenCalledWith("token123", true);
+      expect(result).toBe(true);
+    });
+
+    it("should throw if token is invalid or already confirmed", async () => {
+      dataProvider.updateSubscriptionStatus.mockResolvedValue(false);
+
+      await expect(service.confirm("badtoken")).rejects.toThrow(
+        "Invalid token or subscription already confirmed",
+      );
+    });
+
+    it("should propagate DB errors", async () => {
+      dataProvider.updateSubscriptionStatus.mockRejectedValue(new Error("DB error"));
+
+      await expect(service.confirm("token123")).rejects.toThrow("DB error");
+    });
   });
 
-  test("Get weather for valid city", async ({ page }) => {
-    await page.goto("http://localhost:5173/");
-    await page.fill('input[placeholder="City"]', "Kyiv");
-    await page.click('button:has-text("Show")');
-    await expect(page.locator('text=Temperature:')).toBeVisible({ timeout: 7000 });
-    await expect(page.locator('text=Humidity:')).toBeVisible();
-    await expect(page.locator('text=Description:')).toBeVisible();
-  });
+  describe("unsubscribe", () => {
+    it("should unsubscribe by token", async () => {
+      dataProvider.deleteSubscription.mockResolvedValue(true);
 
-  test("Get weather with empty city shows error", async ({ page }) => {
-    await page.goto("http://localhost:5173/");
-    await page.fill('input[placeholder="City"]', "");
-    await page.click('button:has-text("Show")');
-    await expect(page.locator('text=/please enter a city/i')).toBeVisible();
-  });
+      const result = await service.unsubscribe("token123");
 
-  test("Unsubscribe with empty token shows error", async ({ page }) => {
-    await page.goto("http://localhost:5173/");
-    await page.fill('input[placeholder="Token"]', "");
-    await page.click('button:has-text("Unsubscribe")');
-    await expect(page.locator('text=/please enter your unsubscribe token/i')).toBeVisible();
-  });
+      expect(dataProvider.deleteSubscription).toHaveBeenCalledWith("token123");
+      expect(result).toBe(true);
+    });
 
-  test("WebSocket: subscribe with empty city shows error", async ({ page }) => {
-    await page.goto("http://localhost:5173/");
-    await page.fill('section:has(h4:text("Live Weather Updates")) input[placeholder="City"]', "");
-    await page.click('section:has(h4:text("Live Weather Updates")) button:has-text("Subscribe (WS)")');
-    await expect(page.locator('text=/please enter a city for live updates/i')).toBeVisible();
-  });
+    it("should throw if token is invalid or not found", async () => {
+      dataProvider.deleteSubscription.mockResolvedValue(false);
 
-  test("WebSocket: subscribe and receive weather", async ({ page }) => {
-    await page.goto("http://localhost:5173/");
-    await page.fill('section:has(h4:text("Live Weather Updates")) input[placeholder="City"]', "Kyiv");
-    await page.click('section:has(h4:text("Live Weather Updates")) button:has-text("Subscribe (WS)")');
-    await expect(page.locator('text=/connected. waiting for live updates/i')).toBeVisible({ timeout: 7000 });
-    await expect(page.locator('text=Temperature:')).toBeVisible({ timeout: 20000 });
+      await expect(service.unsubscribe("badtoken")).rejects.toThrow(
+        "Invalid token or subscription not found",
+      );
+    });
+
+    it("should propagate DB errors", async () => {
+      dataProvider.deleteSubscription.mockRejectedValue(new Error("DB error"));
+
+      await expect(service.unsubscribe("token123")).rejects.toThrow("DB error");
+    });
   });
 });
