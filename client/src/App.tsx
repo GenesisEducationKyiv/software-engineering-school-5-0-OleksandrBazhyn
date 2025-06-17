@@ -61,7 +61,7 @@ export default function App() {
     }
     try {
       const res = await fetch(
-        `/api/weather?city=${encodeURIComponent(weatherCity)}`,
+        `/api/v1/weather?city=${encodeURIComponent(weatherCity)}`,
       );
       const data = await res.json();
       setWeather(data);
@@ -162,6 +162,7 @@ export default function App() {
             style={{ display: "block", marginBottom: 8, width: "100%" }}
           />
           <select
+            name="frequency"
             value={form.frequency}
             onChange={(e) =>
               setForm((f) => ({
@@ -179,9 +180,14 @@ export default function App() {
           </button>
         </form>
         <div
+          data-testid="subscribe-status"
           style={{
             marginTop: 10,
-            color: subscribeStatus.includes("success") ? "green" : "red",
+            color:
+              subscribeStatus.toLowerCase().includes("success") ||
+              subscribeStatus.toLowerCase().includes("confirmation email sent")
+                ? "green"
+                : "red",
           }}
         >
           {subscribeStatus}
