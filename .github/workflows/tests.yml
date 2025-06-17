@@ -48,6 +48,8 @@ jobs:
         with:
           node-version: 20
       - run: npm ci
+      - run: cp .env.docker .env
+        working-directory: server
       - run: npx knex migrate:latest --knexfile ./db/knexConfig.ts --esm
         working-directory: server
       - run: npm run test:integration
