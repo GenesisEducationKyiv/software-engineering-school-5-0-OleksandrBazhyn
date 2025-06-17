@@ -65,4 +65,8 @@ jobs:
           node-version: 20
       - run: npm ci
       - run: npx playwright install --with-deps
+      - name: Start frontend
+        run: npm run dev -- --host &
+      - name: Wait for frontend
+        run: npx wait-on http://localhost:5173
       - run: npm run test:e2e
