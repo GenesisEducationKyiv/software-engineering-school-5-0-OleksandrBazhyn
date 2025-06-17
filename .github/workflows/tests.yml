@@ -25,9 +25,9 @@ jobs:
         image: postgres:15
         ports: [5432:5432]
         env:
-          POSTGRES_USER: testuser
-          POSTGRES_PASSWORD: testpass
-          POSTGRES_DB: testdb
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: weather_db
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -37,9 +37,9 @@ jobs:
       run:
         working-directory: server
     env:
-      PGUSER: testuser
-      PGPASSWORD: testpass
-      PGDATABASE: testdb
+      PGUSER: postgres
+      PGPASSWORD: postgres
+      PGDATABASE: weather_db
       PGHOST: localhost
       PGPORT: 5432
     steps:
@@ -49,24 +49,54 @@ jobs:
           node-version: 20
       - run: npm ci
       - run: npx knex migrate:latest --knexfile ./db/knexConfig.ts --esm
-        working-directory: server
       - run: npm run test:integration
 
   e2e-tests:
     name: E2E Tests
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: client
+    services:
+      postgres:
+        image: postgres:15
+        ports: [5432:5432]
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: weather_db
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      PGUSER: postgres
+      PGPASSWORD: postgres
+      PGDATABASE: weather_db
+      PGHOST: localhost
+      PGPORT: 5432
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+
       - run: npm ci
+        working-directory: server
+      - run: npx knex migrate:latest --knexfile ./db/knexConfig.ts --esm
+        working-directory: server
+
+      - run: npm run dev -- --host 0.0.0.0 &
+        working-directory: server
+
+      - run: npm ci
+        working-directory: client
+ 
       - run: npx playwright install --with-deps
-      - name: Start frontend
-        run: npm run dev -- --host &
-      - name: Wait for frontend
-        run: npx wait-on http://localhost:5173
+        working-directory: client
+
+      - run: npm run dev -- --host 0.0.0.0 &
+        working-directory: client
+
+      - run: npx wait-on http://localhost:5173
+
       - run: npm run test:e2e
+        working-directory: client
