@@ -10,5 +10,5 @@ echo "Postgres is up, running migrations..."
 
 npx knex --knexfile ./knexfile.cjs migrate:latest
 
-echo "Starting app..."
-exec node dist/src/app.js
+echo "Running command: $@"
+exec "$@"

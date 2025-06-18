@@ -131,6 +131,7 @@ export default defineConfig([
           singleQuote: false,
           bracketSpacing: true,
           arrowParens: "always",
+          endOfLine: "auto",
         },
       ],
     },

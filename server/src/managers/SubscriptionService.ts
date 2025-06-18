@@ -1,4 +1,5 @@
 import { SubscriptionInput, Mailer, DataProvider } from "../types.js";
+import crypto from "crypto";
 
 class SubscriptionService {
   private mailer: Mailer;

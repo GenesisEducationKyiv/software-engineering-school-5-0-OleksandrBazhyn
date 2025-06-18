@@ -38,16 +38,34 @@ services:
       - app
     restart: unless-stopped
 
-  test:
+  server-test-integration:
     build:
       context: ./server
-      dockerfile: Dockerfile
-    command: npm test
-    env_file:
-      - ./server/.env.docker
+      dockerfile: Dockerfile.test
     depends_on:
       - db
+    env_file:
+      - ./server/.env.docker
 
+#  server-test-unit:
+#    build:
+#      context: ./server
+#      dockerfile: Dockerfile
+#    container_name: weather-unit-test
+#    command: ["npm", "run", "test:unit"]
+#    env_file:
+#      - ./server/.env.docker
+
+  client-test-e2e:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    container_name: weather-e2e-test
+    command: ["npm", "run", "test:e2e"]
+    depends_on:
+      - app
+      - client
+      
 volumes:
   db_data:
     driver: local
