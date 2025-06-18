@@ -1,7 +1,7 @@
 # Testing Guide
 
 > **Вимоги:**  
-> На машині встановлені **git**, **docker** та платформа **Node.js**.
+> На комп'ютері встановлені **git**, **docker** та платформа **Node.js**.
 
 ## Як запустити окремі види тестів
 
@@ -24,7 +24,7 @@ docker compose up --build --abort-on-container-exit server-test-integration db
 Відносно розташування репозиторія
 ```sh
 cd server
-npm install
+npm ci
 npm run test:unit
 ```
 
@@ -36,7 +36,7 @@ npm run test:unit
 Відносно розташування репозиторія
 ```sh
 cd server
-npm install
+npm ci
 npm run dev
 ```
 
@@ -44,7 +44,7 @@ npm run dev
 Відносно розташування репозиторія
 ```sh
 cd client
-npm install
+npm ci
 npm run dev
 ```
 
