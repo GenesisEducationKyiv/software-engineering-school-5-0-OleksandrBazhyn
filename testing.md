@@ -3,43 +3,42 @@
 > **Вимоги:**  
 > На машині встановлені **git**, **docker** та платформа **Node.js**.
 
----
-
-## Як запустити всі тести однією командою
-
-```sh
-docker compose -f docker-compose.yml up --build --abort-on-container-exit
-```
-
-- Це підніме всі необхідні сервіси (PostgreSQL, бекенд, фронтенд) і запустить тести у контейнері `test`.
-- Після завершення тестів контейнери зупиняться автоматично.
-
----
-
 ## Як запустити окремі види тестів
 
-### Unit-тести
+## 1. Інтеграційні тести (API, БД, email)
 
 ```sh
-docker compose -f docker-compose.yml run --rm test npm run test:unit
+docker compose up --build --abort-on-container-exit server-test-integration db
 ```
 
-### Integration-тести
+- Піднімає тестову базу та сервер у тестовому режимі.
+- Міграції застосовуються автоматично.
+- Тести запускаються автоматично після старту контейнера.
+- Результат тестів буде видно у логах контейнера.
+
+---
+
+## 2. Unit тести
 
 ```sh
-docker compose -f docker-compose.yml run --rm test npm run test:integration
+cd server
+npm install
+npm run test:unit
 ```
 
-### E2E-тести (Playwright)
+---
+
+## 3. E2E тести (Playwright, frontend)
 
 ```sh
-docker compose -f docker-compose.yml run --rm client npm run test:e2e
+cd client
+npm install
+npm run test:e2e
 ```
-
 ---
 
 ## Примітки
 
-- **Всі залежності для інтеграційних тестів (PostgreSQL) піднімаються автоматично через Docker.**
+- **Всі залежності для інтеграційних тестів піднімаються автоматично через Docker.**
 - Для запуску тестів не потрібно нічого встановлювати локально, окрім git та docker.
 - Результати тестів можна переглянути у логах відповідних контейнерів.
