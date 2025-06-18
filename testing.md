@@ -45,6 +45,7 @@ npm run dev
 ```sh
 cd client
 npm ci
+npx playwright install
 npm run dev
 ```
 
