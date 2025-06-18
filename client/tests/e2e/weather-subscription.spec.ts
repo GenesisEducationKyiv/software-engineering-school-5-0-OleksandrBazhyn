@@ -129,7 +129,7 @@ test.describe("Weather Subscription SPA", () => {
   });
 
   // WebSocket test is skipped because Playwright does not natively mock WS.
-  test.skip("WebSocket: subscribe and receive weather", async ({ page }) => {
-    // You can implement a custom mock or leave this skipped for now.
-  });
+  //  test.skip("WebSocket: subscribe and receive weather", async ({ page }) => {
+      // You can implement a custom mock or leave this skipped for now.
+  //  // await page.goto("http://localhost:5173/");});
 });

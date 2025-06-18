@@ -5,8 +5,9 @@
 
 ## Як запустити окремі види тестів
 
-## 1. Інтеграційні тести (API, БД, email)
+## 1. Інтеграційні тести
 
+Відносно розташування репозиторія
 ```sh
 docker compose up --build --abort-on-container-exit server-test-integration db
 ```
@@ -20,6 +21,7 @@ docker compose up --build --abort-on-container-exit server-test-integration db
 
 ## 2. Unit тести
 
+Відносно розташування репозиторія
 ```sh
 cd server
 npm install
@@ -30,9 +32,26 @@ npm run test:unit
 
 ## 3. E2E тести (Playwright, frontend)
 
+### Крок 1. Запусти backend (у новому терміналі):
+Відносно розташування репозиторія
+```sh
+cd server
+npm install
+npm run dev
+```
+
+### Крок 2. Запусти frontend (у новому терміналі):
+Відносно розташування репозиторія
 ```sh
 cd client
 npm install
+npm run dev
+```
+
+### Крок 3. Запусти E2E тести (у папці client):
+Відносно розташування репозиторія
+```sh
+cd client
 npm run test:e2e
 ```
 ---
@@ -42,3 +61,4 @@ npm run test:e2e
 - **Всі залежності для інтеграційних тестів піднімаються автоматично через Docker.**
 - Для запуску тестів не потрібно нічого встановлювати локально, окрім git та docker.
 - Результати тестів можна переглянути у логах відповідних контейнерів.
+- Playwright-тести очікують, що backend і frontend вже працюють.
