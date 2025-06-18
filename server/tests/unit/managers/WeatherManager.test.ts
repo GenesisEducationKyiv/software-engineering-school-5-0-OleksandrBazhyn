@@ -1,6 +1,5 @@
 import WeatherManager from "../../../src/managers/WeatherManager.js";
 import { WeatherData } from "../../../src/types.js";
-import { jest, describe, it, expect, beforeEach, afterEach } from "@jest/globals";
 
 describe("WeatherManager", () => {
   const OLD_ENV = process.env;

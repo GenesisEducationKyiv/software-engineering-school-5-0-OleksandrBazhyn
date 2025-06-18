@@ -1,6 +1,5 @@
 import SubscriptionService from "../../../src/managers/SubscriptionService.js";
 import { Mailer, DataProvider, SubscriptionInput } from "../../../src/types.js";
-import { jest, describe, it, expect, beforeEach } from "@jest/globals";
 
 describe("SubscriptionService", () => {
   let mailer: jest.Mocked<Mailer>;

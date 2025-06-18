@@ -10,9 +10,9 @@
     "build": "tsc",
     "start": "node dist/src/app.js",
     "dev": "tsx src/app.ts",
-    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
-    "test:unit": "node --experimental-vm-modules node_modules/jest/bin/jest.js --testPathPattern=unit",
-    "test:integration": "node --experimental-vm-modules node_modules/jest/bin/jest.js --testPathPattern=integration --detectOpenHandles",
+    "test": "cross-env NODE_ENV=test jest",
+    "test:unit": "cross-env NODE_ENV=test jest --testPathPattern=unit",
+    "test:integration": "cross-env NODE_ENV=test jest --testPathPattern=integration --detectOpenHandles",
     "lint": "eslint . --ext .ts,.tsx,.cts,.mts,.js",
     "lint:fix": "eslint . --ext .ts,.tsx,.cts,.mts,.js --fix",
     "format": "prettier --write ."

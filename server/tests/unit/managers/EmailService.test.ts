@@ -6,7 +6,6 @@ import {
   DataProvider,
   SubscriptionFrequency,
 } from "../../../src/types.js";
-import { jest, describe, it, expect, afterEach } from "@jest/globals";
 
 describe("EmailService (alternative setup)", () => {
   let mailer: jest.Mocked<Mailer>;
