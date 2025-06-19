@@ -1,5 +1,6 @@
 import nodemailer from "nodemailer";
 import { WeatherData, Mailer } from "../types.js";
+import { config } from "../config.js";
 
 class MailManager implements Mailer {
   private transporter: nodemailer.Transporter;
@@ -12,7 +13,7 @@ class MailManager implements Mailer {
     console.log("Sending confirmation email to:", email);
     const link = `http://localhost:3000/api/confirm/${token}`;
     await this.transporter.sendMail({
-      from: process.env.SMTP_FROM,
+      from: config.SMTP_FROM,
       to: email,
       subject: "Confirm your subscription",
       html: `<p>Click <a href="${link}">here</a> to confirm your subscription for ${city}</p>`,
@@ -27,7 +28,7 @@ class MailManager implements Mailer {
   ): Promise<void> {
     console.log("Sending weather email to:", email);
     await this.transporter.sendMail({
-      from: process.env.SMTP_FROM,
+      from: config.SMTP_FROM,
       to: email,
       subject: `Weather update for ${city}`,
       html: `

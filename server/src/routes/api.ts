@@ -5,6 +5,7 @@ import { WeatherData, SubscriptionInput } from "../types.js";
 import MailManager from "../managers/MailManager.js";
 import DbDataProvider from "../managers/DbDataProvider.js";
 import nodemailer from "nodemailer";
+import { config } from "../config.js";
 
 const router = express.Router();
 const subscriptionService = new SubscriptionService(
@@ -12,8 +13,8 @@ const subscriptionService = new SubscriptionService(
     nodemailer.createTransport({
       service: "gmail",
       auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
+        user: config.SMTP_USER,
+        pass: config.SMTP_PASS,
       },
     }),
   ),

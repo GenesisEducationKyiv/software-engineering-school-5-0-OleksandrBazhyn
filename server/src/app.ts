@@ -8,10 +8,7 @@ import Scheduler from "./managers/Scheduler.js";
 import MailManager from "./managers/MailManager.js";
 import DbDataProvider from "./managers/DbDataProvider.js";
 import nodemailer from "nodemailer";
-
-if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
-  throw new Error("SMTP_USER and SMTP_PASS environment variables must be set");
-}
+import { config } from "./config.js";
 
 const PORT: number = Number(process.env.PORT) || 3000;
 
@@ -34,8 +31,8 @@ Scheduler.start(
     nodemailer.createTransport({
       service: "gmail",
       auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
+        user: config.SMTP_USER,
+        pass: config.SMTP_PASS,
       },
     }),
   ),
