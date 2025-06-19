@@ -5,8 +5,13 @@ import apiRoutes from "./routes/api.js";
 import http from "http";
 import { setupWebSocket } from "./ws-server.js";
 import Scheduler from "./managers/Scheduler.js";
-import GmailMailer from "./managers/GmailMailer.js";
+import MailManager from "./managers/MailManager.js";
 import DbDataProvider from "./managers/DbDataProvider.js";
+import nodemailer from "nodemailer";
+
+if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
+  throw new Error("SMTP_USER and SMTP_PASS environment variables must be set");
+}
 
 const PORT: number = Number(process.env.PORT) || 3000;
 
@@ -24,4 +29,15 @@ server.listen(PORT, () => {
   console.log(`Server is running (HTTP + WS) on port ${PORT}`);
 });
 
-Scheduler.start(new GmailMailer(), DbDataProvider);
+Scheduler.start(
+  new MailManager(
+    nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
+      },
+    }),
+  ),
+  DbDataProvider,
+);

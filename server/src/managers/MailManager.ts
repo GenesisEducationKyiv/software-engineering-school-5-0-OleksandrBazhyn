@@ -1,20 +1,11 @@
 import nodemailer from "nodemailer";
 import { WeatherData, Mailer } from "../types.js";
 
-class GmailMailer implements Mailer {
+class MailManager implements Mailer {
   private transporter: nodemailer.Transporter;
 
-  constructor() {
-    if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
-      console.warn("SMTP_USER or SMTP_PASS is not set in environment variables.");
-    }
-    this.transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
-      },
-    });
+  constructor(transporter: nodemailer.Transporter) {
+    this.transporter = transporter;
   }
 
   async sendConfirmationEmail(email: string, city: string, token: string): Promise<void> {
@@ -56,4 +47,4 @@ class GmailMailer implements Mailer {
   }
 }
 
-export default GmailMailer;
+export default MailManager;

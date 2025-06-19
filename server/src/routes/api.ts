@@ -2,11 +2,23 @@ import express from "express";
 import WeatherManager from "../managers/WeatherManager.js";
 import SubscriptionService from "../managers/SubscriptionService.js";
 import { WeatherData, SubscriptionInput } from "../types.js";
-import GmailMailer from "../managers/GmailMailer.js";
+import MailManager from "../managers/MailManager.js";
 import DbDataProvider from "../managers/DbDataProvider.js";
+import nodemailer from "nodemailer";
 
 const router = express.Router();
-const subscriptionService = new SubscriptionService(new GmailMailer(), DbDataProvider);
+const subscriptionService = new SubscriptionService(
+  new MailManager(
+    nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
+      },
+    }),
+  ),
+  DbDataProvider,
+);
 
 router.get("/weather", async (req: express.Request, res: express.Response) => {
   const city = req.query.city as string | undefined;
