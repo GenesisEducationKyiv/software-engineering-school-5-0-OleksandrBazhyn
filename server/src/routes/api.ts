@@ -6,6 +6,7 @@ import MailManager from "../managers/MailManager.js";
 import DbDataProvider from "../managers/DbDataProvider.js";
 import nodemailer from "nodemailer";
 import { config } from "../config.js";
+import { SubscriptionError } from "../errors/SubscriptionError.js";
 
 const router = express.Router();
 const subscriptionService = new SubscriptionService(
@@ -56,8 +57,8 @@ router.post("/subscribe", async (req: express.Request, res: express.Response) =>
     await subscriptionService.subscribe({ email, city, frequency });
     return res.status(200).json({ message: "Subscription successful. Confirmation email sent." });
   } catch (err: unknown) {
-    if (err instanceof Error && err.message === "Email already subscribed") {
-      return res.status(409).json({ error: err.message });
+    if (err instanceof SubscriptionError) {
+      return res.status(err.statusCode).json({ error: err.message });
     }
     console.error(err);
     return res.status(400).json({ error: "Invalid input" });
@@ -73,6 +74,9 @@ router.get("/confirm/:token", async (req, res) => {
     }
     return res.status(400).send("Invalid token");
   } catch (err) {
+    if (err instanceof SubscriptionError) {
+      return res.status(err.statusCode).send(err.message);
+    }
     console.error(err);
     return res.status(404).send("Token not found");
   }
@@ -87,6 +91,9 @@ router.get("/unsubscribe/:token", async (req, res) => {
     }
     return res.status(400).send("Invalid token");
   } catch (err) {
+    if (err instanceof SubscriptionError) {
+      return res.status(err.statusCode).send(err.message);
+    }
     console.error(err);
     return res.status(500).send("Server error");
   }

@@ -1,4 +1,6 @@
 import { SubscriptionInput, Mailer, DataProvider } from "../types.js";
+import { SubscriptionError } from "../errors/SubscriptionError.js";
+import crypto from "crypto";
 
 class SubscriptionService {
   private mailer: Mailer;
@@ -12,7 +14,7 @@ class SubscriptionService {
   async subscribe(subscription: SubscriptionInput): Promise<{ token: string }> {
     const existing = await this.dataProvider.checkSubscriptionExists(subscription);
     if (existing) {
-      throw new Error("Email already subscribed");
+      throw SubscriptionError.alreadySubscribed(subscription.email, subscription.city);
     }
     const token = crypto.randomUUID();
     try {
@@ -28,7 +30,7 @@ class SubscriptionService {
   async confirm(token: string): Promise<boolean> {
     const updated = await this.dataProvider.updateSubscriptionStatus(token, true);
     if (!updated) {
-      throw new Error("Invalid token or subscription already confirmed");
+      throw SubscriptionError.invalidToken();
     }
     return true;
   }
@@ -36,7 +38,7 @@ class SubscriptionService {
   async unsubscribe(token: string): Promise<boolean> {
     const deleted = await this.dataProvider.deleteSubscription(token);
     if (!deleted) {
-      throw new Error("Invalid token or subscription not found");
+      throw SubscriptionError.invalidToken();
     }
     return true;
   }
