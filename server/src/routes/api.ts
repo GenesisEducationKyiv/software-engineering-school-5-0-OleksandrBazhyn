@@ -1,9 +1,9 @@
 import express from "express";
-import WeatherManager from "../managers/WeatherManager.js";
-import SubscriptionService from "../managers/SubscriptionService.js";
+import WeatherAPIClient from "../entities/WeatherAPIClient.js";
+import SubscriptionService from "../entities/SubscriptionService.js";
 import { WeatherData, SubscriptionInput } from "../types.js";
-import GmailMailer from "../managers/GmailMailer.js";
-import DbDataProvider from "../managers/DbDataProvider.js";
+import GmailMailer from "../entities/GmailMailer.js";
+import DbDataProvider from "../entities/DbDataProvider.js";
 
 const router = express.Router();
 const subscriptionService = new SubscriptionService(new GmailMailer(), DbDataProvider);
@@ -14,7 +14,7 @@ router.get("/weather", async (req: express.Request, res: express.Response) => {
     return res.status(400).json({ error: "Invalid request" });
   }
   try {
-    const weatherManager = new WeatherManager();
+    const weatherManager = new WeatherAPIClient();
     const weatherData: WeatherData = await weatherManager.getWeatherData(city);
     if (!weatherData) {
       return res.status(404).json({ error: "City not found" });

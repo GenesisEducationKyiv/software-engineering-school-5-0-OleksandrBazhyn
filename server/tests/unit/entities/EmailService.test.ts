@@ -1,4 +1,4 @@
-import EmailService from "../../../src/managers/EmailService.js";
+import EmailService from "../../../src/entities/EmailService.js";
 import {
   Subscription,
   WeatherData,

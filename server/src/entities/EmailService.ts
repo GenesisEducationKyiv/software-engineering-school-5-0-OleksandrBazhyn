@@ -5,15 +5,15 @@ import {
   Mailer,
   DataProvider,
 } from "../types.js";
-import WeatherManager from "./WeatherManager.js";
+import WeatherAPIClient from "./WeatherAPIClient.js";
 
 class EmailService {
-  private weatherManager: WeatherManager;
+  private weatherManager: WeatherAPIClient;
   private mailer: Mailer;
   private dataProvider: DataProvider;
 
   constructor(mailer: Mailer, dataProvider: DataProvider) {
-    this.weatherManager = new WeatherManager();
+    this.weatherManager = new WeatherAPIClient();
     this.mailer = mailer;
     this.dataProvider = dataProvider;
   }

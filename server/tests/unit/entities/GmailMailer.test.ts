@@ -1,5 +1,5 @@
 import nodemailer from "nodemailer";
-import GmailMailer from "../../../src/managers/GmailMailer.js";
+import GmailMailer from "../../../src/entities/GmailMailer.js";
 import { WeatherData } from "../../../src/types.js";
 
 jest.mock("nodemailer");

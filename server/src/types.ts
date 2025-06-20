@@ -70,3 +70,7 @@ export interface DataProvider {
   updateSubscriptionStatus: (token: string, isActive: boolean) => Promise<boolean>;
   deleteSubscription: (token: string) => Promise<boolean>;
 }
+
+export interface WeatherProvider {
+  getWeatherData: (city: string) => Promise<WeatherData>;
+}

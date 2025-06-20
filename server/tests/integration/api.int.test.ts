@@ -2,32 +2,17 @@ import request from "supertest";
 import express, { Express } from "express";
 import { jest, beforeAll, describe, it, expect } from "@jest/globals";
 
-let lastToken: string | undefined = undefined;
-const mockMailer = {
-  sendConfirmationEmail: jest.fn(async (_email, _city, token) => {
-    lastToken = token as string;
-  }),
-  sendWeatherEmail: jest.fn(),
-};
+// Mock dependencies
+jest.mock("../../src/entities/GmailMailer.js");
+jest.mock("../../src/entities/WeatherAPIClient.js");
 
-jest.mock("../../src/managers/GmailMailer.js", () => ({
-  __esModule: true,
-  default: jest.fn().mockImplementation(() => mockMailer),
-}));
-
+// Import after mocking to ensure mocks are used
 import apiRoutes from "../../src/routes/api.js";
+import GmailMailer from "../../src/entities/GmailMailer.js";
 
 let app: Express;
-beforeAll(async () => {
-  const { default: WeatherManager } = await import("../../src/managers/WeatherManager.js");
-  WeatherManager.prototype.getWeatherData = async (_city: string) => ({
-    current: {
-      temp_c: 15,
-      humidity: 44,
-      condition: { text: "Cloudy" },
-    },
-  });
 
+beforeAll(() => {
   app = express();
   app.use(express.json());
   app.use("/api", apiRoutes);
@@ -46,7 +31,9 @@ describe("Advanced Subscription/Confirmation workflow", () => {
     expect(res.statusCode).toBe(200);
     expect(res.body.message).toMatch(/confirmation email sent/i);
 
-    token = lastToken ?? null;
+    // Get token from mock (create an instance first)
+    const mailerInstance = new GmailMailer();
+    token = (mailerInstance as any).__getLastToken() ?? null;
     expect(token).toBeTruthy();
   });
 
@@ -99,8 +86,8 @@ describe("Advanced Subscription/Confirmation workflow", () => {
   });
 
   it("Weather for unknown city returns 404", async () => {
-    const { default: WeatherManager } = await import("../../src/managers/WeatherManager.js");
-    WeatherManager.prototype.getWeatherData = async (_city: string) => {
+    const { default: WeatherAPIClient } = await import("../../src/entities/WeatherAPIClient.js");
+    WeatherAPIClient.prototype.getWeatherData = async (_city: string) => {
       throw new Error("Not found");
     };
 

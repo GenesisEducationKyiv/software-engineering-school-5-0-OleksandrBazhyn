@@ -1,4 +1,4 @@
-import DbDataProvider from "../../../src/managers/DbDataProvider.js";
+import DbDataProvider from "../../../src/entities/DbDataProvider.js";
 import db from "../../../db/knex.js";
 import { SubscriptionInput, Subscription } from "../../../src/types.js";
 

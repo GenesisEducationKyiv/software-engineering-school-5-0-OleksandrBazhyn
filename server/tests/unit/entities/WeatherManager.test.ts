@@ -1,7 +1,7 @@
-import WeatherManager from "../../../src/managers/WeatherManager.js";
+import WeatherAPIClient from "../../../src/entities/WeatherAPIClient.js";
 import { WeatherData } from "../../../src/types.js";
 
-describe("WeatherManager", () => {
+describe("WeatherAPIClient", () => {
   const OLD_ENV = process.env;
   let fetchMock: jest.Mock;
 
@@ -22,21 +22,21 @@ describe("WeatherManager", () => {
   it("should warn if WEATHER_API_KEY is not set in constructor", () => {
     const warnSpy = jest.spyOn(console, "warn").mockImplementation(() => {});
     process.env.WEATHER_API_KEY = "";
-    new WeatherManager();
+    new WeatherAPIClient();
     expect(warnSpy).toHaveBeenCalledWith("WEATHER_API_KEY is not set in environment variables.");
     warnSpy.mockRestore();
   });
 
   it("should throw if WEATHER_API_KEY is not set when calling getWeatherData", async () => {
     process.env.WEATHER_API_KEY = "";
-    const manager = new WeatherManager();
+    const manager = new WeatherAPIClient();
     await expect(manager.getWeatherData("Kyiv")).rejects.toThrow(
       "WEATHER_API_KEY is not set in environment variables.",
     );
   });
 
   it("should fetch weather data and return it on success", async () => {
-    const manager = new WeatherManager();
+    const manager = new WeatherAPIClient();
     const fakeWeather: WeatherData = {
       current: { temp_c: 10, humidity: 80, condition: { text: "Cloudy" } },
     } as WeatherData;
@@ -53,7 +53,7 @@ describe("WeatherManager", () => {
   });
 
   it("should throw if fetch returns not ok", async () => {
-    const manager = new WeatherManager();
+    const manager = new WeatherAPIClient();
     fetchMock.mockResolvedValue({
       ok: false,
       json: async () => ({}),
@@ -63,7 +63,7 @@ describe("WeatherManager", () => {
   });
 
   it("should throw if weather data is invalid", async () => {
-    const manager = new WeatherManager();
+    const manager = new WeatherAPIClient();
     fetchMock.mockResolvedValue({
       ok: true,
       json: async () => ({}),
@@ -73,7 +73,7 @@ describe("WeatherManager", () => {
   });
 
   it("should log and throw if fetch throws", async () => {
-    const manager = new WeatherManager();
+    const manager = new WeatherAPIClient();
     const errorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
     fetchMock.mockRejectedValue(new Error("network fail"));
 

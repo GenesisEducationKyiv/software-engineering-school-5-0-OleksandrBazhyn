@@ -1,10 +1,10 @@
 import cron from "node-cron";
-import Scheduler from "../../../src/managers/Scheduler.js";
-import EmailService from "../../../src/managers/EmailService.js";
+import Scheduler from "../../../src/entities/Scheduler.js";
+import EmailService from "../../../src/entities/EmailService.js";
 import { Mailer, DataProvider } from "../../../src/types.js";
 
 jest.mock("node-cron");
-jest.mock("../../../src/managers/EmailService");
+jest.mock("../../../src/entities/EmailService");
 
 describe("Scheduler", () => {
   let mailer: Mailer;

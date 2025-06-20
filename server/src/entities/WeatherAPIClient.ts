@@ -1,6 +1,6 @@
-import { WeatherData } from "../types.js";
+import { WeatherData, WeatherProvider } from "../types.js";
 
-class WeatherManager {
+class WeatherAPIClient implements WeatherProvider {
   private WEATHER_API_KEY: string | undefined;
 
   constructor() {
@@ -33,4 +33,4 @@ class WeatherManager {
   }
 }
 
-export default WeatherManager;
+export default WeatherAPIClient;

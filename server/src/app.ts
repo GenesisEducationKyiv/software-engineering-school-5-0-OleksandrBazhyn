@@ -4,9 +4,9 @@ import cors from "cors";
 import apiRoutes from "./routes/api.js";
 import http from "http";
 import { setupWebSocket } from "./ws-server.js";
-import Scheduler from "./managers/Scheduler.js";
-import GmailMailer from "./managers/GmailMailer.js";
-import DbDataProvider from "./managers/DbDataProvider.js";
+import Scheduler from "./entities/Scheduler.js";
+import GmailMailer from "./entities/GmailMailer.js";
+import DbDataProvider from "./entities/DbDataProvider.js";
 
 const PORT: number = Number(process.env.PORT) || 3000;
 
