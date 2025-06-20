@@ -3,7 +3,7 @@ import WeatherManager from "../managers/WeatherManager.js";
 import SubscriptionService from "../managers/SubscriptionService.js";
 import { WeatherData, SubscriptionInput } from "../types.js";
 import MailManager from "../managers/MailManager.js";
-import DbDataProvider from "../managers/DbDataProvider.js";
+import SubscriptionDataProvider from "../managers/SubscriptionDataProvider.js";
 import nodemailer from "nodemailer";
 import { config } from "../config.js";
 import { SubscriptionError } from "../errors/SubscriptionError.js";
@@ -19,7 +19,7 @@ const subscriptionService = new SubscriptionService(
       },
     }),
   ),
-  DbDataProvider,
+  SubscriptionDataProvider,
 );
 
 router.get("/weather", async (req: express.Request, res: express.Response) => {

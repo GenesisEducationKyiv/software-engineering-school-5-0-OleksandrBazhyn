@@ -6,7 +6,7 @@ import http from "http";
 import { setupWebSocket } from "./ws-server.js";
 import Scheduler from "./managers/Scheduler.js";
 import MailManager from "./managers/MailManager.js";
-import DbDataProvider from "./managers/DbDataProvider.js";
+import SubscriptionDataProvider from "./managers/SubscriptionDataProvider.js";
 import nodemailer from "nodemailer";
 import { config } from "./config.js";
 
@@ -36,5 +36,5 @@ Scheduler.start(
       },
     }),
   ),
-  DbDataProvider,
+  SubscriptionDataProvider,
 );
