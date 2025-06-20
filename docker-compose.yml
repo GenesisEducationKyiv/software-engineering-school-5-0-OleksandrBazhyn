@@ -45,7 +45,7 @@ services:
     depends_on:
       - db
     env_file:
-      - ./server/.env.docker
+      - ./server/.env.docker.test
 
 #  server-test-unit:
 #    build:
