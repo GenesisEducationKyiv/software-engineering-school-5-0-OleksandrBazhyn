@@ -56,7 +56,7 @@ jobs:
           node-version: 20
       - run: npm ci
       - name: Run migrations
-        run: NODE_ENV=test npx knex migrate:latest --esm
+        run: NODE_ENV=test npx knex migrate:latest --knexfile ./knexfile.cjs
       - run: npm run test:integration
 
   e2e-tests:
