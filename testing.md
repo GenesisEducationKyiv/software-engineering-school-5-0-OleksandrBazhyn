@@ -7,7 +7,7 @@
 
 ## 1. Інтеграційні тести
 
-Відносно розташування репозиторія
+Переконайся, що Docker запущено
 ```sh
 docker compose up --build --abort-on-container-exit server-test-integration db
 ```
