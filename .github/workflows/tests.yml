@@ -42,6 +42,13 @@ jobs:
       PGDATABASE: weather_db
       PGHOST: localhost
       PGPORT: 5432
+      PORT: 3000
+      SMTP_HOST: smtp.example.com
+      SMTP_PORT: 587
+      SMTP_USER: ${{ secrets.SMTP_USER }}
+      SMTP_PASS: ${{ secrets.SMTP_PASS }}
+      SMTP_FROM: ${{ secrets.SMTP_FROM }}
+      WEATHER_API_KEY: ${{ secrets.WEATHER_API_KEY }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
