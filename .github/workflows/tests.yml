@@ -55,7 +55,10 @@ jobs:
         with:
           node-version: 20
       - run: npm ci
-      - run: NODE_ENV=test npx knex migrate:latest --knexfile ./db/knexConfig.ts --esm
+      - name: Run migrations
+        run: |
+          cd $(pwd) # Переконуємося, що робочий каталог залишається незмінним
+          NODE_ENV=test npx knex migrate:latest --knexfile ./db/knexConfig.ts --migrations-directory ./db/migrations --esm
       - run: npm run test:integration
 
   e2e-tests:
