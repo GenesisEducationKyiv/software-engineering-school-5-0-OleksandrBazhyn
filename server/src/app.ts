@@ -24,4 +24,15 @@ server.listen(PORT, () => {
   console.log(`Server is running (HTTP + WS) on port ${PORT}`);
 });
 
-Scheduler.start(new GmailMailer(), DbDataProvider);
+Scheduler.start(
+  new MailManager(
+    nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: config.SMTP_USER,
+        pass: config.SMTP_PASS,
+      },
+    }),
+  ),
+  SubscriptionDataProvider,
+);

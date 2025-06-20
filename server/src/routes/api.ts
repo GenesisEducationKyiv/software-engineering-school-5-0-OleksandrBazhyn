@@ -2,11 +2,25 @@ import express from "express";
 import WeatherAPIClient from "../entities/WeatherAPIClient.js";
 import SubscriptionService from "../entities/SubscriptionService.js";
 import { WeatherData, SubscriptionInput } from "../types.js";
-import GmailMailer from "../entities/GmailMailer.js";
-import DbDataProvider from "../entities/DbDataProvider.js";
+import MailManager from "../entities/MailManager.js";
+import SubscriptionDataProvider from "../entities/SubscriptionDataProvider.js";
+import { config } from "../config.js";
+import { SubscriptionError } from "../errors/SubscriptionError.js";
+import nodemailer from "nodemailer";
 
 const router = express.Router();
-const subscriptionService = new SubscriptionService(new GmailMailer(), DbDataProvider);
+const subscriptionService = new SubscriptionService(
+  new MailManager(
+    nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: config.SMTP_USER,
+        pass: config.SMTP_PASS,
+      },
+    }),
+  ),
+  SubscriptionDataProvider,
+);
 
 router.get("/weather", async (req: express.Request, res: express.Response) => {
   const city = req.query.city as string | undefined;
@@ -43,8 +57,8 @@ router.post("/subscribe", async (req: express.Request, res: express.Response) =>
     await subscriptionService.subscribe({ email, city, frequency });
     return res.status(200).json({ message: "Subscription successful. Confirmation email sent." });
   } catch (err: unknown) {
-    if (err instanceof Error && err.message === "Email already subscribed") {
-      return res.status(409).json({ error: err.message });
+    if (err instanceof SubscriptionError) {
+      return res.status(err.statusCode).json({ error: err.message });
     }
     console.error(err);
     return res.status(400).json({ error: "Invalid input" });
@@ -60,6 +74,9 @@ router.get("/confirm/:token", async (req, res) => {
     }
     return res.status(400).send("Invalid token");
   } catch (err) {
+    if (err instanceof SubscriptionError) {
+      return res.status(err.statusCode).send(err.message);
+    }
     console.error(err);
     return res.status(404).send("Token not found");
   }
@@ -74,6 +91,9 @@ router.get("/unsubscribe/:token", async (req, res) => {
     }
     return res.status(400).send("Invalid token");
   } catch (err) {
+    if (err instanceof SubscriptionError) {
+      return res.status(err.statusCode).send(err.message);
+    }
     console.error(err);
     return res.status(500).send("Server error");
   }
