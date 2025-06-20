@@ -1,4 +1,4 @@
-import DbDataProvider from "../../../src/entities/DbDataProvider.js";
+import SubscriptionDataProvider from "../../../src/entities/SubscriptionDataProvider.js";
 import db from "../../../db/knex.js";
 import { SubscriptionInput, Subscription } from "../../../src/types.js";
 
@@ -14,7 +14,7 @@ interface MockKnex {
 
 jest.mock("../../../db/knex.js");
 
-describe("DbDataProvider", () => {
+describe("SubscriptionDataProvider", () => {
   const testSubscription: SubscriptionInput = {
     email: "test@mail.com",
     city: "Kyiv",
@@ -45,7 +45,7 @@ describe("DbDataProvider", () => {
       };
       (db as unknown as jest.Mock).mockReturnValueOnce(mockKnex);
 
-      const result = await DbDataProvider.getSubscriptionsByFrequency("daily");
+      const result = await SubscriptionDataProvider.getSubscriptionsByFrequency("daily");
       expect(result).toEqual(mockSubs);
     });
 
@@ -57,7 +57,7 @@ describe("DbDataProvider", () => {
       };
       (db as unknown as jest.Mock).mockReturnValueOnce(mockKnex);
 
-      const result = await DbDataProvider.getSubscriptionsByFrequency("hourly");
+      const result = await SubscriptionDataProvider.getSubscriptionsByFrequency("hourly");
       expect(result).toEqual([]);
       expect(warnSpy).toHaveBeenCalledWith("No active subscriptions found for frequency: hourly");
       warnSpy.mockRestore();
@@ -67,7 +67,7 @@ describe("DbDataProvider", () => {
       (db as unknown as jest.Mock).mockImplementation(() => {
         throw new Error("Invalid frequency");
       });
-      await expect(DbDataProvider.getSubscriptionsByFrequency("weekly" as any)).rejects.toThrow(
+      await expect(SubscriptionDataProvider.getSubscriptionsByFrequency("weekly" as any)).rejects.toThrow(
         "Invalid frequency",
       );
     });
@@ -85,7 +85,7 @@ describe("DbDataProvider", () => {
       };
       (db as unknown as jest.Mock).mockReturnValueOnce(mockKnex);
 
-      const result = await DbDataProvider.checkSubscriptionExists(testSubscription);
+      const result = await SubscriptionDataProvider.checkSubscriptionExists(testSubscription);
       expect(result).toBe(true);
       expect(warnSpy).toHaveBeenCalled();
       warnSpy.mockRestore();
@@ -99,7 +99,7 @@ describe("DbDataProvider", () => {
       };
       (db as unknown as jest.Mock).mockReturnValueOnce(mockKnex);
 
-      const result = await DbDataProvider.checkSubscriptionExists(testSubscription);
+      const result = await SubscriptionDataProvider.checkSubscriptionExists(testSubscription);
       expect(result).toBe(false);
     });
   });
@@ -114,7 +114,7 @@ describe("DbDataProvider", () => {
       const logSpy = jest.spyOn(console, "log").mockImplementation(() => {});
 
       await expect(
-        DbDataProvider.insertSubscription(testSubscription, testToken, false),
+        SubscriptionDataProvider.insertSubscription(testSubscription, testToken, false),
       ).resolves.toBeUndefined();
 
       expect(logSpy).toHaveBeenCalledWith(
@@ -133,7 +133,7 @@ describe("DbDataProvider", () => {
       const errorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
 
       await expect(
-        DbDataProvider.insertSubscription(testSubscription, testToken, false),
+        SubscriptionDataProvider.insertSubscription(testSubscription, testToken, false),
       ).rejects.toThrow("Failed to insert subscription");
 
       expect(errorSpy).toHaveBeenCalled();
@@ -147,7 +147,7 @@ describe("DbDataProvider", () => {
       };
       (db as unknown as jest.Mock).mockReturnValueOnce(mockKnex);
       await expect(
-        DbDataProvider.insertSubscription(
+        SubscriptionDataProvider.insertSubscription(
           { email: "", city: "", frequency: "daily" },
           testToken,
           false,
@@ -165,7 +165,7 @@ describe("DbDataProvider", () => {
       (db as unknown as jest.Mock).mockReturnValueOnce(mockKnex);
       const logSpy = jest.spyOn(console, "log").mockImplementation(() => {});
 
-      const result = await DbDataProvider.updateSubscriptionStatus(testToken, true);
+      const result = await SubscriptionDataProvider.updateSubscriptionStatus(testToken, true);
       expect(result).toBe(true);
       expect(logSpy).toHaveBeenCalled();
       logSpy.mockRestore();
@@ -179,7 +179,7 @@ describe("DbDataProvider", () => {
       (db as unknown as jest.Mock).mockReturnValueOnce(mockKnex);
       const warnSpy = jest.spyOn(console, "warn").mockImplementation(() => {});
 
-      const result = await DbDataProvider.updateSubscriptionStatus(testToken, true);
+      const result = await SubscriptionDataProvider.updateSubscriptionStatus(testToken, true);
       expect(result).toBe(false);
       expect(warnSpy).toHaveBeenCalledWith(`No subscription found with token: ${testToken}`);
       warnSpy.mockRestore();
@@ -191,7 +191,7 @@ describe("DbDataProvider", () => {
         update: jest.fn().mockRejectedValue(new Error("update error")),
       };
       (db as unknown as jest.Mock).mockReturnValueOnce(mockKnex);
-      await expect(DbDataProvider.updateSubscriptionStatus(testToken, true)).rejects.toThrow();
+      await expect(SubscriptionDataProvider.updateSubscriptionStatus(testToken, true)).rejects.toThrow();
     });
   });
 
@@ -204,7 +204,7 @@ describe("DbDataProvider", () => {
       (db as unknown as jest.Mock).mockReturnValueOnce(mockKnex);
       const logSpy = jest.spyOn(console, "log").mockImplementation(() => {});
 
-      const result = await DbDataProvider.deleteSubscription(testToken);
+      const result = await SubscriptionDataProvider.deleteSubscription(testToken);
       expect(result).toBe(true);
       expect(logSpy).toHaveBeenCalled();
       logSpy.mockRestore();
@@ -218,7 +218,7 @@ describe("DbDataProvider", () => {
       (db as unknown as jest.Mock).mockReturnValueOnce(mockKnex);
       const warnSpy = jest.spyOn(console, "warn").mockImplementation(() => {});
 
-      const result = await DbDataProvider.deleteSubscription(testToken);
+      const result = await SubscriptionDataProvider.deleteSubscription(testToken);
       expect(result).toBe(false);
       expect(warnSpy).toHaveBeenCalledWith(`No subscription found with token: ${testToken}`);
       warnSpy.mockRestore();
@@ -230,7 +230,7 @@ describe("DbDataProvider", () => {
         del: jest.fn().mockRejectedValue(new Error("delete error")),
       };
       (db as unknown as jest.Mock).mockReturnValueOnce(mockKnex);
-      await expect(DbDataProvider.deleteSubscription(testToken)).rejects.toThrow();
+      await expect(SubscriptionDataProvider.deleteSubscription(testToken)).rejects.toThrow();
     });
   });
 });

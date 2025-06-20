@@ -1,15 +1,15 @@
-import "dotenv/config";
-const isProd = process.env.NODE_ENV === "production";
+import { config as appConfig } from "../src/config.js";
+const isProd = "production";
 const migrationsDir = "./migrations";
 
-const config = {
+const knexConfig = {
   client: "pg",
   connection: {
-    host: process.env.PGHOST || "localhost",
-    user: process.env.PGUSER || "postgres",
-    password: process.env.PGPASSWORD || "postgres",
-    database: process.env.PGDATABASE || "weather_db",
-    port: Number(process.env.PGPORT) || 5432,
+    host: appConfig.PGHOST || "localhost",
+    user: appConfig.PGUSER || "postgres",
+    password: appConfig.PGPASSWORD || "postgres",
+    database: appConfig.PGDATABASE || "weather_db",
+    port: appConfig.PGPORT || 5432,
   },
   migrations: {
     directory: migrationsDir,
@@ -17,4 +17,4 @@ const config = {
   },
 };
 
-export default config;
+export default knexConfig;

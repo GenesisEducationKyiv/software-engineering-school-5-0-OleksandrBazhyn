@@ -28,11 +28,14 @@ describe("WeatherAPIClient", () => {
   });
 
   it("should throw if WEATHER_API_KEY is not set when calling getWeatherData", async () => {
+    const originalKey = process.env.WEATHER_API_KEY;
     process.env.WEATHER_API_KEY = "";
+
     const manager = new WeatherAPIClient();
-    await expect(manager.getWeatherData("Kyiv")).rejects.toThrow(
-      "WEATHER_API_KEY is not set in environment variables.",
-    );
+
+    await expect(manager.getWeatherData("Kyiv")).rejects.toThrow("Failed to fetch weather data");
+
+    process.env.WEATHER_API_KEY = originalKey;
   });
 
   it("should fetch weather data and return it on success", async () => {

@@ -2,7 +2,9 @@ import { Mailer, WeatherData } from "../../types.js";
 
 let lastToken: string | undefined = undefined;
 
-class MockGmailMailer implements Mailer {
+class MockMailManager implements Mailer {
+  constructor(_transporter: unknown) {}
+
   async sendConfirmationEmail(_email: string, _city: string, token: string): Promise<void> {
     lastToken = token;
   }
@@ -19,4 +21,4 @@ class MockGmailMailer implements Mailer {
   }
 }
 
-export default MockGmailMailer;
+export default MockMailManager;

@@ -85,7 +85,7 @@ describe("SubscriptionService", () => {
       dataProvider.updateSubscriptionStatus.mockResolvedValue(false);
 
       await expect(service.confirm("badtoken")).rejects.toThrow(
-        "Invalid token or subscription already confirmed",
+        "Invalid token",
       );
     });
 
@@ -110,7 +110,7 @@ describe("SubscriptionService", () => {
       dataProvider.deleteSubscription.mockResolvedValue(false);
 
       await expect(service.unsubscribe("badtoken")).rejects.toThrow(
-        "Invalid token or subscription not found",
+        "Invalid token",
       );
     });
 

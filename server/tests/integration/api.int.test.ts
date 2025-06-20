@@ -2,13 +2,12 @@ import request from "supertest";
 import express, { Express } from "express";
 import { jest, beforeAll, describe, it, expect } from "@jest/globals";
 
-// Mock dependencies
-jest.mock("../../src/entities/GmailMailer.js");
+jest.mock("../../src/entities/MailManager.js");
 jest.mock("../../src/entities/WeatherAPIClient.js");
 
-// Import after mocking to ensure mocks are used
 import apiRoutes from "../../src/routes/api.js";
-import GmailMailer from "../../src/entities/GmailMailer.js";
+import MailManager from "../../src/entities/MailManager.js";
+import nodemailer from "nodemailer";
 
 let app: Express;
 
@@ -31,8 +30,9 @@ describe("Advanced Subscription/Confirmation workflow", () => {
     expect(res.statusCode).toBe(200);
     expect(res.body.message).toMatch(/confirmation email sent/i);
 
-    // Get token from mock (create an instance first)
-    const mailerInstance = new GmailMailer();
+    const mockTransporter = {} as nodemailer.Transporter;
+
+    const mailerInstance = new MailManager(mockTransporter);
     token = (mailerInstance as any).__getLastToken() ?? null;
     expect(token).toBeTruthy();
   });

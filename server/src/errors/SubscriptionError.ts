@@ -10,11 +10,11 @@ export class SubscriptionError extends Error {
   }
 
   static alreadySubscribed(email: string, city: string): SubscriptionError {
-    return new SubscriptionError(`Email is already subscribed to ${city}`, 409);
+    return new SubscriptionError("Email already subscribed", 409);
   }
 
   static invalidToken(): SubscriptionError {
-    return new SubscriptionError("Invalid token or subscription not found", 400);
+    return new SubscriptionError("Invalid token", 400);
   }
 
   static notConfirmed(): SubscriptionError {
