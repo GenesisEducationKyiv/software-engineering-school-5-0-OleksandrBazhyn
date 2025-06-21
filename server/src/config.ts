@@ -48,4 +48,5 @@ export const config = {
   PGHOST: required("PGHOST", process.env.PGHOST),
   PGUSER: required("PGUSER", process.env.PGUSER),
   PGPASSWORD: required("PGPASSWORD", process.env.PGPASSWORD),
+  OPENWEATHERMAP_API_KEY: required("OPENWEATHERMAP_API_KEY", process.env.OPENWEATHERMAP_API_KEY),
 };

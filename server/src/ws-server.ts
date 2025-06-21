@@ -1,5 +1,5 @@
 import { WebSocketServer, WebSocket } from "ws";
-import WeatherAPIClient from "./entities/WeatherAPIClient.js";
+import { WeatherProviderManager } from "./entities/WeatherProviderManager.js";
 import type { Server } from "http";
 import type {
   WeatherData,
@@ -63,9 +63,8 @@ export function setupWebSocket(server: Server): void {
       // Only send if the connection is open and city is defined
       if (ws.readyState === ws.OPEN && city) {
         try {
-          // Fetch weather for the city using WeatherManager
-          const weatherManager = new WeatherAPIClient();
-          const weatherData: WeatherData = await weatherManager.getWeatherData(city);
+          const weatherManager = WeatherProviderManager.getInstance();
+          const weatherData: WeatherData = await weatherManager.getProvider().getWeatherData(city);
 
           // Send weather info if available
           if (weatherData && weatherData.current) {

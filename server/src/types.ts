@@ -19,6 +19,12 @@ export interface WeatherData {
   };
 }
 
+export interface WeatherResponse {
+  temperature: number;
+  humidity: number;
+  description: string;
+}
+
 export interface SubscriptionMessage {
   city?: string;
   [key: string]: unknown;
@@ -73,4 +79,9 @@ export interface DataProvider {
 
 export interface WeatherProvider {
   getWeatherData: (city: string) => Promise<WeatherData>;
+}
+
+export interface GeocodingResult {
+  lat: number;
+  lon: number;
 }

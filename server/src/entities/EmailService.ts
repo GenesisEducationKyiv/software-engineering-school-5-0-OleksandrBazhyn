@@ -5,7 +5,7 @@ import {
   Mailer,
   DataProvider,
 } from "../types.js";
-import WeatherAPIClient from "./WeatherAPIClient.js";
+import WeatherAPIClient from "./WeatherAPIProvider.js";
 
 class EmailService {
   private weatherManager: WeatherAPIClient;

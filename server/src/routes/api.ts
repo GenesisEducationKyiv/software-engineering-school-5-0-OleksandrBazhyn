@@ -1,7 +1,7 @@
 import express from "express";
-import WeatherAPIClient from "../entities/WeatherAPIClient.js";
+import { WeatherProviderManager } from "../entities/WeatherProviderManager.js";
 import SubscriptionService from "../entities/SubscriptionService.js";
-import { WeatherData, SubscriptionInput } from "../types.js";
+import { WeatherData, SubscriptionInput, WeatherResponse } from "../types.js";
 import MailManager from "../entities/MailManager.js";
 import SubscriptionDataProvider from "../entities/SubscriptionDataProvider.js";
 import { config } from "../config.js";
@@ -28,16 +28,19 @@ router.get("/weather", async (req: express.Request, res: express.Response) => {
     return res.status(400).json({ error: "Invalid request" });
   }
   try {
-    const weatherManager = new WeatherAPIClient();
-    const weatherData: WeatherData = await weatherManager.getWeatherData(city);
-    if (!weatherData) {
+    const weatherManager = WeatherProviderManager.getInstance();
+    const weatherData: WeatherData = await weatherManager.getProvider().getWeatherData(city);
+
+    if (!weatherData || !weatherData.current) {
       return res.status(404).json({ error: "City not found" });
     }
-    const data = {
+
+    const data: WeatherResponse = {
       temperature: weatherData.current.temp_c,
       humidity: weatherData.current.humidity,
       description: weatherData.current.condition.text,
     };
+
     return res.status(200).json(data);
   } catch (error) {
     console.error("Error fetching weather data:", error);
