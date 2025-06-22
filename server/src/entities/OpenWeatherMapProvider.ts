@@ -3,14 +3,14 @@ import { BaseWeatherProvider } from "./BaseWeatherProvider.js";
 import { config } from "../config.js";
 
 export class OpenWeatherMapProvider extends BaseWeatherProvider {
-  private apiKey: string;
+  private OPENWEATHERMAP_API_KEY: string;
 
   constructor(apiKey?: string) {
     super("OpenWeatherMap");
-    this.apiKey =
+    this.OPENWEATHERMAP_API_KEY =
       apiKey || process.env.OPENWEATHERMAP_API_KEY || config.OPENWEATHERMAP_API_KEY || "";
 
-    if (!this.apiKey) {
+    if (!this.OPENWEATHERMAP_API_KEY) {
       console.warn("OPENWEATHERMAP_API_KEY is not set in environment variables.");
     }
   }
@@ -26,7 +26,7 @@ export class OpenWeatherMapProvider extends BaseWeatherProvider {
   }
 
   private validateApiKey(): void {
-    if (!this.apiKey) {
+    if (!this.OPENWEATHERMAP_API_KEY) {
       throw new Error("OPENWEATHERMAP_API_KEY is not set in environment variables.");
     }
   }
@@ -40,7 +40,7 @@ export class OpenWeatherMapProvider extends BaseWeatherProvider {
   protected buildGeocodingUrl(city: string): string {
     return `http://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(
       city,
-    )}&limit=1&appid=${this.apiKey}`;
+    )}&limit=1&appid=${this.OPENWEATHERMAP_API_KEY}`;
   }
 
   protected async makeApiRequest(url: string): Promise<any> {
@@ -67,7 +67,7 @@ export class OpenWeatherMapProvider extends BaseWeatherProvider {
   }
 
   protected buildWeatherUrl(coords: GeocodingResult): string {
-    return `https://api.openweathermap.org/data/2.5/weather?lat=${coords.lat}&lon=${coords.lon}&appid=${this.apiKey}&units=metric`;
+    return `https://api.openweathermap.org/data/2.5/weather?lat=${coords.lat}&lon=${coords.lon}&appid=${this.OPENWEATHERMAP_API_KEY}&units=metric`;
   }
 
   protected validateWeatherData(data: any): void {
