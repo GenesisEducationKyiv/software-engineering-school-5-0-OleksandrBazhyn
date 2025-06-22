@@ -1,6 +1,6 @@
 import request from "supertest";
 import express, { Express } from "express";
-import { jest, beforeAll, describe, it, expect } from "@jest/globals";
+import { jest, beforeAll, afterAll, describe, it, expect } from "@jest/globals";
 
 jest.mock("../../src/entities/MailManager.js");
 

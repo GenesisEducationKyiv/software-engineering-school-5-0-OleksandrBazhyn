@@ -9,9 +9,9 @@ export class WeatherProviderManager {
   private constructor() {
     const weatherAPIProvider = new WeatherAPIProvider();
     const openWeatherMapProvider = new OpenWeatherMapProvider();
-    
+
     weatherAPIProvider.setNext(openWeatherMapProvider);
-    
+
     this.provider = weatherAPIProvider;
   }
 
