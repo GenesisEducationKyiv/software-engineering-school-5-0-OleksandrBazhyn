@@ -3,14 +3,14 @@ import { BaseWeatherProvider } from "./BaseWeatherProvider.js";
 import { config } from "../config.js";
 
 export class OpenWeatherMapProvider extends BaseWeatherProvider {
-  private OPENWEATHERMAP_API_KEY: string | undefined;
+  private apiKey: string;
 
-  constructor() {
+  constructor(apiKey?: string) {
     super("OpenWeatherMap");
-    this.OPENWEATHERMAP_API_KEY =
-      process.env.OPENWEATHERMAP_API_KEY || config.OPENWEATHERMAP_API_KEY;
+    this.apiKey =
+      apiKey || process.env.OPENWEATHERMAP_API_KEY || config.OPENWEATHERMAP_API_KEY || "";
 
-    if (!this.OPENWEATHERMAP_API_KEY || this.OPENWEATHERMAP_API_KEY === "") {
+    if (!this.apiKey) {
       console.warn("OPENWEATHERMAP_API_KEY is not set in environment variables.");
     }
   }
@@ -19,52 +19,58 @@ export class OpenWeatherMapProvider extends BaseWeatherProvider {
     this.validateApiKey();
 
     const coordinates = await this.getCoordinatesForCity(city);
-    const weatherData = await this.getWeatherByCoordinates(coordinates);
+    const rawWeatherData = await this.fetchRawWeatherData(coordinates);
+    this.validateWeatherData(rawWeatherData);
 
-    return this.transformToWeatherData(weatherData);
+    return this.transformToWeatherData(rawWeatherData);
   }
 
   private validateApiKey(): void {
-    if (!this.OPENWEATHERMAP_API_KEY || this.OPENWEATHERMAP_API_KEY === "") {
+    if (!this.apiKey) {
       throw new Error("OPENWEATHERMAP_API_KEY is not set in environment variables.");
     }
   }
 
-  private async getCoordinatesForCity(city: string): Promise<GeocodingResult> {
-    const geoResponse = await fetch(
-      `http://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(city)}&limit=1&appid=${this.OPENWEATHERMAP_API_KEY}`,
-    );
+  protected async getCoordinatesForCity(city: string): Promise<GeocodingResult> {
+    const url = this.buildGeocodingUrl(city);
+    const response = await this.makeApiRequest(url);
+    return this.parseGeocodingResponse(response, city);
+  }
 
-    if (!geoResponse.ok) {
-      throw new Error(`Geocoding API response was not ok: ${geoResponse.status}`);
+  protected buildGeocodingUrl(city: string): string {
+    return `http://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(
+      city,
+    )}&limit=1&appid=${this.apiKey}`;
+  }
+
+  protected async makeApiRequest(url: string): Promise<any> {
+    const response = await fetch(url);
+
+    if (!response.ok) {
+      throw new Error(`API response was not ok: ${response.status}`);
     }
 
-    const geoData = await geoResponse.json();
-    if (!geoData || !geoData.length) {
+    return response.json();
+  }
+
+  protected parseGeocodingResponse(data: any, city: string): GeocodingResult {
+    if (!data || !data.length) {
       throw new Error(`City not found: ${city}`);
     }
 
-    return { lat: geoData[0].lat, lon: geoData[0].lon };
+    return { lat: data[0].lat, lon: data[0].lon };
   }
 
-  private async getWeatherByCoordinates(coords: GeocodingResult): Promise<unknown> {
-    const { lat, lon } = coords;
-
-    const weatherResponse = await fetch(
-      `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${this.OPENWEATHERMAP_API_KEY}&units=metric`,
-    );
-
-    if (!weatherResponse.ok) {
-      throw new Error(`Weather API response was not ok: ${weatherResponse.status}`);
-    }
-
-    const data = await weatherResponse.json();
-    this.validateWeatherData(data);
-
-    return data;
+  protected async fetchRawWeatherData(coords: GeocodingResult): Promise<any> {
+    const url = this.buildWeatherUrl(coords);
+    return this.makeApiRequest(url);
   }
 
-  private validateWeatherData(data: any): void {
+  protected buildWeatherUrl(coords: GeocodingResult): string {
+    return `https://api.openweathermap.org/data/2.5/weather?lat=${coords.lat}&lon=${coords.lon}&appid=${this.apiKey}&units=metric`;
+  }
+
+  protected validateWeatherData(data: any): void {
     if (
       !data.main ||
       typeof data.main.temp !== "number" ||
@@ -74,7 +80,7 @@ export class OpenWeatherMapProvider extends BaseWeatherProvider {
     }
   }
 
-  private transformToWeatherData(data: any): WeatherData {
+  protected transformToWeatherData(data: any): WeatherData {
     return {
       current: {
         temp_c: data.main.temp,
