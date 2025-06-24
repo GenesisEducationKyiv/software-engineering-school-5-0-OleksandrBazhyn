@@ -5,10 +5,9 @@ import { config } from "../config.js";
 export class OpenWeatherMapProvider extends BaseWeatherProvider {
   private OPENWEATHERMAP_API_KEY: string;
 
-  constructor(apiKey?: string) {
+  constructor() {
     super("OpenWeatherMap");
-    this.OPENWEATHERMAP_API_KEY =
-      apiKey || process.env.OPENWEATHERMAP_API_KEY || config.OPENWEATHERMAP_API_KEY || "";
+    this.OPENWEATHERMAP_API_KEY = config.OPENWEATHERMAP_API_KEY || "";
 
     if (!this.OPENWEATHERMAP_API_KEY) {
       console.warn("OPENWEATHERMAP_API_KEY is not set in environment variables.");
