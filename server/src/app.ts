@@ -9,7 +9,7 @@ import SubscriptionDataProvider from "./entities/SubscriptionDataProvider.js";
 import { config } from "./config.js";
 import nodemailer from "nodemailer";
 
-const PORT: number = Number(process.env.PORT) || 3000;
+const PORT = Number(process.env.PORT) || 3000;
 
 const app = express();
 
@@ -17,7 +17,7 @@ app.use(cors());
 app.use(express.json());
 app.use("/api/v1", apiRoutes);
 
-const server: http.Server = http.createServer(app);
+const server = http.createServer(app);
 
 setupWebSocket(server);
 

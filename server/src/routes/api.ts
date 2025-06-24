@@ -5,8 +5,15 @@ import { WeatherData, SubscriptionInput } from "../types.js";
 import MailManager from "../entities/MailManager.js";
 import SubscriptionDataProvider from "../entities/SubscriptionDataProvider.js";
 import { config } from "../config.js";
-import { SubscriptionError } from "../errors/SubscriptionError.js";
+import {
+  SubscriptionError,
+  AlreadySubscribedError,
+  NotConfirmedError,
+  InvalidTokenError,
+  CityNotFound,
+} from "../errors/SubscriptionError.js";
 import nodemailer from "nodemailer";
+import { Cipheriv } from "crypto";
 
 const router = express.Router();
 const subscriptionService = new SubscriptionService(
@@ -39,9 +46,11 @@ router.get("/weather", async (req: express.Request, res: express.Response) => {
       description: weatherData.current.condition.text,
     };
     return res.status(200).json(data);
-  } catch (error) {
-    console.error("Error fetching weather data:", error);
-    return res.status(404).json({ error: "City not found" });
+  } catch (err: unknown) {
+    if (err instanceof CityNotFound) {
+      return res.status(404).json({ error: err.message });
+    }
+    console.error(err);
   }
 });
 
@@ -53,12 +62,31 @@ router.post("/subscribe", async (req: express.Request, res: express.Response) =>
     return res.status(400).json({ error: "Invalid input" });
   }
 
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    return res.status(400).json({ error: "Invalid input" });
+  }
+
+  try {
+    const weatherManager = new WeatherAPIClient();
+    const weatherData: WeatherData = await weatherManager.getWeatherData(city);
+    if (!weatherData) {
+      return res.status(404).json({ error: "City not found" });
+    }
+  } catch (err: unknown) {
+    if (err instanceof CityNotFound) {
+      return res.status(404).json({ error: err.message });
+    }
+    return res.status(500).json({ error: "Weather API error" });
+  }
+
   try {
     await subscriptionService.subscribe({ email, city, frequency });
     return res.status(200).json({ message: "Subscription successful. Confirmation email sent." });
   } catch (err: unknown) {
-    if (err instanceof SubscriptionError) {
-      return res.status(err.statusCode).json({ error: err.message });
+    if (err instanceof AlreadySubscribedError) {
+      return res.status(409).json({ error: err.message });
+    } else if (err instanceof InvalidTokenError) {
+      return res.status(400).json({ error: err.message });
     }
     console.error(err);
     return res.status(400).json({ error: "Invalid input" });
@@ -74,8 +102,8 @@ router.get("/confirm/:token", async (req, res) => {
     }
     return res.status(400).send("Invalid token");
   } catch (err) {
-    if (err instanceof SubscriptionError) {
-      return res.status(err.statusCode).send(err.message);
+    if (err instanceof NotConfirmedError) {
+      return res.status(400).send(err.message);
     }
     console.error(err);
     return res.status(404).send("Token not found");
@@ -91,8 +119,8 @@ router.get("/unsubscribe/:token", async (req, res) => {
     }
     return res.status(400).send("Invalid token");
   } catch (err) {
-    if (err instanceof SubscriptionError) {
-      return res.status(err.statusCode).send(err.message);
+    if (err instanceof InvalidTokenError) {
+      return res.status(500).send(err.message);
     }
     console.error(err);
     return res.status(500).send("Server error");

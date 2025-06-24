@@ -2,12 +2,15 @@ import request from "supertest";
 import express, { Express } from "express";
 import { jest, beforeAll, describe, it, expect } from "@jest/globals";
 
+import { CityNotFound } from "../../src/errors/SubscriptionError.js";
+
 jest.mock("../../src/entities/MailManager.js");
 jest.mock("../../src/entities/WeatherAPIClient.js");
 
 import apiRoutes from "../../src/routes/api.js";
 import MailManager from "../../src/entities/MailManager.js";
 import nodemailer from "nodemailer";
+import { WeatherData } from "../../src/types.js";
 
 let app: Express;
 
@@ -87,14 +90,17 @@ describe("Advanced Subscription/Confirmation workflow", () => {
 
   it("Weather for unknown city returns 404", async () => {
     const { default: WeatherAPIClient } = await import("../../src/entities/WeatherAPIClient.js");
-    WeatherAPIClient.prototype.getWeatherData = async (_city: string) => {
-      throw new Error("Not found");
+    
+    WeatherAPIClient.prototype.getWeatherData = function(location: string): Promise<WeatherData> {
+      return Promise.reject(new CityNotFound());
     };
-
+    
     const res = await request(app).get("/api/weather?city=UnknownCity");
     expect(res.statusCode).toBe(404);
     expect(res.body).toHaveProperty("error");
-  });
+    
+    jest.restoreAllMocks();
+  }, 10000);
 
   it("GET /api/confirm/:token with invalid token returns 400 or 404", async () => {
     const res = await request(app).get("/api/confirm/invalidtoken");
