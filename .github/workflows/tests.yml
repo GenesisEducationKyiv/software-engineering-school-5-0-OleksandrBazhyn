@@ -121,3 +121,6 @@ jobs:
           NODE_ENV: test
           PORT: 3000
           
+      - name: Kill background processes
+        run: pkill -f "tsx" || true
+          
