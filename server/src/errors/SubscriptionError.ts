@@ -1,23 +1,36 @@
 export class SubscriptionError extends Error {
-  statusCode: number;
-
-  constructor(message: string, statusCode = 400) {
+  constructor(message: string) {
     super(message);
     this.name = "SubscriptionError";
-    this.statusCode = statusCode;
-
     Object.setPrototypeOf(this, SubscriptionError.prototype);
   }
+}
 
-  static alreadySubscribed(email: string, city: string): SubscriptionError {
-    return new SubscriptionError(`Email is already subscribed to ${city}`, 409);
+export class AlreadySubscribedError extends SubscriptionError {
+  email: string;
+  city: string;
+
+  constructor(email: string, city: string) {
+    super(`Email is already subscribed to ${city}`);
+    this.name = "AlreadySubscribedError";
+    this.email = email;
+    this.city = city;
+    Object.setPrototypeOf(this, AlreadySubscribedError.prototype);
   }
+}
 
-  static invalidToken(): SubscriptionError {
-    return new SubscriptionError("Invalid token or subscription not found", 400);
+export class InvalidTokenError extends SubscriptionError {
+  constructor() {
+    super("Invalid token or subscription not found");
+    this.name = "InvalidTokenError";
+    Object.setPrototypeOf(this, InvalidTokenError.prototype);
   }
+}
 
-  static notConfirmed(): SubscriptionError {
-    return new SubscriptionError("Subscription not confirmed", 400);
+export class NotConfirmedError extends SubscriptionError {
+  constructor() {
+    super("Subscription not confirmed");
+    this.name = "NotConfirmedError";
+    Object.setPrototypeOf(this, NotConfirmedError.prototype);
   }
 }
