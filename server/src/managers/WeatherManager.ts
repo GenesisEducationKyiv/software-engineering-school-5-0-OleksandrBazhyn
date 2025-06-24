@@ -1,15 +1,17 @@
 import { WeatherData } from "../types.js";
+import { config } from "../config.js";
 
 class WeatherManager {
   private WEATHER_API_KEY: string | undefined;
-  private weatherData: WeatherData | null;
 
   constructor() {
-    this.WEATHER_API_KEY = process.env.WEATHER_API_KEY;
-    this.weatherData = null;
+    if (!this.WEATHER_API_KEY) {
+      console.warn("WEATHER_API_KEY is not set in environment variables.");
+    }
+    this.WEATHER_API_KEY = config.WEATHER_API_KEY;
   }
 
-  async fetchWeatherData(location: string): Promise<WeatherData> {
+  async getWeatherData(location: string): Promise<WeatherData> {
     if (!this.WEATHER_API_KEY) {
       throw new Error("WEATHER_API_KEY is not set in environment variables.");
     }
@@ -21,16 +23,14 @@ class WeatherManager {
         throw new Error("Network response was not ok");
       }
       const data: WeatherData = await response.json();
-      this.weatherData = data;
+      if (!data || !data.current) {
+        throw new Error("Invalid weather data received");
+      }
       return data;
     } catch (error) {
       console.error("Error fetching weather data:", error);
       throw new Error("Failed to fetch weather data");
     }
-  }
-
-  getWeatherData(): WeatherData | null {
-    return this.weatherData;
   }
 }
 

@@ -42,3 +42,31 @@ export interface WebSocketInfoMessage {
   type: "info";
   message: string;
 }
+
+export interface Mailer {
+  sendConfirmationEmail: (email: string, city: string, token: string) => Promise<void>;
+  sendWeatherEmail: (
+    email: string,
+    city: string,
+    weather: WeatherData,
+    token: string,
+  ) => Promise<void>;
+}
+
+export interface SubscriptionInput {
+  email: string;
+  city: string;
+  frequency: SubscriptionFrequency;
+}
+
+export interface DataProvider {
+  getSubscriptionsByFrequency: (frequency: SubscriptionFrequency) => Promise<Subscription[]>;
+  checkSubscriptionExists: (subscription: SubscriptionInput) => Promise<boolean>;
+  insertSubscription: (
+    subscription: SubscriptionInput,
+    token: string,
+    is_active?: boolean,
+  ) => Promise<void>;
+  updateSubscriptionStatus: (token: string, isActive: boolean) => Promise<boolean>;
+  deleteSubscription: (token: string) => Promise<boolean>;
+}

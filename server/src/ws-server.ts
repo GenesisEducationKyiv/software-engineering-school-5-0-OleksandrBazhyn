@@ -27,11 +27,7 @@ export function setupWebSocket(server: Server): void {
     ws.on("message", (data: WebSocket.RawData) => {
       try {
         const msg: SubscriptionMessage = JSON.parse(data.toString());
-        if (
-          msg.city &&
-          typeof msg.city === "string" &&
-          msg.city.trim() !== ""
-        ) {
+        if (msg.city && typeof msg.city === "string" && msg.city.trim() !== "") {
           // Save this city as the client's subscription
           subscriptions.set(ws, msg.city.trim());
         }
@@ -69,8 +65,7 @@ export function setupWebSocket(server: Server): void {
         try {
           // Fetch weather for the city using WeatherManager
           const weatherManager = new WeatherManager();
-          const weatherData: WeatherData =
-            await weatherManager.fetchWeatherData(city);
+          const weatherData: WeatherData = await weatherManager.getWeatherData(city);
 
           // Send weather info if available
           if (weatherData && weatherData.current) {
