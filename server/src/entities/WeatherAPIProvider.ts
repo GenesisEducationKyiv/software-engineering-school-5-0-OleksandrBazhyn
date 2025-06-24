@@ -10,15 +10,11 @@ export class WeatherAPIProvider extends BaseWeatherProvider {
     this.WEATHER_API_KEY = config.WEATHER_API_KEY;
 
     if (!this.WEATHER_API_KEY || this.WEATHER_API_KEY === "") {
-      console.warn("WEATHER_API_KEY is not set in environment variables.");
+      throw new Error("WEATHER_API_KEY is not set in environment variables.");
     }
   }
 
   protected async fetchWeatherData(location: string): Promise<WeatherData> {
-    if (!this.WEATHER_API_KEY) {
-      throw new Error("WEATHER_API_KEY is not set in environment variables.");
-    }
-
     const response = await fetch(
       `https://api.weatherapi.com/v1/current.json?key=${this.WEATHER_API_KEY}&q=${encodeURIComponent(
         location,

@@ -10,24 +10,16 @@ export class OpenWeatherMapProvider extends BaseWeatherProvider {
     this.OPENWEATHERMAP_API_KEY = config.OPENWEATHERMAP_API_KEY || "";
 
     if (!this.OPENWEATHERMAP_API_KEY) {
-      console.warn("OPENWEATHERMAP_API_KEY is not set in environment variables.");
+      throw new Error("OPENWEATHERMAP_API_KEY is not set in environment variables.");
     }
   }
 
   protected async fetchWeatherData(city: string): Promise<WeatherData> {
-    this.validateApiKey();
-
     const coordinates = await this.getCoordinatesForCity(city);
     const rawWeatherData = await this.fetchRawWeatherData(coordinates);
     this.validateWeatherData(rawWeatherData);
 
     return this.transformToWeatherData(rawWeatherData);
-  }
-
-  private validateApiKey(): void {
-    if (!this.OPENWEATHERMAP_API_KEY) {
-      throw new Error("OPENWEATHERMAP_API_KEY is not set in environment variables.");
-    }
   }
 
   protected async getCoordinatesForCity(city: string): Promise<GeocodingResult> {
