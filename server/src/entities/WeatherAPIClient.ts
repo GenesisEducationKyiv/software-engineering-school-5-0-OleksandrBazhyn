@@ -5,10 +5,10 @@ class WeatherAPIClient implements WeatherProvider {
   private WEATHER_API_KEY: string | undefined;
 
   constructor() {
+    this.WEATHER_API_KEY = config.WEATHER_API_KEY;
     if (!this.WEATHER_API_KEY || this.WEATHER_API_KEY === "") {
       console.warn("WEATHER_API_KEY is not set in environment variables.");
     }
-    this.WEATHER_API_KEY = config.WEATHER_API_KEY;
   }
 
   async getWeatherData(location: string): Promise<WeatherData> {
