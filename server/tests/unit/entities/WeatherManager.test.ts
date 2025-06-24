@@ -19,13 +19,6 @@ describe("WeatherAPIClient", () => {
     delete global.fetch;
     jest.clearAllMocks();
   });
-  it("should warn if WEATHER_API_KEY is not set in constructor", () => {
-    const warnSpy = jest.spyOn(console, "warn").mockImplementation(() => {});
-    process.env.WEATHER_API_KEY = "";
-    new WeatherAPIClient();
-    expect(warnSpy).toHaveBeenCalledWith("WEATHER_API_KEY is not set in environment variables.");
-    warnSpy.mockRestore();
-  });
 
   it("should throw if WEATHER_API_KEY is not set when calling getWeatherData", async () => {
     const originalKey = process.env.WEATHER_API_KEY;

@@ -1,9 +1,10 @@
 import { WeatherData, WeatherProvider } from "../../types.js";
+import { CityNotFound } from "../../errors/SubscriptionError.js";
 
 class MockWeatherAPIClient implements WeatherProvider {
   async getWeatherData(city: string): Promise<WeatherData> {
     if (city === "UnknownCity") {
-      throw new Error("Not found");
+      throw new CityNotFound();
     }
 
     return {
