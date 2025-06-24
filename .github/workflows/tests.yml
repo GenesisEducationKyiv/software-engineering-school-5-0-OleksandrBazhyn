@@ -68,16 +68,28 @@ jobs:
         with:
           node-version: 20
 
-      - run: npm ci
+      - name: Install server dependencies
+        run: npm ci
+        working-directory: server
+
+      - name: Install client dependencies
+        run: npm ci
         working-directory: client
 
-      - run: npx playwright install --with-deps
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
         working-directory: client
 
-      - run: npm run dev -- --host 0.0.0.0 &
+      - name: Start client
+        run: npm run dev -- --host 0.0.0.0 &
         working-directory: client
 
-      - run: npx wait-on http://localhost:5173
+      - name: Wait for client
+        run: npx wait-on http://localhost:5173
 
-      - run: npm run test:e2e
+      - name: Run E2E tests
+        run: npm run test:e2e
         working-directory: client
+        env:
+          NODE_ENV: test
+          PORT: 3000
