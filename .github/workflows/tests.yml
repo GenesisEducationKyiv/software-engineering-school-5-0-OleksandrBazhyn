@@ -93,6 +93,18 @@ jobs:
         run: npx playwright install --with-deps
         working-directory: client
 
+      - name: Run DB migrations for E2E
+        run: |
+          npx knex --knexfile knexfile.cjs migrate:latest
+        working-directory: server
+        env:
+          NODE_ENV: test
+          PGUSER: postgres
+          PGPASSWORD: postgres
+          PGDATABASE: weather_db
+          PGHOST: localhost
+          PGPORT: 5432
+
       - name: Run E2E tests
         run: npm run test:e2e
         working-directory: client
@@ -108,3 +120,4 @@ jobs:
           SMTP_FROM: ${{ secrets.SMTP_FROM }}
           NODE_ENV: test
           PORT: 3000
+          
