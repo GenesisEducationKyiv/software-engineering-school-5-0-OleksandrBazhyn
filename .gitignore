@@ -1,8 +1,8 @@
 .env
 .env.docker
 
-client/test-results/
-client/playwright-report/
+/client/test-results/
+/client/playwright-report/
 
 # Logs
 logs
