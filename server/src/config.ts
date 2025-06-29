@@ -19,6 +19,7 @@ const getTestDefault = (name: string): string => {
     PGHOST: "localhost",
     PGUSER: "postgres",
     PGPASSWORD: "postgres",
+    REDIS_URL: "redis://localhost:6379",
     NODE_ENV: "test",
   };
 
@@ -50,5 +51,6 @@ export const config = {
   PGUSER: required("PGUSER", process.env.PGUSER),
   PGPASSWORD: required("PGPASSWORD", process.env.PGPASSWORD),
   OPENWEATHERMAP_API_KEY: required("OPENWEATHERMAP_API_KEY", process.env.OPENWEATHERMAP_API_KEY),
+  REDIS_URL: required("REDIS_URL", process.env.REDIS_URL) || "redis://localhost:6379",
   NODE_ENV: required("NODE_ENV", process.env.NODE_ENV),
 };

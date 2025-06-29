@@ -1,10 +1,10 @@
-import { SubscriptionInput, Mailer, DataProvider } from "../types.js";
+import { SubscriptionInput, Mailer, DataProvider, SubscriptionServiceInterface } from "../types.js";
 import { AlreadySubscribedError, InvalidTokenError } from "../errors/SubscriptionError.js";
 import { Logger } from "winston";
 import { createLogger } from "../logger/index.js";
 import crypto from "crypto";
 
-class SubscriptionService {
+class SubscriptionService implements SubscriptionServiceInterface {
   private mailer: Mailer;
   private dataProvider: DataProvider;
   private logger: Logger;

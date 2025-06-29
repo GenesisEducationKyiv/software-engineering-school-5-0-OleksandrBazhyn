@@ -6,16 +6,30 @@ import { CityNotFound } from "../../src/errors/SubscriptionError.js";
 
 jest.mock("../../src/entities/MailManager.js");
 
-import apiRoutes from "../../src/routes/api.js";
+import { createApiRoutes } from "../../src/routes/api.js";
 import MailManager from "../../src/entities/MailManager.js";
+import SubscriptionService from "../../src/entities/SubscriptionService.js";
+import SubscriptionDataProvider from "../../src/entities/SubscriptionDataProvider.js";
+import { WeatherProviderManager } from "../../src/entities/WeatherProviderManager.js";
 import nodemailer from "nodemailer";
-import { WeatherData } from "../../src/types.js";
+import { createLogger } from "../../src/logger/index.js";
 
 let app: Express;
 
 beforeAll(() => {
   app = express();
   app.use(express.json());
+  
+  const mockTransporter = {} as nodemailer.Transporter;
+  const mailManager = new MailManager(mockTransporter, createLogger("MailManager"));
+  const subscriptionService = new SubscriptionService(
+    mailManager,
+    SubscriptionDataProvider,
+    createLogger("SubscriptionService")
+  );
+  const weatherManager = new WeatherProviderManager(createLogger("WeatherProviderManager"));
+  
+  const apiRoutes = createApiRoutes(weatherManager, subscriptionService);
   app.use("/api", apiRoutes);
 });
 
