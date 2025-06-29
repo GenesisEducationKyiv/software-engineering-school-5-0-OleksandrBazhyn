@@ -5,15 +5,15 @@ import {
   Mailer,
   DataProvider,
 } from "../types.js";
-import WeatherAPIClient from "./WeatherAPIProvider.js";
+import { WeatherProviderManager } from "./WeatherProviderManager.js";
 
 class EmailService {
-  private weatherManager: WeatherAPIClient;
+  private weatherManager: WeatherProviderManager;
   private mailer: Mailer;
   private dataProvider: DataProvider;
 
   constructor(mailer: Mailer, dataProvider: DataProvider) {
-    this.weatherManager = new WeatherAPIClient();
+    this.weatherManager = WeatherProviderManager.getInstance();
     this.mailer = mailer;
     this.dataProvider = dataProvider;
   }
@@ -34,7 +34,9 @@ class EmailService {
 
     for (const sub of subscriptions) {
       try {
-        const weather: WeatherData | null = await this.weatherManager.getWeatherData(sub.city);
+        const weather: WeatherData | null = await this.weatherManager
+          .getProvider()
+          .getWeatherData(sub.city);
         if (!weather) {
           console.error(`No weather data found for city: ${sub.city}`);
           continue;
