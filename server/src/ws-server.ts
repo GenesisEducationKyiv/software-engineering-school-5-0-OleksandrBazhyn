@@ -15,7 +15,10 @@ import type {
  * @param {http.Server} server - The HTTP server instance (from http.createServer)
  * @param {WeatherProviderManagerInterface} weatherManager - The weather provider manager instance
  */
-export function setupWebSocket(server: Server, weatherManager: WeatherProviderManagerInterface): void {
+export function setupWebSocket(
+  server: Server,
+  weatherManager: WeatherProviderManagerInterface,
+): void {
   // Create WebSocket server attached to the given HTTP server
   const wss = new WebSocketServer({ server });
 
