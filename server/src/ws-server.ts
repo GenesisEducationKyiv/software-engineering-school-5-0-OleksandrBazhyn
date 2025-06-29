@@ -8,6 +8,7 @@ import type {
   WebSocketInfoMessage,
   SubscriptionMessage,
 } from "./types.js";
+import { createLogger } from "./logger/index.js";
 
 /**
  * Set up a WebSocket server using the given HTTP server.
@@ -19,6 +20,8 @@ export function setupWebSocket(
   server: Server,
   weatherManager: WeatherProviderManagerInterface,
 ): void {
+  const logger = createLogger("WebSocketServer");
+
   // Create WebSocket server attached to the given HTTP server
   const wss = new WebSocketServer({ server });
 
@@ -36,7 +39,7 @@ export function setupWebSocket(
           subscriptions.set(ws, msg.city.trim());
         }
       } catch (error) {
-        console.error("Error parsing WebSocket message:", error);
+        logger.error("Error parsing WebSocket message:", error);
         const errMsg: WebSocketErrorMessage = {
           type: "error",
           message: "Invalid message format",
@@ -82,7 +85,7 @@ export function setupWebSocket(
             ws.send(JSON.stringify(weatherMsg));
           }
         } catch (error) {
-          console.error(`Error fetching weather for ${city}:`, error);
+          logger.error(`Error fetching weather for ${city}:`, error);
           const errMsg: WebSocketErrorMessage = {
             type: "error",
             message: `Failed to fetch weather for ${city}`,

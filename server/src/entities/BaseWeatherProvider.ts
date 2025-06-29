@@ -1,14 +1,15 @@
 import { WeatherData, WeatherProvider } from "../types.js";
 import { Logger } from "winston";
+import { createLogger } from "../logger/index.js";
 
 export abstract class BaseWeatherProvider implements WeatherProvider {
   protected nextProvider: WeatherProvider | null = null;
   protected name: string;
   protected logger: Logger;
 
-  constructor(name: string, logger: Logger) {
+  constructor(name: string, logger?: Logger) {
     this.name = name;
-    this.logger = logger;
+    this.logger = logger || createLogger(`WeatherProvider:${name}`);
   }
 
   setNext(provider: WeatherProvider): WeatherProvider {

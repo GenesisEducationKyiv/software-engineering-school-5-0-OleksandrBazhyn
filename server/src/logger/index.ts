@@ -3,11 +3,16 @@ import buildDevLogger from "./dev-logger.js";
 import buildProdLogger from "./prod-logger.js";
 import { Logger } from "winston";
 
-let logger: Logger;
+let baseLogger: Logger;
 if (config.NODE_ENV === "development") {
-  logger = buildDevLogger();
+  baseLogger = buildDevLogger();
 } else {
-  logger = buildProdLogger();
+  baseLogger = buildProdLogger();
 }
 
+export function createLogger(serviceName: string): Logger {
+  return baseLogger.child({ service: serviceName });
+}
+
+const logger = baseLogger;
 export default logger;

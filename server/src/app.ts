@@ -7,9 +7,11 @@ import Scheduler from "./entities/Scheduler.js";
 import MailManager from "./entities/MailManager.js";
 import SubscriptionDataProvider from "./entities/SubscriptionDataProvider.js";
 import { config } from "./config.js";
+import { createLogger } from "./logger/index.js";
 import nodemailer from "nodemailer";
 
 const PORT = Number(config.PORT) || 3000;
+const logger = createLogger("Server");
 
 const app = express();
 
@@ -22,10 +24,10 @@ const server = http.createServer(app);
 setupWebSocket(server, weatherManager);
 
 server.listen(PORT, () => {
-  console.log(`Server is running (HTTP + WS) on port ${PORT}`);
+  logger.info(`Server is running (HTTP + WS) on port ${PORT}`);
 });
 
-const scheduler = new Scheduler();
+const scheduler = new Scheduler(createLogger("Scheduler"));
 scheduler.start(
   new MailManager(
     nodemailer.createTransport({
@@ -35,6 +37,7 @@ scheduler.start(
         pass: config.SMTP_PASS,
       },
     }),
+    createLogger("MailManager"),
   ),
   SubscriptionDataProvider,
 );

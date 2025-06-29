@@ -6,7 +6,7 @@ import { Logger } from "winston";
 export class OpenWeatherMapProvider extends BaseWeatherProvider {
   private OPENWEATHERMAP_API_KEY: string;
 
-  constructor(logger: Logger) {
+  constructor(logger?: Logger) {
     super("OpenWeatherMap", logger);
     this.OPENWEATHERMAP_API_KEY = config.OPENWEATHERMAP_API_KEY || "";
 

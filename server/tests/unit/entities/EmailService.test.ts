@@ -13,6 +13,7 @@ describe("EmailService (alternative setup)", () => {
   let weatherProvider: { getWeatherData: jest.Mock };
   let weatherManager: { getProvider: jest.Mock };
   let service: EmailService;
+  let mockLogger: any;
 
   const testSub: Subscription = {
     id: 1,
@@ -31,9 +32,9 @@ describe("EmailService (alternative setup)", () => {
     },
   };
 
-  let logSpy: jest.SpyInstance;
-  let errorSpy: jest.SpyInstance;
-  let warnSpy: jest.SpyInstance;
+  let logSpy: jest.Mock;
+  let errorSpy: jest.Mock;
+  let warnSpy: jest.Mock;
 
   beforeEach(() => {
     mailer = {
@@ -52,20 +53,26 @@ describe("EmailService (alternative setup)", () => {
     weatherProvider = { getWeatherData: jest.fn() };
     weatherManager = { getProvider: jest.fn().mockReturnValue(weatherProvider) };
     
-    service = new EmailService(mailer, dataProvider, weatherManager);
+    // Create mock logger
+    mockLogger = {
+      info: jest.fn(),
+      error: jest.fn(),
+      warn: jest.fn(),
+      debug: jest.fn(),
+    };
+    
+    service = new EmailService(mailer, dataProvider, weatherManager, mockLogger);
     
     jest.clearAllMocks();
-    logSpy = jest.spyOn(console, "log").mockImplementation(() => {});
-    errorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
-    warnSpy = jest.spyOn(console, "warn").mockImplementation(() => {});
+    logSpy = mockLogger.info;
+    errorSpy = mockLogger.error;
+    warnSpy = mockLogger.warn;
     // Prevent WEATHER_API_KEY warning in test output
     process.env.WEATHER_API_KEY = "dummy";
   });
 
   afterEach(() => {
-    logSpy.mockRestore();
-    errorSpy.mockRestore();
-    warnSpy.mockRestore();
+    // No need to restore mock functions
   });
 
   describe.each(["daily", "hourly"] as const)("sendWeatherEmailsByFrequency(%s)", (frequency) => {

@@ -6,7 +6,7 @@ import { Logger } from "winston";
 export class WeatherAPIProvider extends BaseWeatherProvider {
   private WEATHER_API_KEY: string | undefined;
 
-  constructor(logger: Logger) {
+  constructor(logger?: Logger) {
     super("WeatherAPI", logger);
     this.WEATHER_API_KEY = config.WEATHER_API_KEY;
 

@@ -12,12 +12,13 @@ import {
   CityNotFound,
 } from "../errors/SubscriptionError.js";
 import nodemailer from "nodemailer";
-import logger from "../logger/index.js";
+import { createLogger } from "../logger/index.js";
 
 const router = express.Router();
+const logger = createLogger("API");
 
 // Create shared instances
-const weatherManager = new WeatherProviderManager(logger);
+const weatherManager = new WeatherProviderManager(createLogger("WeatherProviderManager"));
 
 // Export the weatherManager for use in other modules
 export { weatherManager };
@@ -31,8 +32,10 @@ const subscriptionService = new SubscriptionService(
         pass: config.SMTP_PASS,
       },
     }),
+    createLogger("MailManager"),
   ),
   SubscriptionDataProvider,
+  createLogger("SubscriptionService"),
 );
 
 router.get("/weather", async (req: express.Request, res: express.Response) => {
@@ -58,13 +61,13 @@ router.get("/weather", async (req: express.Request, res: express.Response) => {
     if (err instanceof CityNotFound) {
       return res.status(404).json({ error: err.message });
     }
-    console.error(err);
+    logger.error("Weather service error:", err);
     return res.status(500).json({ error: "Weather service error" });
   }
 });
 
 router.post("/subscribe", async (req: express.Request, res: express.Response) => {
-  console.log("Request body:", req.body);
+  logger.info("Subscription request received:", req.body);
   const { email, city, frequency } = req.body as SubscriptionInput;
 
   if (!email || !city || !frequency || !["daily", "hourly"].includes(frequency)) {
@@ -96,7 +99,7 @@ router.post("/subscribe", async (req: express.Request, res: express.Response) =>
     } else if (err instanceof InvalidTokenError) {
       return res.status(400).json({ error: err.message });
     }
-    console.error(err);
+    logger.error("Subscription error:", err);
     return res.status(400).json({ error: "Invalid input" });
   }
 });
@@ -113,7 +116,7 @@ router.get("/confirm/:token", async (req, res) => {
     if (err instanceof NotConfirmedError) {
       return res.status(400).send(err.message);
     }
-    console.error(err);
+    logger.error("Confirmation error:", err);
     return res.status(404).send("Token not found");
   }
 });
@@ -130,7 +133,7 @@ router.get("/unsubscribe/:token", async (req, res) => {
     if (err instanceof InvalidTokenError) {
       return res.status(500).send(err.message);
     }
-    console.error(err);
+    logger.error("Unsubscribe error:", err);
     return res.status(500).send("Server error");
   }
 });

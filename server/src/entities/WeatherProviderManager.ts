@@ -2,6 +2,7 @@ import { WeatherProvider } from "../types.js";
 import { WeatherAPIProvider } from "./WeatherAPIProvider.js";
 import { OpenWeatherMapProvider } from "./OpenWeatherMapProvider.js";
 import { Logger } from "winston";
+import { createLogger } from "../logger/index.js";
 
 export interface WeatherProviderManagerInterface {
   getProvider(): WeatherProvider;
@@ -9,10 +10,12 @@ export interface WeatherProviderManagerInterface {
 
 export class WeatherProviderManager implements WeatherProviderManagerInterface {
   private chainHead: WeatherProvider;
+  private logger: Logger;
 
-  constructor(logger: Logger) {
-    const weatherAPIProvider = new WeatherAPIProvider(logger);
-    const openWeatherMapProvider = new OpenWeatherMapProvider(logger);
+  constructor(logger?: Logger) {
+    this.logger = logger || createLogger("WeatherProviderManager");
+    const weatherAPIProvider = new WeatherAPIProvider(this.logger);
+    const openWeatherMapProvider = new OpenWeatherMapProvider(this.logger);
 
     weatherAPIProvider.setNext(openWeatherMapProvider);
 
