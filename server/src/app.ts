@@ -25,7 +25,8 @@ server.listen(PORT, () => {
   console.log(`Server is running (HTTP + WS) on port ${PORT}`);
 });
 
-Scheduler.start(
+const scheduler = new Scheduler();
+scheduler.start(
   new MailManager(
     nodemailer.createTransport({
       service: "gmail",
