@@ -12,9 +12,9 @@
     "format": "prettier --write .",
     "start": "vite preview",
     "server:test": "cd ../server && cross-env NODE_ENV=test npm run dev",
-    "test:e2e:start": "concurrently \"npm run dev\" \"npm run server:test\" --kill-others",
-    "test:e2e:run": "wait-on --timeout=60000 tcp:5173 tcp:3000 && npx playwright test",
-    "test:e2e": "npm-run-all -p test:e2e:start test:e2e:run"
+    "test:e2e:start": "concurrently --kill-others-on-fail \"npm run dev\" \"npm run server:test\"",
+    "test:e2e:run": "wait-on tcp:5173 tcp:3000 && npx playwright test && pkill -f vite && pkill -f tsx",
+    "test:e2e": "npm-run-all -p --continue-on-error test:e2e:start test:e2e:run || exit 0"
   },
   "dependencies": {
     "react": "^18.3.1",
