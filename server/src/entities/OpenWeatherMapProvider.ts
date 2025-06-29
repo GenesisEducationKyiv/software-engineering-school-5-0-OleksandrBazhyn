@@ -11,6 +11,7 @@ export class OpenWeatherMapProvider extends BaseWeatherProvider {
     this.OPENWEATHERMAP_API_KEY = config.OPENWEATHERMAP_API_KEY || "";
 
     if (!this.OPENWEATHERMAP_API_KEY) {
+      this.logger.error("OPENWEATHERMAP_API_KEY is not set in environment variables.");
       throw new Error("OPENWEATHERMAP_API_KEY is not set in environment variables.");
     }
   }
@@ -39,6 +40,7 @@ export class OpenWeatherMapProvider extends BaseWeatherProvider {
     const response = await fetch(url);
 
     if (!response.ok) {
+      this.logger.error("API request failed", { url, status: response.status });
       throw new Error(`API response was not ok: ${response.status}`);
     }
 
@@ -47,6 +49,7 @@ export class OpenWeatherMapProvider extends BaseWeatherProvider {
 
   protected parseGeocodingResponse(data: any, city: string): GeocodingResult {
     if (!data || !data.length) {
+      this.logger.error("Geocoding API returned no results", { city });
       throw new Error(`City not found: ${city}`);
     }
 
@@ -68,6 +71,7 @@ export class OpenWeatherMapProvider extends BaseWeatherProvider {
       typeof data.main.temp !== "number" ||
       typeof data.main.humidity !== "number"
     ) {
+      this.logger.error("Invalid weather data format", { data });
       throw new Error("Invalid weather data format: missing required fields");
     }
   }
