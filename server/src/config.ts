@@ -19,6 +19,7 @@ const getTestDefault = (name: string): string => {
     PGHOST: "localhost",
     PGUSER: "postgres",
     PGPASSWORD: "postgres",
+    NODE_ENV: "test",
   };
 
   return defaults[name] || "mock-value";
@@ -49,4 +50,5 @@ export const config = {
   PGUSER: required("PGUSER", process.env.PGUSER),
   PGPASSWORD: required("PGPASSWORD", process.env.PGPASSWORD),
   OPENWEATHERMAP_API_KEY: required("OPENWEATHERMAP_API_KEY", process.env.OPENWEATHERMAP_API_KEY),
+  NODE_ENV: required("NODE_ENV", process.env.NODE_ENV),
 };

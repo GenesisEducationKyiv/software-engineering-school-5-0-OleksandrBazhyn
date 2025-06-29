@@ -9,7 +9,7 @@ import SubscriptionDataProvider from "./entities/SubscriptionDataProvider.js";
 import { config } from "./config.js";
 import nodemailer from "nodemailer";
 
-const PORT = Number(process.env.PORT) || 3000;
+const PORT = Number(config.PORT) || 3000;
 
 const app = express();
 
