@@ -19,25 +19,37 @@ export abstract class BaseWeatherProvider implements WeatherProvider {
   async getWeatherData(city: string): Promise<WeatherData> {
     try {
       const data = await this.fetchWeatherData(city);
-      this.logger.info("Weather data fetched successfully", {
-        provider: this.name,
-        city,
-        data,
-      });
+      try {
+        this.logger.info("Weather data fetched successfully", {
+          provider: this.name,
+          city,
+          data,
+        });
+      } catch (logError) {
+        console.error("Logging error:", logError);
+      }
       return data;
     } catch (error) {
-      this.logger.error("Error fetching weather data from provider", {
-        provider: this.name,
-        city,
-        error,
-      });
+      try {
+        this.logger.error("Error fetching weather data from provider", {
+          provider: this.name,
+          city,
+          error,
+        });
+      } catch (logError) {
+        console.error("Logging error:", logError);
+      }
 
       if (this.nextProvider) {
-        this.logger.info("Trying next provider", {
-          currentProvider: this.name,
-          nextProvider: this.nextProvider.constructor.name,
-          city,
-        });
+        try {
+          this.logger.info("Trying next provider", {
+            currentProvider: this.name,
+            nextProvider: this.nextProvider.constructor.name,
+            city,
+          });
+        } catch (logError) {
+          console.error("Logging error:", logError);
+        }
         return this.nextProvider.getWeatherData(city);
       }
       throw new Error("Failed to fetch weather data for " + city + " from all providers");
