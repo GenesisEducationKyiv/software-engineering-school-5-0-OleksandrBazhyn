@@ -1,11 +1,23 @@
 import { OpenWeatherMapProvider } from "../../../src/entities/OpenWeatherMapProvider.js";
 import { config } from "../../../src/config.js";
+import { Logger } from "winston";
+
+// Mock logger for testing
+const mockLogger = {
+  info: jest.fn(),
+  error: jest.fn(),
+  warn: jest.fn(),
+  debug: jest.fn(),
+} as unknown as Logger;
 
 describe("OpenWeatherMapProvider", () => {
   let originalApiKey: string;
   let fetchMock: jest.SpyInstance;
   
   beforeEach(() => {
+    // Clear all mocks
+    jest.clearAllMocks();
+    
     // Save original API key
     originalApiKey = process.env.OPENWEATHERMAP_API_KEY || '';
     
@@ -57,13 +69,13 @@ describe("OpenWeatherMapProvider", () => {
   });
 
   it("should have API key from environment variables", () => {
-    const provider = new OpenWeatherMapProvider();
+    const provider = new OpenWeatherMapProvider(mockLogger);
     // @ts-ignore - accessing private property for testing
     expect(provider.OPENWEATHERMAP_API_KEY).toBe("test-api-key");
   });
 
   it("should fetch weather data successfully", async () => {
-    const provider = new OpenWeatherMapProvider();
+    const provider = new OpenWeatherMapProvider(mockLogger);
     const result = await provider.getWeatherData("London");
     
     expect(fetchMock).toHaveBeenCalledTimes(2);
@@ -82,14 +94,14 @@ describe("OpenWeatherMapProvider", () => {
       json: async () => [] // Empty array means city not found
     } as Response));
 
-    const provider = new OpenWeatherMapProvider();
+    const provider = new OpenWeatherMapProvider(mockLogger);
     await expect(provider.getWeatherData("NonexistentCity")).rejects.toThrow(
       "Failed to fetch weather data for NonexistentCity from all providers"
     );
   });
 
   it("should handle weather API errors", async () => {
-    const provider = new OpenWeatherMapProvider();
+    const provider = new OpenWeatherMapProvider(mockLogger);
     
     fetchMock.mockResolvedValueOnce({
       ok: true,
@@ -105,7 +117,7 @@ describe("OpenWeatherMapProvider", () => {
   });
   
   it("should handle empty geocoding results", async () => {
-    const provider = new OpenWeatherMapProvider();
+    const provider = new OpenWeatherMapProvider(mockLogger);
     
     fetchMock.mockResolvedValueOnce({
       ok: true,
@@ -116,7 +128,7 @@ describe("OpenWeatherMapProvider", () => {
   });
   
   it("should handle invalid weather data format", async () => {
-    const provider = new OpenWeatherMapProvider();
+    const provider = new OpenWeatherMapProvider(mockLogger);
     
     fetchMock.mockResolvedValueOnce({
       ok: true,

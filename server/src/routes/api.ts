@@ -4,7 +4,6 @@ import SubscriptionService from "../entities/SubscriptionService.js";
 import { WeatherData, SubscriptionInput, WeatherResponse } from "../types.js";
 import MailManager from "../entities/MailManager.js";
 import SubscriptionDataProvider from "../entities/SubscriptionDataProvider.js";
-import WeatherAPIClient from "../entities/WeatherAPIClient.js";
 import { config } from "../config.js";
 import {
   AlreadySubscribedError,
@@ -53,6 +52,7 @@ router.get("/weather", async (req: express.Request, res: express.Response) => {
       return res.status(404).json({ error: err.message });
     }
     console.error(err);
+    return res.status(500).json({ error: "Weather service error" });
   }
 });
 
@@ -69,8 +69,8 @@ router.post("/subscribe", async (req: express.Request, res: express.Response) =>
   }
 
   try {
-    const weatherManager = new WeatherAPIClient();
-    const weatherData: WeatherData = await weatherManager.getWeatherData(city);
+    const weatherManager = WeatherProviderManager.getInstance();
+    const weatherData: WeatherData = await weatherManager.getProvider().getWeatherData(city);
     if (!weatherData) {
       return res.status(404).json({ error: "City not found" });
     }

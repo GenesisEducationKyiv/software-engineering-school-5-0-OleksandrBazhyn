@@ -1,14 +1,22 @@
 import { WeatherAPIProvider } from "../../../src/entities/WeatherAPIProvider.js";
 import { config } from "../../../src/config.js";
+import { Logger } from "winston";
+
+// Mock logger for testing
+const mockLogger = {
+  info: jest.fn(),
+  error: jest.fn(),
+  warn: jest.fn(),
+  debug: jest.fn(),
+} as unknown as Logger;
 
 describe("WeatherAPIProvider", () => {
   let originalConfig: typeof config;
-  let errorSpy: jest.SpyInstance;
   let fetchMock: jest.SpyInstance;
   
   beforeEach(() => {
+    jest.clearAllMocks();
     originalConfig = { ...config };
-    errorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
     fetchMock = jest.spyOn(global, "fetch").mockImplementation();
     config.WEATHER_API_KEY = "test-key";
   });
@@ -20,13 +28,13 @@ describe("WeatherAPIProvider", () => {
 
   it("should throw if WEATHER_API_KEY is not set in constructor", () => {
     config.WEATHER_API_KEY = "";
-    expect(() => new WeatherAPIProvider()).toThrow(
+    expect(() => new WeatherAPIProvider(mockLogger)).toThrow(
       "WEATHER_API_KEY is not set in environment variables."
     );
   });
 
   it("should fetch weather data and return it on success", async () => {
-    const provider = new WeatherAPIProvider();
+    const provider = new WeatherAPIProvider(mockLogger);
     const fakeWeather = {
       current: { 
         temp_c: 10, 
@@ -61,15 +69,19 @@ describe("WeatherAPIProvider", () => {
       status: 404
     } as Response);
     
-    const provider = new WeatherAPIProvider();
+    const provider = new WeatherAPIProvider(mockLogger);
     
     await expect(provider.getWeatherData("London")).rejects.toThrow(
       "Failed to fetch weather data for London from all providers"
     );
 
-    expect(errorSpy).toHaveBeenCalledWith(
-      expect.stringContaining("Error fetching weather data from WeatherAPI:"),
-      expect.objectContaining({ message: "Network response was not ok: 404" })
+    expect(mockLogger.error).toHaveBeenCalledWith(
+      "Error fetching weather data from provider",
+      expect.objectContaining({
+        provider: "WeatherAPI",
+        city: "London",
+        error: expect.any(Error),
+      })
     );
   });
 
@@ -79,21 +91,25 @@ describe("WeatherAPIProvider", () => {
       json: () => Promise.resolve({})
     } as Response);
     
-    const provider = new WeatherAPIProvider();
+    const provider = new WeatherAPIProvider(mockLogger);
     
     await expect(provider.getWeatherData("London")).rejects.toThrow(
       "Failed to fetch weather data for London from all providers"
     );
 
-    expect(errorSpy).toHaveBeenCalledWith(
-      expect.stringContaining("Error fetching weather data from WeatherAPI:"),
-      expect.objectContaining({ message: "Invalid weather data received" })
+    expect(mockLogger.error).toHaveBeenCalledWith(
+      "Error fetching weather data from provider",
+      expect.objectContaining({
+        provider: "WeatherAPI",
+        city: "London",
+        error: expect.any(Error),
+      })
     );
   });
 
   it("should include API key in the request URL", async () => {
     config.WEATHER_API_KEY = "special-test-key";
-    const provider = new WeatherAPIProvider();
+    const provider = new WeatherAPIProvider(mockLogger);
     const fakeWeather = {
       current: { 
         temp_c: 10, 
@@ -115,7 +131,7 @@ describe("WeatherAPIProvider", () => {
   });
 
   it("should properly encode the location in the URL", async () => {
-    const provider = new WeatherAPIProvider();
+    const provider = new WeatherAPIProvider(mockLogger);
     const fakeWeather = {
       current: { 
         temp_c: 10, 
@@ -139,15 +155,19 @@ describe("WeatherAPIProvider", () => {
   it("should handle network errors during fetch", async () => {
     fetchMock.mockRejectedValue(new Error("Network failure"));
     
-    const provider = new WeatherAPIProvider();
+    const provider = new WeatherAPIProvider(mockLogger);
     
     await expect(provider.getWeatherData("London")).rejects.toThrow(
       "Failed to fetch weather data for London from all providers"
     );
 
-    expect(errorSpy).toHaveBeenCalledWith(
-      expect.stringContaining("Error fetching weather data from WeatherAPI:"),
-      expect.any(Error)
+    expect(mockLogger.error).toHaveBeenCalledWith(
+      "Error fetching weather data from provider",
+      expect.objectContaining({
+        provider: "WeatherAPI",
+        city: "London",
+        error: expect.any(Error),
+      })
     );
   });
 
@@ -157,15 +177,19 @@ describe("WeatherAPIProvider", () => {
       json: () => Promise.reject(new SyntaxError("Unexpected token in JSON"))
     } as any);
     
-    const provider = new WeatherAPIProvider();
+    const provider = new WeatherAPIProvider(mockLogger);
     
     await expect(provider.getWeatherData("London")).rejects.toThrow(
       "Failed to fetch weather data for London from all providers"
     );
 
-    expect(errorSpy).toHaveBeenCalledWith(
-      expect.stringContaining("Error fetching weather data from WeatherAPI:"),
-      expect.any(SyntaxError)
+    expect(mockLogger.error).toHaveBeenCalledWith(
+      "Error fetching weather data from provider",
+      expect.objectContaining({
+        provider: "WeatherAPI",
+        city: "London",
+        error: expect.any(SyntaxError),
+      })
     );
   });
 });
