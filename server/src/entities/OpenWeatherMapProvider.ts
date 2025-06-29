@@ -1,12 +1,13 @@
 import { WeatherData, GeocodingResult } from "../types.js";
 import { BaseWeatherProvider } from "./BaseWeatherProvider.js";
 import { config } from "../config.js";
+import { Logger } from "winston";
 
 export class OpenWeatherMapProvider extends BaseWeatherProvider {
   private OPENWEATHERMAP_API_KEY: string;
 
-  constructor() {
-    super("OpenWeatherMap");
+  constructor(logger: Logger) {
+    super("OpenWeatherMap", logger);
     this.OPENWEATHERMAP_API_KEY = config.OPENWEATHERMAP_API_KEY || "";
 
     if (!this.OPENWEATHERMAP_API_KEY) {
