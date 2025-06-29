@@ -1,14 +1,20 @@
-import { config } from "../src/config.js";
+import { config as appConfig } from "../src/config.js";
 const isProd = "production";
-const migrationsDir = "./db/migrations";
+const migrationsDir = "./migrations";
 
-const config = {
+const knexConfig = {
   client: "pg",
-  connection: config.DATABASE_URL,
+  connection: {
+    host: appConfig.PGHOST || "localhost",
+    user: appConfig.PGUSER || "postgres",
+    password: appConfig.PGPASSWORD || "postgres",
+    database: appConfig.PGDATABASE || "weather_db",
+    port: appConfig.PGPORT || 5432,
+  },
   migrations: {
     directory: migrationsDir,
     extension: isProd ? "js" : "ts",
   },
 };
 
-export default config;
+export default knexConfig;

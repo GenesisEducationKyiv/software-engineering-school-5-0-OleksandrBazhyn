@@ -39,7 +39,7 @@ class MailManager implements Mailer {
                     <li>Description: ${weather.current.condition.text}</li>
                 </ul>
                 <p>
-                    <a href="http://localhost:3000/api/unsubscribe/${token}">
+                    <a href="http://localhost:3000/api/v1/unsubscribe/${token}">
                         Unsubscribe from weather updates
                     </a>
                 </p>

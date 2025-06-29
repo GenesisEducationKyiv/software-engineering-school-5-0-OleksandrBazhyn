@@ -5,24 +5,29 @@ import {
   Mailer,
   DataProvider,
 } from "../types.js";
-import WeatherManager from "./WeatherManager.js";
+import WeatherAPIClient from "./WeatherAPIClient.js";
 
 class EmailService {
-  private weatherManager: WeatherManager;
+  private weatherManager: WeatherAPIClient;
   private mailer: Mailer;
   private dataProvider: DataProvider;
 
   constructor(mailer: Mailer, dataProvider: DataProvider) {
-    this.weatherManager = new WeatherManager();
+    this.weatherManager = new WeatherAPIClient();
     this.mailer = mailer;
     this.dataProvider = dataProvider;
   }
 
   async sendWeatherEmailsByFrequency(frequency: SubscriptionFrequency): Promise<void> {
-    const subscriptions: Subscription[] =
-      await this.dataProvider.getSubscriptionsByFrequency(frequency);
+    let subscriptions: Subscription[] | null | undefined;
+    try {
+      subscriptions = await this.dataProvider.getSubscriptionsByFrequency(frequency);
+    } catch (err) {
+      console.error("Failed to get subscriptions:", err);
+      return;
+    }
 
-    if (subscriptions.length === 0) {
+    if (!subscriptions || subscriptions.length === 0) {
       console.log(`No active subscriptions for frequency: ${frequency}`);
       return;
     }

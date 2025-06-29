@@ -11,7 +11,7 @@ export class AlreadySubscribedError extends SubscriptionError {
   city: string;
 
   constructor(email: string, city: string) {
-    super(`Email is already subscribed to ${city}`);
+    super("Email already subscribed");
     this.name = "AlreadySubscribedError";
     this.email = email;
     this.city = city;
@@ -21,7 +21,7 @@ export class AlreadySubscribedError extends SubscriptionError {
 
 export class InvalidTokenError extends SubscriptionError {
   constructor() {
-    super("Invalid token or subscription not found");
+    super("Invalid token");
     this.name = "InvalidTokenError";
     Object.setPrototypeOf(this, InvalidTokenError.prototype);
   }
@@ -32,5 +32,13 @@ export class NotConfirmedError extends SubscriptionError {
     super("Subscription not confirmed");
     this.name = "NotConfirmedError";
     Object.setPrototypeOf(this, NotConfirmedError.prototype);
+  }
+}
+
+export class CityNotFound extends Error {
+  constructor() {
+    super("City not found");
+    this.name = "CityNotFound";
+    Object.setPrototypeOf(this, CityNotFound.prototype);
   }
 }

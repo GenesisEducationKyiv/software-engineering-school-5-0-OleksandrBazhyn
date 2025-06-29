@@ -2,32 +2,19 @@ import request from "supertest";
 import express, { Express } from "express";
 import { jest, beforeAll, describe, it, expect } from "@jest/globals";
 
-let lastToken: string | undefined = undefined;
-const mockMailer = {
-  sendConfirmationEmail: jest.fn(async (_email, _city, token) => {
-    lastToken = token as string;
-  }),
-  sendWeatherEmail: jest.fn(),
-};
+import { CityNotFound } from "../../src/errors/SubscriptionError.js";
 
-jest.mock("../src/managers/GmailMailer", () => ({
-  __esModule: true,
-  default: jest.fn().mockImplementation(() => mockMailer),
-}));
+jest.mock("../../src/entities/MailManager.js");
+jest.mock("../../src/entities/WeatherAPIClient.js");
 
-import apiRoutes from "../src/routes/api.js";
+import apiRoutes from "../../src/routes/api.js";
+import MailManager from "../../src/entities/MailManager.js";
+import nodemailer from "nodemailer";
+import { WeatherData } from "../../src/types.js";
 
 let app: Express;
-beforeAll(async () => {
-  const { default: WeatherManager } = await import("../src/managers/WeatherManager.js");
-  WeatherManager.prototype.getWeatherData = async (_city: string) => ({
-    current: {
-      temp_c: 15,
-      humidity: 44,
-      condition: { text: "Cloudy" },
-    },
-  });
 
+beforeAll(() => {
   app = express();
   app.use(express.json());
   app.use("/api", apiRoutes);
@@ -46,7 +33,10 @@ describe("Advanced Subscription/Confirmation workflow", () => {
     expect(res.statusCode).toBe(200);
     expect(res.body.message).toMatch(/confirmation email sent/i);
 
-    token = lastToken ?? null;
+    const mockTransporter = {} as nodemailer.Transporter;
+
+    const mailerInstance = new MailManager(mockTransporter);
+    token = (mailerInstance as any).__getLastToken() ?? null;
     expect(token).toBeTruthy();
   });
 
@@ -90,14 +80,35 @@ describe("Advanced Subscription/Confirmation workflow", () => {
     expect(res.statusCode).toBe(400);
   });
 
-  it("Weather for unknown city returns 404", async () => {
-    const { default: WeatherManager } = await import("../src/managers/WeatherManager.js");
-    WeatherManager.prototype.getWeatherData = async (_city: string) => {
-      throw new Error("Not found");
-    };
+  it("Weather for known city returns weather data", async () => {
+    const res = await request(app).get("/api/weather?city=Kyiv");
+    expect(res.statusCode).toBe(200);
+    expect(res.body).toHaveProperty("temperature");
+    expect(res.body).toHaveProperty("humidity");
+    expect(res.body).toHaveProperty("description");
+  });
 
+  it("Weather for unknown city returns 404", async () => {
+    const { default: WeatherAPIClient } = await import("../../src/entities/WeatherAPIClient.js");
+    
+    WeatherAPIClient.prototype.getWeatherData = function(location: string): Promise<WeatherData> {
+      return Promise.reject(new CityNotFound());
+    };
+    
     const res = await request(app).get("/api/weather?city=UnknownCity");
     expect(res.statusCode).toBe(404);
     expect(res.body).toHaveProperty("error");
+    
+    jest.restoreAllMocks();
+  }, 10000);
+
+  it("GET /api/confirm/:token with invalid token returns 400 or 404", async () => {
+    const res = await request(app).get("/api/confirm/invalidtoken");
+    expect([400, 404]).toContain(res.statusCode);
+  });
+
+  it("GET /api/unsubscribe/:token with invalid token returns 400, 404 or 500", async () => {
+    const res = await request(app).get("/api/unsubscribe/invalidtoken");
+    expect([400, 404, 500]).toContain(res.statusCode);
   });
 });

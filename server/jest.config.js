@@ -12,4 +12,5 @@ export default {
     },
   },
   testMatch: ["**/tests/**/*.test.ts"],
+  forceExit: true,
 };

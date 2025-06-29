@@ -1,14 +1,13 @@
-import "dotenv/config";
 import express from "express";
 import cors from "cors";
 import apiRoutes from "./routes/api.js";
 import http from "http";
 import { setupWebSocket } from "./ws-server.js";
-import Scheduler from "./managers/Scheduler.js";
-import MailManager from "./managers/MailManager.js";
-import SubscriptionDataProvider from "./managers/SubscriptionDataProvider.js";
-import nodemailer from "nodemailer";
+import Scheduler from "./entities/Scheduler.js";
+import MailManager from "./entities/MailManager.js";
+import SubscriptionDataProvider from "./entities/SubscriptionDataProvider.js";
 import { config } from "./config.js";
+import nodemailer from "nodemailer";
 
 const PORT = Number(process.env.PORT) || 3000;
 

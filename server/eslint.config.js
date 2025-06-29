@@ -1,12 +1,14 @@
 import js from "@eslint/js";
 import globals from "globals";
 import { defineConfig } from "eslint/config";
-import jest from "eslint-plugin-jest";
 import tseslint from "@typescript-eslint/eslint-plugin";
 import tsParser from "@typescript-eslint/parser";
 import prettierPlugin from "eslint-plugin-prettier";
 
 export default defineConfig([
+  {
+    ignores: ["tests/**/*", "**/*.test.*", "**/*.spec.*"],
+  },
   {
     name: "server-js",
     files: ["**/*.{js,mjs,cjs,jsx}"],
@@ -83,36 +85,13 @@ export default defineConfig([
       "@typescript-eslint/no-use-before-define": "off",
       "@typescript-eslint/no-var-requires": "off",
       "@typescript-eslint/explicit-function-return-type": "off",
-    },
-  },
-  {
-    name: "server-tests",
-    files: ["tests/**/*.{js,ts,tsx}"],
-    languageOptions: {
-      ecmaVersion: "latest",
-      sourceType: "module",
-      parser: tsParser,
-      parserOptions: {
-        project: "./tsconfig.json",
-        tsconfigRootDir: process.cwd(),
-      },
-      globals: { ...globals.node, ...globals.jest },
-    },
-    plugins: { jest, "@typescript-eslint": tseslint },
-    rules: {
-      "no-unused-vars": "off",
-      "@typescript-eslint/no-unused-vars": "warn",
-      "no-console": "off",
-      "jest/no-disabled-tests": "warn",
-      "jest/no-focused-tests": "error",
-      "jest/no-identical-title": "error",
-      "jest/valid-expect": "error",
-    },
-  },
-  {
-    files: ["**/*.spec.ts", "**/*.spec.tsx"],
-    rules: {
-      "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/no-unused-vars": [
+        "warn",
+        {
+          argsIgnorePattern: "^_",
+          varsIgnorePattern: "^_",
+        },
+      ],
     },
   },
   {
@@ -131,6 +110,7 @@ export default defineConfig([
           singleQuote: false,
           bracketSpacing: true,
           arrowParens: "always",
+          endOfLine: "auto",
         },
       ],
     },

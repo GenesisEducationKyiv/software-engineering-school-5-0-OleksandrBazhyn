@@ -11,6 +11,8 @@
     "start": "node dist/src/app.js",
     "dev": "tsx src/app.ts",
     "test": "cross-env NODE_ENV=test jest",
+    "test:unit": "cross-env NODE_ENV=test jest --testPathPattern=unit",
+    "test:integration": "cross-env NODE_ENV=test jest --testPathPattern=integration --detectOpenHandles",
     "lint": "eslint . --ext .ts,.tsx,.cts,.mts,.js",
     "lint:fix": "eslint . --ext .ts,.tsx,.cts,.mts,.js --fix",
     "format": "prettier --write ."
