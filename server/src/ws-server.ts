@@ -1,5 +1,5 @@
 import { WebSocketServer, WebSocket } from "ws";
-import { WeatherProviderManager } from "./entities/WeatherProviderManager.js";
+import { WeatherProviderManagerInterface } from "./entities/WeatherProviderManager.js";
 import type { Server } from "http";
 import type {
   WeatherData,
@@ -13,8 +13,9 @@ import type {
  * Set up a WebSocket server using the given HTTP server.
  * Handles client subscriptions for live weather updates.
  * @param {http.Server} server - The HTTP server instance (from http.createServer)
+ * @param {WeatherProviderManagerInterface} weatherManager - The weather provider manager instance
  */
-export function setupWebSocket(server: Server): void {
+export function setupWebSocket(server: Server, weatherManager: WeatherProviderManagerInterface): void {
   // Create WebSocket server attached to the given HTTP server
   const wss = new WebSocketServer({ server });
 
@@ -63,7 +64,6 @@ export function setupWebSocket(server: Server): void {
       // Only send if the connection is open and city is defined
       if (ws.readyState === ws.OPEN && city) {
         try {
-          const weatherManager = WeatherProviderManager.getInstance();
           const weatherData: WeatherData = await weatherManager.getProvider().getWeatherData(city);
 
           // Send weather info if available

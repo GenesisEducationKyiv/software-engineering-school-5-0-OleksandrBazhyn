@@ -1,6 +1,7 @@
 import { WeatherProviderManager } from "../../../src/entities/WeatherProviderManager.js";
 import { WeatherAPIProvider } from "../../../src/entities/WeatherAPIProvider.js";
 import { OpenWeatherMapProvider } from "../../../src/entities/OpenWeatherMapProvider.js";
+import logger from "../../../src/logger/index.js";
 
 jest.mock("../../../src/entities/WeatherAPIProvider.js", () => {
   return {
@@ -23,15 +24,6 @@ jest.mock("../../../src/entities/OpenWeatherMapProvider.js", () => {
 describe("WeatherProviderManager", () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    // @ts-ignore
-    WeatherProviderManager.instance = undefined;
-  });
-
-  it("should return a singleton instance", () => {
-    const instance1 = WeatherProviderManager.getInstance();
-    const instance2 = WeatherProviderManager.getInstance();
-    
-    expect(instance1).toBe(instance2);
   });
 
   it("should create chain of providers on initialization", () => {
@@ -40,10 +32,10 @@ describe("WeatherProviderManager", () => {
       setNext: mockSetNext
     }));
     
-    const manager = WeatherProviderManager.getInstance();
+    const manager = new WeatherProviderManager(logger);
     
-    expect(WeatherAPIProvider).toHaveBeenCalled();
-    expect(OpenWeatherMapProvider).toHaveBeenCalled();
+    expect(WeatherAPIProvider).toHaveBeenCalledWith(logger);
+    expect(OpenWeatherMapProvider).toHaveBeenCalledWith(logger);
     expect(mockSetNext).toHaveBeenCalled();
   });
 
@@ -54,7 +46,7 @@ describe("WeatherProviderManager", () => {
       ...mockChainHead
     }));
     
-    const manager = WeatherProviderManager.getInstance();
+    const manager = new WeatherProviderManager(logger);
     expect(manager.getProvider()).toBeDefined();
   });
 });

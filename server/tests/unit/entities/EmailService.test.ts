@@ -47,14 +47,12 @@ describe("EmailService (alternative setup)", () => {
       updateSubscriptionStatus: jest.fn(),
       deleteSubscription: jest.fn(),
     };
-    service = new EmailService(mailer, dataProvider);
     
     // Create the mock provider and manager chain
     weatherProvider = { getWeatherData: jest.fn() };
     weatherManager = { getProvider: jest.fn().mockReturnValue(weatherProvider) };
     
-    // @ts-expect-error: override private property for testing
-    service.weatherManager = weatherManager;
+    service = new EmailService(mailer, dataProvider, weatherManager);
     
     jest.clearAllMocks();
     logSpy = jest.spyOn(console, "log").mockImplementation(() => {});

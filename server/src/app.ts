@@ -1,6 +1,6 @@
 import express from "express";
 import cors from "cors";
-import apiRoutes from "./routes/api.js";
+import apiRoutes, { weatherManager } from "./routes/api.js";
 import http from "http";
 import { setupWebSocket } from "./ws-server.js";
 import Scheduler from "./entities/Scheduler.js";
@@ -19,7 +19,7 @@ app.use("/api/v1", apiRoutes);
 
 const server = http.createServer(app);
 
-setupWebSocket(server);
+setupWebSocket(server, weatherManager);
 
 server.listen(PORT, () => {
   console.log(`Server is running (HTTP + WS) on port ${PORT}`);

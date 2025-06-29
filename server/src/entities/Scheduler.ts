@@ -1,10 +1,13 @@
 import cron from "node-cron";
 import EmailService from "./EmailService.js";
 import { Mailer, DataProvider } from "../types.js";
+import { WeatherProviderManager } from "./WeatherProviderManager.js";
+import logger from "../logger/index.js";
 
 class Scheduler {
   start(mailer: Mailer, dataProvider: DataProvider): void {
-    const emailService = new EmailService(mailer, dataProvider);
+    const weatherManager = new WeatherProviderManager(logger);
+    const emailService = new EmailService(mailer, dataProvider, weatherManager);
 
     // Hourly (at the beginning of each hour)
     cron.schedule("0 * * * *", async () => {
@@ -20,4 +23,4 @@ class Scheduler {
   }
 }
 
-export default new Scheduler();
+export default Scheduler;

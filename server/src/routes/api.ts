@@ -12,8 +12,16 @@ import {
   CityNotFound,
 } from "../errors/SubscriptionError.js";
 import nodemailer from "nodemailer";
+import logger from "../logger/index.js";
 
 const router = express.Router();
+
+// Create shared instances
+const weatherManager = new WeatherProviderManager(logger);
+
+// Export the weatherManager for use in other modules
+export { weatherManager };
+
 const subscriptionService = new SubscriptionService(
   new MailManager(
     nodemailer.createTransport({
@@ -33,7 +41,6 @@ router.get("/weather", async (req: express.Request, res: express.Response) => {
     return res.status(400).json({ error: "Invalid request" });
   }
   try {
-    const weatherManager = WeatherProviderManager.getInstance();
     const weatherData: WeatherData = await weatherManager.getProvider().getWeatherData(city);
 
     if (!weatherData || !weatherData.current) {
@@ -69,7 +76,6 @@ router.post("/subscribe", async (req: express.Request, res: express.Response) =>
   }
 
   try {
-    const weatherManager = WeatherProviderManager.getInstance();
     const weatherData: WeatherData = await weatherManager.getProvider().getWeatherData(city);
     if (!weatherData) {
       return res.status(404).json({ error: "City not found" });

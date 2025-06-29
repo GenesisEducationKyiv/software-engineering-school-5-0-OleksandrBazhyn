@@ -2,6 +2,7 @@ import { WeatherProviderManager } from "../../src/entities/WeatherProviderManage
 import { mockState as weatherAPIState } from "../../src/entities/__mocks__/WeatherAPIProvider.js";
 import { mockState as openWeatherMapState } from "../../src/entities/__mocks__/OpenWeatherMapProvider.js";
 import { WeatherData } from "../../src/types.js";
+import logger from "../../src/logger/index.js";
 
 // Important: Mock both providers AND the manager
 jest.mock("../../src/entities/WeatherAPIProvider.js");
@@ -30,8 +31,8 @@ describe("Weather Provider Chain Integration", () => {
     weatherAPIState.shouldFail = true;
     openWeatherMapState.weatherData = testData;
     
-    // Get a fresh instance of the manager
-    const manager = WeatherProviderManager.getInstance();
+    // Create a new instance of the manager with logger
+    const manager = new WeatherProviderManager(logger);
     const result = await manager.getProvider().getWeatherData("London");
     
     expect(result).toEqual(testData);
@@ -49,7 +50,7 @@ describe("Weather Provider Chain Integration", () => {
     // Set the test data on the first provider
     weatherAPIState.weatherData = testData;
     
-    const manager = WeatherProviderManager.getInstance();
+    const manager = new WeatherProviderManager(logger);
     const result = await manager.getProvider().getWeatherData("London");
     
     expect(result).toEqual(testData);
@@ -60,7 +61,7 @@ describe("Weather Provider Chain Integration", () => {
     weatherAPIState.shouldFail = true;
     openWeatherMapState.shouldFail = true;
     
-    const manager = WeatherProviderManager.getInstance();
+    const manager = new WeatherProviderManager(logger);
     await expect(manager.getProvider().getWeatherData("London"))
       .rejects
       .toThrow("Failed to fetch weather data for London from all providers");

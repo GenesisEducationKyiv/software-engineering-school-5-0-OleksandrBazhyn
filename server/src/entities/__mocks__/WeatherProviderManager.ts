@@ -1,33 +1,23 @@
 import { WeatherProvider } from "../../types.js";
+import { WeatherProviderManagerInterface } from "../WeatherProviderManager.js";
 import { WeatherAPIProvider } from "./WeatherAPIProvider.js";
 import { OpenWeatherMapProvider } from "./OpenWeatherMapProvider.js";
+import { Logger } from "winston";
 
-export class WeatherProviderManager {
-  private static instance: WeatherProviderManager | undefined;
-  private provider: WeatherProvider;
+export class WeatherProviderManager implements WeatherProviderManagerInterface {
+  private chainHead: WeatherProvider;
 
-  private constructor() {
-    const weatherAPIProvider = new WeatherAPIProvider();
-    const openWeatherMapProvider = new OpenWeatherMapProvider();
+  constructor(logger: Logger) {
+    const weatherAPIProvider = new WeatherAPIProvider(logger);
+    const openWeatherMapProvider = new OpenWeatherMapProvider(logger);
 
     weatherAPIProvider.setNext(openWeatherMapProvider);
 
-    this.provider = weatherAPIProvider;
-  }
-
-  public static getInstance(): WeatherProviderManager {
-    if (!WeatherProviderManager.instance) {
-      WeatherProviderManager.instance = new WeatherProviderManager();
-    }
-    return WeatherProviderManager.instance;
-  }
-
-  public static resetInstance(): void {
-    WeatherProviderManager.instance = undefined;
+    this.chainHead = weatherAPIProvider;
   }
 
   public getProvider(): WeatherProvider {
-    return this.provider;
+    return this.chainHead;
   }
 }
 

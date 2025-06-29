@@ -1,4 +1,5 @@
 import { WeatherData, WeatherProvider } from "../../types.js";
+import { Logger } from "winston";
 
 export const mockState = {
   weatherData: null as WeatherData | null,
@@ -12,8 +13,11 @@ export const mockState = {
 export class OpenWeatherMapProvider implements WeatherProvider {
   name = "OpenWeatherMap";
   private nextProvider?: WeatherProvider;
+  private logger: Logger;
 
-  constructor() {}
+  constructor(logger: Logger) {
+    this.logger = logger;
+  }
 
   setNext(nextProvider: WeatherProvider): WeatherProvider {
     this.nextProvider = nextProvider;
