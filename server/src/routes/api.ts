@@ -4,16 +4,15 @@ import SubscriptionService from "../entities/SubscriptionService.js";
 import { WeatherData, SubscriptionInput, WeatherResponse } from "../types.js";
 import MailManager from "../entities/MailManager.js";
 import SubscriptionDataProvider from "../entities/SubscriptionDataProvider.js";
+import WeatherAPIClient from "../entities/WeatherAPIClient.js";
 import { config } from "../config.js";
 import {
-  SubscriptionError,
   AlreadySubscribedError,
   NotConfirmedError,
   InvalidTokenError,
   CityNotFound,
 } from "../errors/SubscriptionError.js";
 import nodemailer from "nodemailer";
-import { Cipheriv } from "crypto";
 
 const router = express.Router();
 const subscriptionService = new SubscriptionService(

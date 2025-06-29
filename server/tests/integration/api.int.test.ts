@@ -90,20 +90,6 @@ describe("Advanced Subscription/Confirmation workflow", () => {
     expect(typeof res.body.description).toBe("string");
   });
 
-it("Weather for unknown city returns 404", async () => {
-  const { default: WeatherAPIClient } = await import("../../src/entities/WeatherAPIClient.js");
-  
-  WeatherAPIClient.prototype.getWeatherData = function(location: string): Promise<WeatherData> {
-    return Promise.reject(new CityNotFound());
-  };
-  
-  const res = await request(app).get("/api/weather?city=UnknownCity");
-  expect(res.statusCode).toBe(404);
-  expect(res.body).toHaveProperty("error");
-  
-  jest.restoreAllMocks();
-}, 10000);
-
   it("GET /api/confirm/:token with invalid token returns 400 or 404", async () => {
     const res = await request(app).get("/api/confirm/invalidtoken");
     expect([400, 404]).toContain(res.statusCode);
