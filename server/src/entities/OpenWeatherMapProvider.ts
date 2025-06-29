@@ -66,11 +66,11 @@ export class OpenWeatherMapProvider extends BaseWeatherProvider {
   }
 
   protected validateWeatherData(data: any): void {
-    if (
-      !data.main ||
-      typeof data.main.temp !== "number" ||
-      typeof data.main.humidity !== "number"
-    ) {
+    const hasMain = !!data.main;
+    const hasValidTemp = typeof data.main?.temp === "number";
+    const hasValidHumidity = typeof data.main?.humidity === "number";
+
+    if (!hasMain || !hasValidTemp || !hasValidHumidity) {
       this.logger.error("Invalid weather data format", { data });
       throw new Error("Invalid weather data format: missing required fields");
     }
