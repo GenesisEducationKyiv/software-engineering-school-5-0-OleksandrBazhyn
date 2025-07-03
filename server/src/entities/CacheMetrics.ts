@@ -61,33 +61,55 @@ class CacheMetrics implements CacheMetricsInterface {
   }
 
   async getMetricsData() {
-    const hits = await this.cacheHits.get();
-    const misses = await this.cacheMisses.get();
-    const duration = await this.cacheOperationDuration.get();
-    const errors = await this.cacheErrors.get()
+    try {
+      const metrics = await register.metrics();
+      const parsed = this.parsePrometheusMetrics(metrics);
+      
+      return {
+        hits: parsed.cache_hits_total || 0,
+        misses: parsed.cache_misses_total || 0,
+        errors: parsed.cache_errors_total || 0,
+        avgGetTime: parsed.avg_get_time || 0,
+        avgSetTime: parsed.avg_set_time || 0,
+        totalOperations: (parsed.cache_hits_total || 0) + (parsed.cache_misses_total || 0),
+        hitRate: this.calculateHitRate(parsed.cache_hits_total || 0, parsed.cache_misses_total || 0),
+        errorRate: this.calculateErrorRate(parsed.cache_errors_total || 0, (parsed.cache_hits_total || 0) + (parsed.cache_misses_total || 0))
+      };
+    } catch (error) {
+      console.error('Error getting metrics data:', error);
+      return {
+        hits: 0, misses: 0, errors: 0, avgGetTime: 0, avgSetTime: 0,
+        totalOperations: 0, hitRate: 0, errorRate: 0
+      };
+    }
+  }
 
-    const totalHits = hits.values.reduce((sum, metric) => sum + metric.value, 0);
-    const totalMisses = misses.values.reduce((sum, metric) => sum + metric.value, 0);
-    const totalErrors = errors.values.reduce((sum, metric) => sum + metric.value, 0);
-    const totalOperations = totalHits + totalMisses;
+  private parsePrometheusMetrics(metrics: string) {
+    const lines = metrics.split('\n');
+    const result: any = {};
     
-    const hitRate = totalOperations > 0 ? ((totalHits / totalOperations) * 100).toFixed(2) : "0";
+    for (const line of lines) {
+      if (line.startsWith('cache_hits_total')) {
+        result.cache_hits_total = parseFloat(line.split(' ')[1]) || 0;
+      } else if (line.startsWith('cache_misses_total')) {
+        result.cache_misses_total = parseFloat(line.split(' ')[1]) || 0;
+      } else if (line.startsWith('cache_errors_total')) {
+        result.cache_errors_total = parseFloat(line.split(' ')[1]) || 0;
+      } else if (line.includes('cache_operation_duration_seconds_sum') && line.includes('operation="get"')) {
+        result.avg_get_time = (parseFloat(line.split(' ')[1]) * 1000) || 0;
+      }
+    }
     
-    const avgResponseTime = duration.values.length > 0 
-      ? (duration.values.reduce((sum, metric) => sum + metric.value, 0) / duration.values.length * 1000).toFixed(2)
-      : "0";
+    return result;
+  }
 
-    const errorRate = totalOperations > 0 ? ((totalErrors / totalOperations) * 100).toFixed(2) : "0";
+  private calculateHitRate(hits: number, misses: number): number {
+    const total = hits + misses;
+    return total > 0 ? parseFloat(((hits / total) * 100).toFixed(1)) : 0;
+  }
 
-    return {
-      hits: totalHits,
-      misses: totalMisses,
-      hitRate: parseFloat(hitRate),
-      avgResponseTime: parseFloat(avgResponseTime),
-      totalOperations,
-      errors: totalErrors,
-      errorRate: parseFloat(errorRate)
-    };
+  private calculateErrorRate(errors: number, total: number): number {
+    return total > 0 ? parseFloat(((errors / total) * 100).toFixed(1)) : 0;
   }
 }
 
