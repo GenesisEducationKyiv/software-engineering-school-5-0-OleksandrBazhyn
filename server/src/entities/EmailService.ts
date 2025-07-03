@@ -6,7 +6,6 @@ import {
   DataProvider,
   WeatherProviderManagerInterface,
 } from "../types.js";
-import { WeatherProviderManagerInterface } from "./WeatherProviderManager.js";
 import { Logger } from "winston";
 import { createLogger } from "../logger/index.js";
 
