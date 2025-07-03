@@ -12,7 +12,7 @@ export async function createServices(): Promise<AppServicesInterface> {
   const logger = createLogger("ServiceContainer");
 
   let redisClient: RedisClient | null = null;
-  if (process.env.REDIS_ENABLED !== "false" && process.env.NODE_ENV !== "test") {
+  if (config.REDIS_ENABLED) {
     try {
       redisClient = new RedisClient(createLogger("RedisClient"));
       await redisClient.connect();

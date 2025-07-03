@@ -53,4 +53,5 @@ export const config = {
   OPENWEATHERMAP_API_KEY: required("OPENWEATHERMAP_API_KEY", process.env.OPENWEATHERMAP_API_KEY),
   REDIS_URL: required("REDIS_URL", process.env.REDIS_URL) || "redis://localhost:6379",
   NODE_ENV: required("NODE_ENV", process.env.NODE_ENV),
+  REDIS_ENABLED: process.env.REDIS_ENABLED !== "false" && !isTestEnvironment,
 };
