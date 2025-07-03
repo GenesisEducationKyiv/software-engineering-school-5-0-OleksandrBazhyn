@@ -59,6 +59,36 @@ class CacheMetrics implements CacheMetricsInterface {
   async getMetrics(): Promise<string> {
     return await register.metrics();
   }
+
+  async getMetricsData() {
+    const hits = await this.cacheHits.get();
+    const misses = await this.cacheMisses.get();
+    const duration = await this.cacheOperationDuration.get();
+    const errors = await this.cacheErrors.get()
+
+    const totalHits = hits.values.reduce((sum, metric) => sum + metric.value, 0);
+    const totalMisses = misses.values.reduce((sum, metric) => sum + metric.value, 0);
+    const totalErrors = errors.values.reduce((sum, metric) => sum + metric.value, 0);
+    const totalOperations = totalHits + totalMisses;
+    
+    const hitRate = totalOperations > 0 ? ((totalHits / totalOperations) * 100).toFixed(2) : "0";
+    
+    const avgResponseTime = duration.values.length > 0 
+      ? (duration.values.reduce((sum, metric) => sum + metric.value, 0) / duration.values.length * 1000).toFixed(2)
+      : "0";
+
+    const errorRate = totalOperations > 0 ? ((totalErrors / totalOperations) * 100).toFixed(2) : "0";
+
+    return {
+      hits: totalHits,
+      misses: totalMisses,
+      hitRate: parseFloat(hitRate),
+      avgResponseTime: parseFloat(avgResponseTime),
+      totalOperations,
+      errors: totalErrors,
+      errorRate: parseFloat(errorRate)
+    };
+  }
 }
 
 export const cacheMetrics = new CacheMetrics();

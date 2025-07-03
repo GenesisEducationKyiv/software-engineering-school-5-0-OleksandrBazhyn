@@ -134,6 +134,86 @@ export function createApiRoutes(
     }
   });
 
+  router.get("/metrics/dashboard", async (req: express.Request, res: express.Response) => {
+    try {
+      const metricsData = await cacheMetrics.getMetricsData(); // Нова функція для отримання структурованих даних
+      
+      const html = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Cache Metrics Dashboard</title>
+        <style>
+          body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+          .container { max-width: 1200px; margin: 0 auto; }
+          .metric-card { background: white; border-radius: 8px; padding: 20px; margin: 15px 0; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+          .metric-title { font-size: 1.2em; font-weight: bold; color: #333; margin-bottom: 10px; }
+          .metric-value { font-size: 2em; font-weight: bold; color: #2196F3; }
+          .metric-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+          .success { color: #4CAF50; }
+          .warning { color: #FF9800; }
+          .error { color: #F44336; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <h1>Cache Metrics Dashboard</h1>
+          <div class="metric-grid">
+            <div class="metric-card">
+              <div class="metric-title">Cache Hits</div>
+              <div class="metric-value success">${metricsData.hits}</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-title">Cache Misses</div>
+              <div class="metric-value warning">${metricsData.misses}</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-title">Hit Rate</div>
+              <div class="metric-value">${metricsData.hitRate}%</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-title">Average Response Time</div>
+              <div class="metric-value">${metricsData.avgResponseTime}ms</div>
+            </div>
+          </div>
+        </div>
+      </body>
+      </html>`;
+      
+      res.send(html);
+    } catch (error) {
+      logger.error("Error getting metrics dashboard:", error);
+      res.status(500).json({ error: "Failed to get metrics dashboard" });
+    }
+  });
+
+  router.get("/metrics/json", async (req: express.Request, res: express.Response) => {
+    try {
+      const metricsData = await cacheMetrics.getMetricsData();
+      res.status(200).json({
+        timestamp: new Date().toISOString(),
+        cache: {
+          hits: metricsData.hits,
+          misses: metricsData.misses,
+          hitRate: metricsData.hitRate,
+          totalOperations: metricsData.hits + metricsData.misses
+        },
+        performance: {
+          averageGetTime: metricsData.avgResponseTime,
+          averageSetTime: metricsData.avgResponseTime,
+          totalOperationTime: metricsData.totalOperations
+        },
+        errors: {
+          count: metricsData.errors,
+          rate: metricsData.errorRate
+        }
+      });
+    } catch (error) {
+      logger.error("Error getting JSON metrics:", error);
+      res.status(500).json({ error: "Failed to get metrics" });
+    }
+  });
+
   return router;
 }
 
