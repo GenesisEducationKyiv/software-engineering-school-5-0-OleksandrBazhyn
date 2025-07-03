@@ -1,5 +1,5 @@
 import { Counter, Histogram, register } from "prom-client";
-import { CacheMetricsInterface } from "../types.js";
+import { CacheMetricsInterface, ParsedMetrics, MetricsData} from "../types.js";
 
 class CacheMetrics implements CacheMetricsInterface {
   public cacheHits: Counter<string>;
@@ -60,11 +60,11 @@ class CacheMetrics implements CacheMetricsInterface {
     return await register.metrics();
   }
 
-  async getMetricsData() {
+  async getMetricsData(): Promise<MetricsData> {
     try {
       const metrics = await register.metrics();
       const parsed = this.parsePrometheusMetrics(metrics);
-      
+
       return {
         hits: parsed.cache_hits_total || 0,
         misses: parsed.cache_misses_total || 0,
@@ -72,34 +72,54 @@ class CacheMetrics implements CacheMetricsInterface {
         avgGetTime: parsed.avg_get_time || 0,
         avgSetTime: parsed.avg_set_time || 0,
         totalOperations: (parsed.cache_hits_total || 0) + (parsed.cache_misses_total || 0),
-        hitRate: this.calculateHitRate(parsed.cache_hits_total || 0, parsed.cache_misses_total || 0),
-        errorRate: this.calculateErrorRate(parsed.cache_errors_total || 0, (parsed.cache_hits_total || 0) + (parsed.cache_misses_total || 0))
+        hitRate: this.calculateHitRate(
+          parsed.cache_hits_total || 0,
+          parsed.cache_misses_total || 0,
+        ),
+        errorRate: this.calculateErrorRate(
+          parsed.cache_errors_total || 0,
+          (parsed.cache_hits_total || 0) + (parsed.cache_misses_total || 0),
+        ),
       };
     } catch (error) {
-      console.error('Error getting metrics data:', error);
+      console.error("Error getting metrics data:", error);
       return {
-        hits: 0, misses: 0, errors: 0, avgGetTime: 0, avgSetTime: 0,
-        totalOperations: 0, hitRate: 0, errorRate: 0
+        hits: 0,
+        misses: 0,
+        errors: 0,
+        avgGetTime: 0,
+        avgSetTime: 0,
+        totalOperations: 0,
+        hitRate: 0,
+        errorRate: 0,
       };
     }
   }
 
-  private parsePrometheusMetrics(metrics: string) {
-    const lines = metrics.split('\n');
-    const result: any = {};
-    
+  private parsePrometheusMetrics(metrics: string): ParsedMetrics {
+    const lines = metrics.split("\n");
+    const result: ParsedMetrics = {};
+
     for (const line of lines) {
-      if (line.startsWith('cache_hits_total')) {
-        result.cache_hits_total = parseFloat(line.split(' ')[1]) || 0;
-      } else if (line.startsWith('cache_misses_total')) {
-        result.cache_misses_total = parseFloat(line.split(' ')[1]) || 0;
-      } else if (line.startsWith('cache_errors_total')) {
-        result.cache_errors_total = parseFloat(line.split(' ')[1]) || 0;
-      } else if (line.includes('cache_operation_duration_seconds_sum') && line.includes('operation="get"')) {
-        result.avg_get_time = (parseFloat(line.split(' ')[1]) * 1000) || 0;
+      if (line.startsWith("cache_hits_total")) {
+        result.cache_hits_total = parseFloat(line.split(" ")[1]) || 0;
+      } else if (line.startsWith("cache_misses_total")) {
+        result.cache_misses_total = parseFloat(line.split(" ")[1]) || 0;
+      } else if (line.startsWith("cache_errors_total")) {
+        result.cache_errors_total = parseFloat(line.split(" ")[1]) || 0;
+      } else if (
+        line.includes("cache_operation_duration_seconds_sum") &&
+        line.includes('operation="get"')
+      ) {
+        result.avg_get_time = parseFloat(line.split(" ")[1]) * 1000 || 0;
+      } else if (
+        line.includes("cache_operation_duration_seconds_sum") &&
+        line.includes('operation="set"')
+      ) {
+        result.avg_set_time = parseFloat(line.split(" ")[1]) * 1000 || 0;
       }
     }
-    
+
     return result;
   }
 

@@ -286,7 +286,7 @@ export function createApiRoutes(
         </script>
       </body>
       </html>`;
-      
+
       res.send(html);
     } catch (error) {
       logger.error("Error getting metrics dashboard:", error);
@@ -303,16 +303,16 @@ export function createApiRoutes(
           hits: metricsData.hits,
           misses: metricsData.misses,
           hitRate: metricsData.hitRate,
-          totalOperations: metricsData.totalOperations
+          totalOperations: metricsData.totalOperations,
         },
         performance: {
           averageGetTime: metricsData.avgGetTime.toFixed(2),
-          averageSetTime: metricsData.avgSetTime.toFixed(2)
+          averageSetTime: metricsData.avgSetTime.toFixed(2),
         },
         errors: {
           count: metricsData.errors,
-          rate: metricsData.errorRate
-        }
+          rate: metricsData.errorRate,
+        },
       });
     } catch (error) {
       logger.error("Error getting JSON metrics:", error);
