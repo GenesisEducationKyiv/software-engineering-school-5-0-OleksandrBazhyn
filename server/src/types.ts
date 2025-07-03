@@ -214,3 +214,22 @@ export interface OpenWeatherMapWeatherResponse {
   name: string;
   cod: number;
 }
+
+export interface ParsedMetrics {
+  cache_hits_total?: number;
+  cache_misses_total?: number;
+  cache_errors_total?: number;
+  avg_get_time?: number;
+  avg_set_time?: number;
+}
+
+export interface MetricsData {
+  hits: number;
+  misses: number;
+  errors: number;
+  avgGetTime: number;
+  avgSetTime: number;
+  totalOperations: number;
+  hitRate: number;
+  errorRate: number;
+}
