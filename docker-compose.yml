@@ -55,15 +55,6 @@ services:
     env_file:
       - ./server/.env.docker.test
 
-#  server-test-unit:
-#    build:
-#      context: ./server
-#      dockerfile: Dockerfile
-#    container_name: weather-unit-test
-#    command: ["npm", "run", "test:unit"]
-#    env_file:
-#      - ./server/.env.docker
-
   client-test-e2e:
     build:
       context: ./client
