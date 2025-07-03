@@ -1,5 +1,5 @@
 import { Counter, Histogram, register } from "prom-client";
-import { CacheMetricsInterface, ParsedMetrics, MetricsData} from "../types.js";
+import { CacheMetricsInterface, ParsedMetrics, MetricsData } from "../types.js";
 
 class CacheMetrics implements CacheMetricsInterface {
   public cacheHits: Counter<string>;
