@@ -1,17 +1,20 @@
 import nodemailer from "nodemailer";
 import { WeatherData, Mailer } from "../types.js";
 import { config } from "../config.js";
+import { Logger } from "winston";
 
 class MailManager implements Mailer {
   private transporter: nodemailer.Transporter;
+  private logger: Logger;
 
-  constructor(transporter: nodemailer.Transporter) {
+  constructor(transporter: nodemailer.Transporter, logger: Logger) {
     this.transporter = transporter;
+    this.logger = logger;
   }
 
   async sendConfirmationEmail(email: string, city: string, token: string): Promise<void> {
-    console.log("Sending confirmation email to:", email);
-    const link = `http://localhost:3000/api/confirm/${token}`;
+    this.logger.info(`Sending confirmation email to: ${email}`);
+    const link = `http://localhost:3000/api/v1/confirm/${token}`;
     await this.transporter.sendMail({
       from: config.SMTP_FROM,
       to: email,
@@ -26,7 +29,7 @@ class MailManager implements Mailer {
     weather: WeatherData,
     token: string,
   ): Promise<void> {
-    console.log("Sending weather email to:", email);
+    this.logger.info(`Sending weather email to: ${email} for city: ${city}`);
     await this.transporter.sendMail({
       from: config.SMTP_FROM,
       to: email,

@@ -1,21 +1,28 @@
 import express from "express";
-import WeatherAPIClient from "../entities/WeatherAPIClient.js";
+import { WeatherProviderManager } from "../entities/WeatherProviderManager.js";
 import SubscriptionService from "../entities/SubscriptionService.js";
-import { WeatherData, SubscriptionInput } from "../types.js";
+import { WeatherData, SubscriptionInput, WeatherResponse } from "../types.js";
 import MailManager from "../entities/MailManager.js";
 import SubscriptionDataProvider from "../entities/SubscriptionDataProvider.js";
 import { config } from "../config.js";
 import {
-  SubscriptionError,
   AlreadySubscribedError,
   NotConfirmedError,
   InvalidTokenError,
   CityNotFound,
 } from "../errors/SubscriptionError.js";
 import nodemailer from "nodemailer";
-import { Cipheriv } from "crypto";
+import { createLogger } from "../logger/index.js";
 
 const router = express.Router();
+const logger = createLogger("API");
+
+// Create shared instances
+const weatherManager = new WeatherProviderManager(createLogger("WeatherProviderManager"));
+
+// Export the weatherManager for use in other modules
+export { weatherManager };
+
 const subscriptionService = new SubscriptionService(
   new MailManager(
     nodemailer.createTransport({
@@ -25,8 +32,10 @@ const subscriptionService = new SubscriptionService(
         pass: config.SMTP_PASS,
       },
     }),
+    createLogger("MailManager"),
   ),
   SubscriptionDataProvider,
+  createLogger("SubscriptionService"),
 );
 
 router.get("/weather", async (req: express.Request, res: express.Response) => {
@@ -35,27 +44,30 @@ router.get("/weather", async (req: express.Request, res: express.Response) => {
     return res.status(400).json({ error: "Invalid request" });
   }
   try {
-    const weatherManager = new WeatherAPIClient();
-    const weatherData: WeatherData = await weatherManager.getWeatherData(city);
-    if (!weatherData) {
+    const weatherData: WeatherData = await weatherManager.getProvider().getWeatherData(city);
+
+    if (!weatherData || !weatherData.current) {
       return res.status(404).json({ error: "City not found" });
     }
-    const data = {
+
+    const data: WeatherResponse = {
       temperature: weatherData.current.temp_c,
       humidity: weatherData.current.humidity,
       description: weatherData.current.condition.text,
     };
+
     return res.status(200).json(data);
   } catch (err: unknown) {
     if (err instanceof CityNotFound) {
       return res.status(404).json({ error: err.message });
     }
-    console.error(err);
+    logger.error("Weather service error:", err);
+    return res.status(500).json({ error: "Weather service error" });
   }
 });
 
 router.post("/subscribe", async (req: express.Request, res: express.Response) => {
-  console.log("Request body:", req.body);
+  logger.info("Subscription request received:", req.body);
   const { email, city, frequency } = req.body as SubscriptionInput;
 
   if (!email || !city || !frequency || !["daily", "hourly"].includes(frequency)) {
@@ -67,8 +79,7 @@ router.post("/subscribe", async (req: express.Request, res: express.Response) =>
   }
 
   try {
-    const weatherManager = new WeatherAPIClient();
-    const weatherData: WeatherData = await weatherManager.getWeatherData(city);
+    const weatherData: WeatherData = await weatherManager.getProvider().getWeatherData(city);
     if (!weatherData) {
       return res.status(404).json({ error: "City not found" });
     }
@@ -88,7 +99,7 @@ router.post("/subscribe", async (req: express.Request, res: express.Response) =>
     } else if (err instanceof InvalidTokenError) {
       return res.status(400).json({ error: err.message });
     }
-    console.error(err);
+    logger.error("Subscription error:", err);
     return res.status(400).json({ error: "Invalid input" });
   }
 });
@@ -105,7 +116,7 @@ router.get("/confirm/:token", async (req, res) => {
     if (err instanceof NotConfirmedError) {
       return res.status(400).send(err.message);
     }
-    console.error(err);
+    logger.error("Confirmation error:", err);
     return res.status(404).send("Token not found");
   }
 });
@@ -122,7 +133,7 @@ router.get("/unsubscribe/:token", async (req, res) => {
     if (err instanceof InvalidTokenError) {
       return res.status(500).send(err.message);
     }
-    console.error(err);
+    logger.error("Unsubscribe error:", err);
     return res.status(500).send("Server error");
   }
 });

@@ -1,5 +1,5 @@
 import { WebSocketServer, WebSocket } from "ws";
-import WeatherAPIClient from "./entities/WeatherAPIClient.js";
+import { WeatherProviderManagerInterface } from "./entities/WeatherProviderManager.js";
 import type { Server } from "http";
 import type {
   WeatherData,
@@ -8,13 +8,20 @@ import type {
   WebSocketInfoMessage,
   SubscriptionMessage,
 } from "./types.js";
+import { createLogger } from "./logger/index.js";
 
 /**
  * Set up a WebSocket server using the given HTTP server.
  * Handles client subscriptions for live weather updates.
  * @param {http.Server} server - The HTTP server instance (from http.createServer)
+ * @param {WeatherProviderManagerInterface} weatherManager - The weather provider manager instance
  */
-export function setupWebSocket(server: Server): void {
+export function setupWebSocket(
+  server: Server,
+  weatherManager: WeatherProviderManagerInterface,
+): void {
+  const logger = createLogger("WebSocketServer");
+
   // Create WebSocket server attached to the given HTTP server
   const wss = new WebSocketServer({ server });
 
@@ -32,7 +39,7 @@ export function setupWebSocket(server: Server): void {
           subscriptions.set(ws, msg.city.trim());
         }
       } catch (error) {
-        console.error("Error parsing WebSocket message:", error);
+        logger.error("Error parsing WebSocket message:", error);
         const errMsg: WebSocketErrorMessage = {
           type: "error",
           message: "Invalid message format",
@@ -63,9 +70,7 @@ export function setupWebSocket(server: Server): void {
       // Only send if the connection is open and city is defined
       if (ws.readyState === ws.OPEN && city) {
         try {
-          // Fetch weather for the city using WeatherManager
-          const weatherManager = new WeatherAPIClient();
-          const weatherData: WeatherData = await weatherManager.getWeatherData(city);
+          const weatherData: WeatherData = await weatherManager.getProvider().getWeatherData(city);
 
           // Send weather info if available
           if (weatherData && weatherData.current) {
@@ -80,7 +85,7 @@ export function setupWebSocket(server: Server): void {
             ws.send(JSON.stringify(weatherMsg));
           }
         } catch (error) {
-          console.error(`Error fetching weather for ${city}:`, error);
+          logger.error(`Error fetching weather for ${city}:`, error);
           const errMsg: WebSocketErrorMessage = {
             type: "error",
             message: `Failed to fetch weather for ${city}`,

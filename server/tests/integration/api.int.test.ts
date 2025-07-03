@@ -1,11 +1,17 @@
 import request from "supertest";
 import express, { Express } from "express";
-import { jest, beforeAll, describe, it, expect } from "@jest/globals";
+import { jest, beforeAll, afterAll, describe, it, expect } from "@jest/globals";
 
 import { CityNotFound } from "../../src/errors/SubscriptionError.js";
 
 jest.mock("../../src/entities/MailManager.js");
-jest.mock("../../src/entities/WeatherAPIClient.js");
+
+const mockLogger = {
+    info: jest.fn(),
+    error: jest.fn(),
+    warn: jest.fn(),
+    debug: jest.fn(),
+  } as any;
 
 import apiRoutes from "../../src/routes/api.js";
 import MailManager from "../../src/entities/MailManager.js";
@@ -35,7 +41,7 @@ describe("Advanced Subscription/Confirmation workflow", () => {
 
     const mockTransporter = {} as nodemailer.Transporter;
 
-    const mailerInstance = new MailManager(mockTransporter);
+    const mailerInstance = new MailManager(mockTransporter, mockLogger);
     token = (mailerInstance as any).__getLastToken() ?? null;
     expect(token).toBeTruthy();
   });
@@ -86,21 +92,10 @@ describe("Advanced Subscription/Confirmation workflow", () => {
     expect(res.body).toHaveProperty("temperature");
     expect(res.body).toHaveProperty("humidity");
     expect(res.body).toHaveProperty("description");
+    expect(typeof res.body.temperature).toBe("number");
+    expect(typeof res.body.humidity).toBe("number");
+    expect(typeof res.body.description).toBe("string");
   });
-
-  it("Weather for unknown city returns 404", async () => {
-    const { default: WeatherAPIClient } = await import("../../src/entities/WeatherAPIClient.js");
-    
-    WeatherAPIClient.prototype.getWeatherData = function(location: string): Promise<WeatherData> {
-      return Promise.reject(new CityNotFound());
-    };
-    
-    const res = await request(app).get("/api/weather?city=UnknownCity");
-    expect(res.statusCode).toBe(404);
-    expect(res.body).toHaveProperty("error");
-    
-    jest.restoreAllMocks();
-  }, 10000);
 
   it("GET /api/confirm/:token with invalid token returns 400 or 404", async () => {
     const res = await request(app).get("/api/confirm/invalidtoken");

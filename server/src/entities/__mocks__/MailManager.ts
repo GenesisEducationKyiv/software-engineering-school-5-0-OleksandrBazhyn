@@ -3,7 +3,7 @@ import { Mailer, WeatherData } from "../../types.js";
 let lastToken: string | undefined = undefined;
 
 class MockMailManager implements Mailer {
-  constructor(_transporter: unknown) {}
+  constructor(_transporter: unknown, _logger: unknown) {}
 
   async sendConfirmationEmail(_email: string, _city: string, token: string): Promise<void> {
     lastToken = token;
