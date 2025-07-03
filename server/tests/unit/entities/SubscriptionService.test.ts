@@ -5,6 +5,12 @@ describe("SubscriptionService", () => {
   let mailer: jest.Mocked<Mailer>;
   let dataProvider: jest.Mocked<DataProvider>;
   let service: SubscriptionService;
+  const mockLogger = {
+    info: jest.fn(),
+    error: jest.fn(),
+    warn: jest.fn(),
+    debug: jest.fn(),
+  } as any;
   const testInput: SubscriptionInput = {
     email: "test@mail.com",
     city: "Kyiv",
@@ -21,7 +27,7 @@ describe("SubscriptionService", () => {
       updateSubscriptionStatus: jest.fn(),
       deleteSubscription: jest.fn(),
     } as any;
-    service = new SubscriptionService(mailer, dataProvider);
+    service = new SubscriptionService(mailer, dataProvider, mockLogger);
   });
 
   describe("subscribe", () => {
