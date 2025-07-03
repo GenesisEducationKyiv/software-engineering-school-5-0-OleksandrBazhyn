@@ -1,7 +1,6 @@
 import { SubscriptionInput, Mailer, DataProvider, SubscriptionServiceInterface } from "../types.js";
 import { AlreadySubscribedError, InvalidTokenError } from "../errors/SubscriptionError.js";
 import { Logger } from "winston";
-import { createLogger } from "../logger/index.js";
 import crypto from "crypto";
 
 class SubscriptionService implements SubscriptionServiceInterface {
@@ -9,10 +8,10 @@ class SubscriptionService implements SubscriptionServiceInterface {
   private dataProvider: DataProvider;
   private logger: Logger;
 
-  constructor(mailer: Mailer, dataProvider: DataProvider, logger?: Logger) {
+  constructor(mailer: Mailer, dataProvider: DataProvider, logger: Logger) {
     this.mailer = mailer;
     this.dataProvider = dataProvider;
-    this.logger = logger || createLogger("SubscriptionService");
+    this.logger = logger;
   }
 
   async subscribe(subscription: SubscriptionInput): Promise<{ token: string }> {

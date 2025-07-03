@@ -2,15 +2,14 @@ import nodemailer from "nodemailer";
 import { WeatherData, Mailer } from "../types.js";
 import { config } from "../config.js";
 import { Logger } from "winston";
-import { createLogger } from "../logger/index.js";
 
 class MailManager implements Mailer {
   private transporter: nodemailer.Transporter;
   private logger: Logger;
 
-  constructor(transporter: nodemailer.Transporter, logger?: Logger) {
+  constructor(transporter: nodemailer.Transporter, logger: Logger) {
     this.transporter = transporter;
-    this.logger = logger || createLogger("MailManager");
+    this.logger = logger;
   }
 
   async sendConfirmationEmail(email: string, city: string, token: string): Promise<void> {

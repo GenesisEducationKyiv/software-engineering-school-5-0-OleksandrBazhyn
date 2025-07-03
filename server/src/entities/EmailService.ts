@@ -6,6 +6,7 @@ import {
   DataProvider,
   WeatherProviderManagerInterface,
 } from "../types.js";
+import { WeatherProviderManagerInterface } from "./WeatherProviderManager.js";
 import { Logger } from "winston";
 import { createLogger } from "../logger/index.js";
 
@@ -43,7 +44,9 @@ class EmailService {
 
     for (const sub of subscriptions) {
       try {
-        const weather: WeatherData | null = await this.weatherManager.getWeatherData(sub.city);
+        const weather: WeatherData | null = await this.weatherManager
+          .getProvider()
+          .getWeatherData(sub.city);
         if (!weather) {
           this.logger.error(`No weather data found for city: ${sub.city}`);
           continue;

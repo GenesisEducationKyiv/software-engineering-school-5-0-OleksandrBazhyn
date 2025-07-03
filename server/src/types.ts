@@ -131,3 +131,86 @@ export interface WeatherProviderManagerInterface {
   getProvider(): WeatherProvider;
   getWeatherData(city: string): Promise<WeatherData | null>;
 }
+
+// OpenWeatherMap API types
+export interface OpenWeatherMapLocalNames {
+  [languageCode: string]: string;
+}
+
+export interface OpenWeatherMapGeocodingResponse {
+  name: string;
+  local_names?: OpenWeatherMapLocalNames;
+  lat: number;
+  lon: number;
+  country: string;
+  state?: string;
+}
+
+export interface OpenWeatherMapWeatherCondition {
+  id: number;
+  main: string;
+  description: string;
+  icon: string;
+}
+
+export interface OpenWeatherMapMain {
+  temp: number;
+  feels_like: number;
+  temp_min: number;
+  temp_max: number;
+  pressure: number;
+  humidity: number;
+  sea_level?: number;
+  grnd_level?: number;
+}
+
+export interface OpenWeatherMapWind {
+  speed: number;
+  deg: number;
+  gust?: number;
+}
+
+export interface OpenWeatherMapClouds {
+  all: number;
+}
+
+export interface OpenWeatherMapRain {
+  "1h"?: number;
+  "3h"?: number;
+}
+
+export interface OpenWeatherMapSnow {
+  "1h"?: number;
+  "3h"?: number;
+}
+
+export interface OpenWeatherMapSys {
+  type: number;
+  id: number;
+  country: string;
+  sunrise: number;
+  sunset: number;
+}
+
+export interface OpenWeatherMapCoord {
+  lon: number;
+  lat: number;
+}
+
+export interface OpenWeatherMapWeatherResponse {
+  coord: OpenWeatherMapCoord;
+  weather: OpenWeatherMapWeatherCondition[];
+  base: string;
+  main: OpenWeatherMapMain;
+  visibility: number;
+  wind?: OpenWeatherMapWind;
+  rain?: OpenWeatherMapRain;
+  snow?: OpenWeatherMapSnow;
+  clouds: OpenWeatherMapClouds;
+  dt: number;
+  sys: OpenWeatherMapSys;
+  timezone: number;
+  id: number;
+  name: string;
+  cod: number;
+}

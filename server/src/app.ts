@@ -9,8 +9,11 @@ import SubscriptionDataProvider from "./entities/SubscriptionDataProvider.js";
 import { createServices } from "./container/ServiceContainer.js";
 import { config } from "./config.js";
 import { createLogger } from "./logger/index.js";
+import { createLogger } from "./logger/index.js";
 import nodemailer from "nodemailer";
 
+const PORT = Number(config.PORT) || 3000;
+const logger = createLogger("Server");
 const PORT = Number(config.PORT) || 3000;
 const logger = createLogger("Server");
 

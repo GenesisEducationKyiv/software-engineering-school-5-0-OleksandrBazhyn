@@ -6,6 +6,13 @@ import { CityNotFound } from "../../src/errors/SubscriptionError.js";
 
 jest.mock("../../src/entities/MailManager.js");
 
+const mockLogger = {
+    info: jest.fn(),
+    error: jest.fn(),
+    warn: jest.fn(),
+    debug: jest.fn(),
+  } as any;
+
 import { createApiRoutes } from "../../src/routes/api.js";
 import MailManager from "../../src/entities/MailManager.js";
 import SubscriptionService from "../../src/entities/SubscriptionService.js";
@@ -48,7 +55,7 @@ describe("Advanced Subscription/Confirmation workflow", () => {
 
     const mockTransporter = {} as nodemailer.Transporter;
 
-    const mailerInstance = new MailManager(mockTransporter);
+    const mailerInstance = new MailManager(mockTransporter, mockLogger);
     token = (mailerInstance as any).__getLastToken() ?? null;
     expect(token).toBeTruthy();
   });

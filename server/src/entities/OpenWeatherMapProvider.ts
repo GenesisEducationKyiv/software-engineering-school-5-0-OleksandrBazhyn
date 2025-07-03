@@ -1,4 +1,9 @@
-import { WeatherData, GeocodingResult } from "../types.js";
+import {
+  WeatherData,
+  GeocodingResult,
+  OpenWeatherMapGeocodingResponse,
+  OpenWeatherMapWeatherResponse,
+} from "../types.js";
 import { BaseWeatherProvider } from "./BaseWeatherProvider.js";
 import { config } from "../config.js";
 import { Logger } from "winston";
@@ -6,7 +11,7 @@ import { Logger } from "winston";
 export class OpenWeatherMapProvider extends BaseWeatherProvider {
   private OPENWEATHERMAP_API_KEY: string;
 
-  constructor(logger?: Logger) {
+  constructor(logger: Logger) {
     super("OpenWeatherMap", logger);
     this.OPENWEATHERMAP_API_KEY = config.OPENWEATHERMAP_API_KEY || "";
 
@@ -26,7 +31,7 @@ export class OpenWeatherMapProvider extends BaseWeatherProvider {
 
   protected async getCoordinatesForCity(city: string): Promise<GeocodingResult> {
     const url = this.buildGeocodingUrl(city);
-    const response = await this.makeApiRequest(url);
+    const response = await this.makeApiRequest<OpenWeatherMapGeocodingResponse[]>(url);
     return this.parseGeocodingResponse(response, city);
   }
 
@@ -36,7 +41,7 @@ export class OpenWeatherMapProvider extends BaseWeatherProvider {
     )}&limit=1&appid=${this.OPENWEATHERMAP_API_KEY}`;
   }
 
-  protected async makeApiRequest(url: string): Promise<any> {
+  protected async makeApiRequest<T>(url: string): Promise<T> {
     const response = await fetch(url);
 
     if (!response.ok) {
@@ -44,10 +49,16 @@ export class OpenWeatherMapProvider extends BaseWeatherProvider {
       throw new Error(`API response was not ok: ${response.status}`);
     }
 
-    return response.json();
+    const jsonData = await response.json();
+    this.logger.debug("API request successful", jsonData);
+    return jsonData;
   }
 
-  protected parseGeocodingResponse(data: any, city: string): GeocodingResult {
+  protected parseGeocodingResponse(
+    data: OpenWeatherMapGeocodingResponse[],
+    city: string,
+  ): GeocodingResult {
+    this.logger.debug("Parsing geocoding response", { data, city });
     if (!data || !data.length) {
       this.logger.error("Geocoding API returned no results", { city });
       throw new Error(`City not found: ${city}`);
@@ -56,16 +67,18 @@ export class OpenWeatherMapProvider extends BaseWeatherProvider {
     return { lat: data[0].lat, lon: data[0].lon };
   }
 
-  protected async fetchRawWeatherData(coords: GeocodingResult): Promise<any> {
+  protected async fetchRawWeatherData(
+    coords: GeocodingResult,
+  ): Promise<OpenWeatherMapWeatherResponse> {
     const url = this.buildWeatherUrl(coords);
-    return this.makeApiRequest(url);
+    return this.makeApiRequest<OpenWeatherMapWeatherResponse>(url);
   }
 
   protected buildWeatherUrl(coords: GeocodingResult): string {
     return `https://api.openweathermap.org/data/2.5/weather?lat=${coords.lat}&lon=${coords.lon}&appid=${this.OPENWEATHERMAP_API_KEY}&units=metric`;
   }
 
-  protected validateWeatherData(data: any): void {
+  protected validateWeatherData(data: OpenWeatherMapWeatherResponse): void {
     const hasMain = !!data.main;
     const hasValidTemp = typeof data.main?.temp === "number";
     const hasValidHumidity = typeof data.main?.humidity === "number";
@@ -76,7 +89,7 @@ export class OpenWeatherMapProvider extends BaseWeatherProvider {
     }
   }
 
-  protected transformToWeatherData(data: any): WeatherData {
+  protected transformToWeatherData(data: OpenWeatherMapWeatherResponse): WeatherData {
     return {
       current: {
         temp_c: data.main.temp,
