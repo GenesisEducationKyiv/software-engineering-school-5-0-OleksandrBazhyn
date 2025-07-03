@@ -51,7 +51,7 @@ export class WeatherProviderManager implements WeatherProviderManagerInterface {
           await this.cacheService.set(city, weatherData);
           this.logger.debug(`Weather data cached for ${city}`);
         } catch (cacheError) {
-          this.logger.warn(`Failed to cache weather data for ${city}:`, cacheError);
+          this.logger.warn(`Failed to cache weather data for '${city}':`, cacheError);
         }
       }
       this.logger.debug(`Weather data retrieved for ${city}`, {
@@ -60,7 +60,7 @@ export class WeatherProviderManager implements WeatherProviderManagerInterface {
       });
       return weatherData;
     } catch (error) {
-      this.logger.error(`Failed to get weather data for ${city}:`, error);
+      this.logger.error(`Failed to get weather data for $'{city}':`, error);
       return null;
     }
   }
