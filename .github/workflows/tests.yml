@@ -1,0 +1,126 @@
+name: Test Pipelines
+
+on: [push, pull_request]
+
+jobs:
+  unit-tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: server
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm ci
+      - run: npm run test:unit
+
+  integration-tests:
+    name: Integration Tests
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15
+        ports: [5432:5432]
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: weather_db
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    defaults:
+      run:
+        working-directory: server
+    env:
+      PGUSER: postgres
+      PGPASSWORD: postgres
+      PGDATABASE: weather_db
+      PGHOST: localhost
+      PGPORT: 5432
+      PORT: 3000
+      SMTP_HOST: smtp.example.com
+      SMTP_PORT: 587
+      SMTP_USER: ${{ secrets.SMTP_USER }}
+      SMTP_PASS: ${{ secrets.SMTP_PASS }}
+      SMTP_FROM: ${{ secrets.SMTP_FROM }}
+      WEATHER_API_KEY: ${{ secrets.WEATHER_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm ci
+      - name: Run migrations
+        run: NODE_ENV=test npx knex migrate:latest --knexfile ./knexfile.cjs
+      - run: npm run test:integration
+
+  e2e-tests:
+    name: E2E Tests
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15
+        ports: [5432:5432]
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: weather_db
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install server dependencies
+        run: npm ci
+        working-directory: server
+
+      - name: Install client dependencies
+        run: npm ci
+        working-directory: client
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+        working-directory: client
+
+      - name: Run DB migrations for E2E
+        run: |
+          npx knex --knexfile knexfile.cjs migrate:latest
+        working-directory: server
+        env:
+          NODE_ENV: test
+          PGUSER: postgres
+          PGPASSWORD: postgres
+          PGDATABASE: weather_db
+          PGHOST: localhost
+          PGPORT: 5432
+
+      - name: Run E2E tests
+        run: npm run test:e2e
+        working-directory: client
+        env:
+          PGUSER: postgres
+          PGPASSWORD: postgres
+          PGDATABASE: weather_db
+          PGHOST: localhost
+          PGPORT: 5432
+          WEATHER_API_KEY: ${{ secrets.WEATHER_API_KEY }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASS: ${{ secrets.SMTP_PASS }}
+          SMTP_FROM: ${{ secrets.SMTP_FROM }}
+          NODE_ENV: test
+          PORT: 3000
+          
+      - name: Kill background processes
+        run: pkill -f "tsx" || true
+          
