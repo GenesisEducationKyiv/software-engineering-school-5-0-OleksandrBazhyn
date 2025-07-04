@@ -1,4 +1,9 @@
-import { SubscriptionInput, Mailer, DataProvider, SubscriptionServiceInterface } from "../../types.js";
+import {
+  SubscriptionInput,
+  Mailer,
+  DataProvider,
+  SubscriptionServiceInterface,
+} from "../../types.js";
 import { AlreadySubscribedError, InvalidTokenError } from "../../errors/SubscriptionError.js";
 import { Logger } from "winston";
 import crypto from "crypto";

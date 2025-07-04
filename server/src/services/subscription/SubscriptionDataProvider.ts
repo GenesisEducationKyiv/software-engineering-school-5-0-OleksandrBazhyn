@@ -1,4 +1,9 @@
-import { SubscriptionFrequency, Subscription, SubscriptionInput, DataProvider } from "../../types.js";
+import {
+  SubscriptionFrequency,
+  Subscription,
+  SubscriptionInput,
+  DataProvider,
+} from "../../types.js";
 import db from "../../../db/knex.js";
 
 class SubscriptionDataProvider implements DataProvider {
