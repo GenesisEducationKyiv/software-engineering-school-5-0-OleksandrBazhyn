@@ -8,7 +8,7 @@ const logger = createLogger("WeatherController");
 export class WeatherController {
   constructor(private weatherManager: WeatherProviderManagerInterface) {}
 
-  async getWeather(req: Request, res: Response) {
+  async getWeather(req: Request, res: Response): Promise<Response> {
     const city = req.query.city as string | undefined;
     if (!city) {
       return res.status(400).json({ error: "Invalid request" });

@@ -5,21 +5,21 @@ import { createLogger } from "../logger/index.js";
 const logger = createLogger("MetricsController");
 
 export class MetricsController {
-  async getMetrics(req: Request, res: Response) {
+  async getMetrics(req: Request, res: Response): Promise<Response | void> {
     try {
       const metrics = await cacheMetrics.getMetrics();
       res.set("Content-Type", "text/plain");
-      res.status(200).send(metrics);
+      return res.status(200).send(metrics);
     } catch (error) {
       logger.error("Error getting metrics:", error);
-      res.status(500).json({ error: "Failed to get metrics" });
+      return res.status(500).json({ error: "Failed to get metrics" });
     }
   }
 
-  async getMetricsJson(req: Request, res: Response) {
+  async getMetricsJson(req: Request, res: Response): Promise<Response> {
     try {
       const metricsData = await cacheMetrics.getMetricsData();
-      res.status(200).json({
+      return res.status(200).json({
         timestamp: new Date().toISOString(),
         cache: {
           hits: metricsData.hits,
@@ -38,11 +38,11 @@ export class MetricsController {
       });
     } catch (error) {
       logger.error("Error getting JSON metrics:", error);
-      res.status(500).json({ error: "Failed to get metrics" });
+      return res.status(500).json({ error: "Failed to get metrics" });
     }
   }
 
-  async getDashboard(req: Request, res: Response) {
+  async getDashboard(req: Request, res: Response): Promise<Response | void> {
     try {
       const html = `
       <!DOCTYPE html>
@@ -195,10 +195,10 @@ export class MetricsController {
       </body>
       </html>`;
 
-      res.status(200).send(html);
+      return res.send(html);
     } catch (error) {
       logger.error("Error getting metrics dashboard:", error);
-      res.status(500).json({ error: "Failed to get metrics dashboard" });
+      return res.status(500).json({ error: "Failed to get metrics dashboard" });
     }
   }
 }

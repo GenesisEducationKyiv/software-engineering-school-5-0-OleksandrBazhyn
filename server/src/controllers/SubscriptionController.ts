@@ -49,16 +49,19 @@ export class SubscriptionController {
     }
   }
 
-  async confirm(req: Request, res: Response) {
+  async confirm(req: Request, res: Response): Promise<Response> {
     const { token } = req.params;
+    
     try {
       const confirmed = await this.subscriptionService.confirm(token);
       if (confirmed) {
         return res.status(200).send("Subscription confirmed successfully");
       }
       return res.status(400).send("Invalid token");
-    } catch (err) {
+    } catch (err: unknown) {
       if (err instanceof NotConfirmedError) {
+        return res.status(400).send(err.message);
+      } else if (err instanceof InvalidTokenError) {
         return res.status(400).send(err.message);
       }
       logger.error("Confirmation error:", err);
@@ -66,17 +69,18 @@ export class SubscriptionController {
     }
   }
 
-  async unsubscribe(req: Request, res: Response) {
+  async unsubscribe(req: Request, res: Response): Promise<Response> {
     const { token } = req.params;
+    
     try {
       const unsubscribed = await this.subscriptionService.unsubscribe(token);
       if (unsubscribed) {
         return res.status(200).send("Unsubscribed and deleted successfully");
       }
       return res.status(400).send("Invalid token");
-    } catch (err) {
+    } catch (err: unknown) {
       if (err instanceof InvalidTokenError) {
-        return res.status(500).send(err.message);
+        return res.status(400).send(err.message);
       }
       logger.error("Unsubscribe error:", err);
       return res.status(500).send("Server error");
