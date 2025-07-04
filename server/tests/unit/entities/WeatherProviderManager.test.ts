@@ -34,8 +34,8 @@ describe("WeatherProviderManager", () => {
     
     const manager = new WeatherProviderManager(logger);
     
-    expect(WeatherAPIProvider).toHaveBeenCalled();
-    expect(OpenWeatherMapProvider).toHaveBeenCalled();
+    expect(WeatherAPIProvider).toHaveBeenCalledWith(logger);
+    expect(OpenWeatherMapProvider).toHaveBeenCalledWith(logger);
     expect(mockSetNext).toHaveBeenCalled();
   });
 

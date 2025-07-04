@@ -7,6 +7,7 @@ import type {
   WebSocketMessage,
   WebSocketInfoMessage,
   SubscriptionMessage,
+  WeatherProviderManagerInterface,
 } from "./types.js";
 import { createLogger } from "./logger/index.js";
 
@@ -70,7 +71,7 @@ export function setupWebSocket(
       // Only send if the connection is open and city is defined
       if (ws.readyState === ws.OPEN && city) {
         try {
-          const weatherData: WeatherData = await weatherManager.getProvider().getWeatherData(city);
+          const weatherData: WeatherData = await weatherManager.getWeatherData(city);
 
           // Send weather info if available
           if (weatherData && weatherData.current) {

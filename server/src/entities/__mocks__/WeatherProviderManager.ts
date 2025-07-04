@@ -1,5 +1,4 @@
-import { WeatherProvider } from "../../types.js";
-import { WeatherProviderManagerInterface } from "../WeatherProviderManager.js";
+import { WeatherProvider, WeatherProviderManagerInterface } from "../../types.js";
 import { WeatherAPIProvider } from "./WeatherAPIProvider.js";
 import { OpenWeatherMapProvider } from "./OpenWeatherMapProvider.js";
 import { Logger } from "winston";
@@ -18,6 +17,10 @@ export class WeatherProviderManager implements WeatherProviderManagerInterface {
 
   public getProvider(): WeatherProvider {
     return this.chainHead;
+  }
+
+  public async getWeatherData(city: string) {
+    return await this.chainHead.getWeatherData(city);
   }
 }
 

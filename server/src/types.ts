@@ -86,6 +86,52 @@ export interface GeocodingResult {
   lon: number;
 }
 
+export interface CacheService<T> {
+  get(key: string): Promise<T | null>;
+  set(key: string, value: T, ttl?: number): Promise<void>;
+  invalidate(key: string): Promise<void>;
+  exists(key: string): Promise<boolean>;
+  setDefaultTTL(ttl: number): void;
+  getDefaultTTL(): number;
+}
+
+export type WeatherCacheServiceInterface = CacheService<WeatherData>;
+
+export interface RedisClientInterface {
+  connect(): Promise<void>;
+  disconnect(): Promise<void>;
+  get(key: string): Promise<string | null>;
+  set(key: string, value: string, ttl?: number): Promise<void>;
+  del(key: string): Promise<void>;
+  exists(key: string): Promise<boolean>;
+  isConnected(): boolean;
+}
+
+export interface CacheMetricsInterface {
+  recordHit(cacheType: string, keyPrefix: string): void;
+  recordMiss(cacheType: string, keyPrefix: string): void;
+  recordError(cacheType: string, operation: string): void;
+  recordOperationDuration(cacheType: string, operation: string, duration: number): void;
+  getMetrics(): Promise<string>;
+}
+
+export interface AppServicesInterface {
+  weatherManager: WeatherProviderManagerInterface;
+  subscriptionService: SubscriptionServiceInterface;
+  redisClient: RedisClientInterface | null;
+}
+
+export interface SubscriptionServiceInterface {
+  subscribe(subscription: SubscriptionInput): Promise<{ token: string }>;
+  confirm(token: string): Promise<boolean>;
+  unsubscribe(token: string): Promise<boolean>;
+}
+
+export interface WeatherProviderManagerInterface {
+  getProvider(): WeatherProvider;
+  getWeatherData(city: string): Promise<WeatherData | null>;
+}
+
 // OpenWeatherMap API types
 export interface OpenWeatherMapLocalNames {
   [languageCode: string]: string;
@@ -167,4 +213,23 @@ export interface OpenWeatherMapWeatherResponse {
   id: number;
   name: string;
   cod: number;
+}
+
+export interface ParsedMetrics {
+  cache_hits_total?: number;
+  cache_misses_total?: number;
+  cache_errors_total?: number;
+  avg_get_time?: number;
+  avg_set_time?: number;
+}
+
+export interface MetricsData {
+  hits: number;
+  misses: number;
+  errors: number;
+  avgGetTime: number;
+  avgSetTime: number;
+  totalOperations: number;
+  hitRate: number;
+  errorRate: number;
 }

@@ -7,13 +7,54 @@ import {
   SubscriptionFrequency,
 } from "../../../src/types.js";
 
-describe("EmailService (alternative setup)", () => {
+describe("EmailService", () => {
   let mailer: jest.Mocked<Mailer>;
   let dataProvider: jest.Mocked<DataProvider>;
-  let weatherProvider: { getWeatherData: jest.Mock };
-  let weatherManager: { getProvider: jest.Mock };
+  let weatherManager: any;
+  let weatherProvider: any;
   let service: EmailService;
   let mockLogger: any;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    
+    mailer = {
+      sendMail: jest.fn(),
+      sendWeatherEmail: jest.fn(),
+      sendConfirmationEmail: jest.fn(),
+    } as any;
+
+    dataProvider = {
+      getActiveSubscriptions: jest.fn(),
+      getUsersByFrequency: jest.fn(),
+      getSubscriptionsByFrequency: jest.fn(),
+      checkSubscriptionExists: jest.fn(),
+      insertSubscription: jest.fn(),
+      updateSubscriptionStatus: jest.fn(),
+      deleteSubscription: jest.fn(),
+    } as any;
+
+    weatherProvider = {
+      getWeatherData: jest.fn(),
+    };
+
+    weatherManager = {
+      getProvider: jest.fn().mockReturnValue(weatherProvider),
+      getWeatherData: jest.fn(),
+    };
+
+    mockLogger = {
+      info: jest.fn(),
+      error: jest.fn(),
+      warn: jest.fn(),
+      debug: jest.fn(),
+    };
+
+    service = new EmailService(mailer, dataProvider, weatherManager, mockLogger);
+
+    // Prevent WEATHER_API_KEY warning in test output
+    process.env.WEATHER_API_KEY = "dummy";
+  });
 
   const testSub: Subscription = {
     id: 1,
@@ -34,45 +75,10 @@ describe("EmailService (alternative setup)", () => {
 
   let logSpy: jest.Mock;
   let errorSpy: jest.Mock;
-  let warnSpy: jest.Mock;
 
   beforeEach(() => {
-    mailer = {
-      sendWeatherEmail: jest.fn(),
-      sendConfirmationEmail: jest.fn(),
-    };
-    dataProvider = {
-      getSubscriptionsByFrequency: jest.fn(),
-      checkSubscriptionExists: jest.fn(),
-      insertSubscription: jest.fn(),
-      updateSubscriptionStatus: jest.fn(),
-      deleteSubscription: jest.fn(),
-    };
-    
-    // Create the mock provider and manager chain
-    weatherProvider = { getWeatherData: jest.fn() };
-    weatherManager = { getProvider: jest.fn().mockReturnValue(weatherProvider) };
-    
-    // Create mock logger
-    mockLogger = {
-      info: jest.fn(),
-      error: jest.fn(),
-      warn: jest.fn(),
-      debug: jest.fn(),
-    };
-    
-    service = new EmailService(mailer, dataProvider, weatherManager, mockLogger);
-    
-    jest.clearAllMocks();
     logSpy = mockLogger.info;
     errorSpy = mockLogger.error;
-    warnSpy = mockLogger.warn;
-    // Prevent WEATHER_API_KEY warning in test output
-    process.env.WEATHER_API_KEY = "dummy";
-  });
-
-  afterEach(() => {
-    // No need to restore mock functions
   });
 
   describe.each(["daily", "hourly"] as const)("sendWeatherEmailsByFrequency(%s)", (frequency) => {
