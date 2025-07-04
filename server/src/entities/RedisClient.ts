@@ -8,26 +8,14 @@ export class RedisClient implements RedisClientInterface {
   private client: RedisClientType;
   private logger: Logger;
 
-  constructor(logger?: Logger) {
-    this.logger = logger || createLogger("RedisClient");
+  constructor(logger: Logger) {
+    this.logger = logger;
     this.client = createClient({
       url: config.REDIS_URL,
     });
 
     this.client.on("error", (err) => {
       this.logger.error("Redis Client Error:", err);
-    });
-
-    this.client.on("connect", () => {
-      this.logger.info("Redis client connected");
-    });
-
-    this.client.on("ready", () => {
-      this.logger.info("Redis client ready");
-    });
-
-    this.client.on("end", () => {
-      this.logger.info("Redis client disconnected");
     });
   }
 
@@ -43,7 +31,7 @@ export class RedisClient implements RedisClientInterface {
 
   async disconnect(): Promise<void> {
     try {
-      await this.client.disconnect();
+      await this.client.quit();
       this.logger.info("Redis connection closed");
     } catch (error) {
       this.logger.error("Error disconnecting from Redis:", error);

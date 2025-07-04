@@ -35,11 +35,11 @@ export class WeatherProviderManager implements WeatherProviderManagerInterface {
       try {
         const cachedData = await this.cacheService.get(city);
         if (cachedData) {
-          this.logger.info(`Returning cached weather data for '${city}'`);
+          this.logger.info(`Returning cached weather data for ${city}`);
           return cachedData;
         }
       } catch (error) {
-        this.logger.warn(`Cache error for '${city}', falling back to providers:`, error);
+        this.logger.error(`Cache error for ${city}, falling back to providers:`, error);
       }
     }
 
@@ -49,18 +49,18 @@ export class WeatherProviderManager implements WeatherProviderManagerInterface {
       if (weatherData && this.cacheService) {
         try {
           await this.cacheService.set(city, weatherData);
-          this.logger.debug(`Weather data cached for '${city}'`);
+          this.logger.debug(`Weather data cached for ${city}`);
         } catch (cacheError) {
-          this.logger.warn(`Failed to cache weather data for '${city}':`, cacheError);
+          this.logger.warn(`Failed to cache weather data for ${city}:`, cacheError);
         }
       }
-      this.logger.debug(`Weather data retrieved for '${city}'`, {
+      this.logger.debug(`Weather data retrieved for ${city}`, {
         provider: this.chainHead.constructor.name,
         data: weatherData,
       });
       return weatherData;
     } catch (error) {
-      this.logger.error(`Failed to get weather data for '${city}':`, error);
+      this.logger.error(`Failed to get weather data for ${city}:`, error);
       return null;
     }
   }
