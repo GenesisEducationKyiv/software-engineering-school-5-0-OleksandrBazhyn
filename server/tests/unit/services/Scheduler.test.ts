@@ -5,8 +5,8 @@ import { Mailer, DataProvider } from "../../../src/types.js";
 import { Logger } from "winston";
 
 jest.mock("node-cron");
-jest.mock("../../../src/services/email/EmailService");
-jest.mock("../../../src/services/weather/poviders/WeatherProviderManager");
+jest.mock("../../../src/services/email/EmailService.js");
+jest.mock("../../../src/services/weather/WeatherProviderManager.js");
 jest.mock("../../../src/logger/index.js", () => ({
   createLogger: jest.fn().mockReturnValue({
     info: jest.fn(),
@@ -71,7 +71,7 @@ describe("Scheduler", () => {
   });
 
   it("should create scheduler with default logger when no logger provided", () => {
-    const defaultScheduler = new Scheduler();
+    const defaultScheduler = new Scheduler(mockLogger);
     expect(defaultScheduler).toBeDefined();
   });
 

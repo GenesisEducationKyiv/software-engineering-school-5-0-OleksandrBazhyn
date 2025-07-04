@@ -1,5 +1,5 @@
 import cron from "node-cron";
-import EmailService from "./EmailService.js";
+import EmailService from "../email/EmailService.js";
 import { Mailer, DataProvider } from "../../types.js";
 import { WeatherProviderManager } from "../weather/WeatherProviderManager.js";
 import { Logger } from "winston";
@@ -8,8 +8,8 @@ import { createLogger } from "../../logger/index.js";
 class Scheduler {
   private logger: Logger;
 
-  constructor(logger?: Logger) {
-    this.logger = logger || createLogger("Scheduler");
+  constructor(logger: Logger) {
+    this.logger = logger;
   }
 
   start(mailer: Mailer, dataProvider: DataProvider): void {

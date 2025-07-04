@@ -7,7 +7,6 @@ import {
   WeatherProviderManagerInterface,
 } from "../../types.js";
 import { Logger } from "winston";
-import { createLogger } from "../../logger/index.js";
 
 class EmailService {
   private weatherManager: WeatherProviderManagerInterface;
@@ -19,12 +18,12 @@ class EmailService {
     mailer: Mailer,
     dataProvider: DataProvider,
     weatherManager: WeatherProviderManagerInterface,
-    logger?: Logger,
+    logger: Logger,
   ) {
     this.weatherManager = weatherManager;
     this.mailer = mailer;
     this.dataProvider = dataProvider;
-    this.logger = logger || createLogger("EmailService");
+    this.logger = logger;
   }
 
   async sendWeatherEmailsByFrequency(frequency: SubscriptionFrequency): Promise<void> {

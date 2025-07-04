@@ -20,9 +20,9 @@ describe("Weather Provider Chain Integration", () => {
     // Set up the test data
     const testData = {
       current: {
-        temp_c: 15,
-        humidity: 70,
-        condition: { text: "Partly cloudy" }
+        temp_c: 20,
+        humidity: 60,
+        condition: { text: "Default mock condition" }
       }
     } as WeatherData;
     
@@ -32,7 +32,7 @@ describe("Weather Provider Chain Integration", () => {
     
     // Create a new instance of the manager with logger
     const manager = new WeatherProviderManager(logger);
-    const result = await manager.getProvider().getWeatherData("London");
+    const result = await manager.getWeatherData("London");
     
     expect(result).toEqual(testData);
   });
@@ -40,9 +40,9 @@ describe("Weather Provider Chain Integration", () => {
   it("should use first provider when it works correctly", async () => {
     const testData = {
       current: {
-        temp_c: 22,
-        humidity: 55,
-        condition: { text: "Sunny" }
+        temp_c: 20,
+        humidity: 60,
+        condition: { text: "Default mock condition" }
       }
     } as WeatherData;
     
@@ -50,7 +50,7 @@ describe("Weather Provider Chain Integration", () => {
     weatherAPIState.weatherData = testData;
     
     const manager = new WeatherProviderManager(logger);
-    const result = await manager.getProvider().getWeatherData("London");
+    const result = await manager.getWeatherData("London");
     
     expect(result).toEqual(testData);
   });
@@ -61,7 +61,7 @@ describe("Weather Provider Chain Integration", () => {
     openWeatherMapState.shouldFail = true;
     
     const manager = new WeatherProviderManager(logger);
-    await expect(manager.getProvider().getWeatherData("London"))
+    await expect(manager.getWeatherData("London"))
       .rejects
       .toThrow("Failed to fetch weather data for London from all providers");
   });

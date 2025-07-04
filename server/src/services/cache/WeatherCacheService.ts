@@ -2,16 +2,15 @@ import { WeatherData, WeatherCacheServiceInterface } from "../../types.js";
 import { RedisClient } from "./RedisClient.js";
 import { cacheMetrics } from "./CacheMetrics.js";
 import { Logger } from "winston";
-import { createLogger } from "../../logger/index.js";
 
 export class WeatherCacheService implements WeatherCacheServiceInterface {
   private redisClient: RedisClient;
   private logger: Logger;
   private defaultTTL = 300; // 5 minutes
 
-  constructor(redisClient: RedisClient, logger?: Logger) {
+  constructor(redisClient: RedisClient, logger: Logger) {
     this.redisClient = redisClient;
-    this.logger = logger || createLogger("WeatherCacheService");
+    this.logger = logger;
   }
 
   private getCacheKey(city: string): string {

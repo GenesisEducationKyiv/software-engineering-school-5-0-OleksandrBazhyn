@@ -4,15 +4,14 @@ import { OpenWeatherMapProvider } from "./providers/OpenWeatherMapProvider.js";
 import { WeatherCacheService } from "../cache/WeatherCacheService.js";
 import { RedisClient } from "../cache/RedisClient.js";
 import { Logger } from "winston";
-import { createLogger } from "../../logger/index.js";
 
 export class WeatherProviderManager implements WeatherProviderManagerInterface {
   private chainHead: WeatherProvider;
   private logger: Logger;
   private cacheService: WeatherCacheService | null = null;
 
-  constructor(logger?: Logger, redisClient?: RedisClient) {
-    this.logger = logger || createLogger("WeatherProviderManager");
+  constructor(logger: Logger, redisClient?: RedisClient) {
+    this.logger = logger;
 
     if (redisClient) {
       this.cacheService = new WeatherCacheService(redisClient, this.logger);
