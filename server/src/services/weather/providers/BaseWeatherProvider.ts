@@ -1,4 +1,4 @@
-import { WeatherData, WeatherProvider } from "../types.js";
+import { WeatherData, WeatherProvider } from "../../../types.js";
 import { Logger } from "winston";
 
 export abstract class BaseWeatherProvider implements WeatherProvider {

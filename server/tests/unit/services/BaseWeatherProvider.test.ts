@@ -1,4 +1,4 @@
-import { BaseWeatherProvider } from "../../../src/entities/BaseWeatherProvider.js";
+import { BaseWeatherProvider } from "../../../src/services/weather/providers/BaseWeatherProvider.js";
 import { WeatherData, WeatherProvider } from "../../../src/types.js";
 import { Logger } from "winston";
 

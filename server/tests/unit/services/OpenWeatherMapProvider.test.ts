@@ -1,4 +1,4 @@
-import { OpenWeatherMapProvider } from "../../../src/entities/OpenWeatherMapProvider.js";
+import { OpenWeatherMapProvider } from "../../../src/services/weather/providers/OpenWeatherMapProvider.js";
 import { config } from "../../../src/config.js";
 import { Logger } from "winston";
 

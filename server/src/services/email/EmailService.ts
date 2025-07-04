@@ -5,9 +5,9 @@ import {
   Mailer,
   DataProvider,
   WeatherProviderManagerInterface,
-} from "../types.js";
+} from "../../types.js";
 import { Logger } from "winston";
-import { createLogger } from "../logger/index.js";
+import { createLogger } from "../../logger/index.js";
 
 class EmailService {
   private weatherManager: WeatherProviderManagerInterface;

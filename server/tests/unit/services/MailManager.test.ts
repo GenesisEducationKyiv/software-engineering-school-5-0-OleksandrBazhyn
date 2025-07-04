@@ -1,5 +1,5 @@
 import nodemailer from "nodemailer";
-import MailManager from "../../../src/entities/MailManager.js";
+import MailManager from "../../../src/services/email/MailManager.js";
 import { WeatherData } from "../../../src/types.js";
 import { config } from "../../../src/config.js";
 

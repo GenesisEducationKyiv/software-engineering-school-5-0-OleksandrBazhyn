@@ -1,12 +1,12 @@
 import cron from "node-cron";
-import Scheduler from "../../../src/entities/Scheduler.js";
-import EmailService from "../../../src/entities/EmailService.js";
+import Scheduler from "../../../src/services/scheduler/Scheduler.js";
+import EmailService from "../../../src/services/email/EmailService.js";
 import { Mailer, DataProvider } from "../../../src/types.js";
 import { Logger } from "winston";
 
 jest.mock("node-cron");
-jest.mock("../../../src/entities/EmailService");
-jest.mock("../../../src/entities/WeatherProviderManager");
+jest.mock("../../../src/services/email/EmailService");
+jest.mock("../../../src/services/weather/poviders/WeatherProviderManager");
 jest.mock("../../../src/logger/index.js", () => ({
   createLogger: jest.fn().mockReturnValue({
     info: jest.fn(),

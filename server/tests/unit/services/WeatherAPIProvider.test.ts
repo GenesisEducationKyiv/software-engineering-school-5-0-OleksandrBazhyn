@@ -1,4 +1,4 @@
-import { WeatherAPIProvider } from "../../../src/entities/WeatherAPIProvider.js";
+import { WeatherAPIProvider } from "../../../src/services/weather/providers/WeatherAPIProvider.js";
 import { config } from "../../../src/config.js";
 import { Logger } from "winston";
 

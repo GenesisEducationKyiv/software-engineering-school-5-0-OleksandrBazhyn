@@ -12,7 +12,7 @@ import {
   InvalidTokenError,
   CityNotFound,
 } from "../errors/SubscriptionError.js";
-import { cacheMetrics } from "../services/CacheMetrics.js";
+import { cacheMetrics } from "../services/cache/CacheMetrics.js";
 import { createLogger } from "../logger/index.js";
 
 const logger = createLogger("API");

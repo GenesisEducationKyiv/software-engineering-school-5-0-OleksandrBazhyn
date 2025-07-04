@@ -1,4 +1,4 @@
-import SubscriptionService from "../../../src/entities/SubscriptionService.js";
+import SubscriptionService from "../../../src/services/subscription/SubscriptionService.js";
 import { Mailer, DataProvider, SubscriptionInput } from "../../../src/types.js";
 
 describe("SubscriptionService", () => {

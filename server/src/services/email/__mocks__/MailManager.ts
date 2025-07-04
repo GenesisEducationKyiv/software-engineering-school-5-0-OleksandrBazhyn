@@ -1,4 +1,4 @@
-import { Mailer, WeatherData } from "../../types.js";
+import { Mailer, WeatherData } from "../../../types.js";
 
 let lastToken: string | undefined = undefined;
 

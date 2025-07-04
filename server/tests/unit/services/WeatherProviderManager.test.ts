@@ -1,9 +1,9 @@
-import { WeatherProviderManager } from "../../../src/entities/WeatherProviderManager.js";
-import { WeatherAPIProvider } from "../../../src/entities/WeatherAPIProvider.js";
-import { OpenWeatherMapProvider } from "../../../src/entities/OpenWeatherMapProvider.js";
+import { WeatherProviderManager } from "../../../src/services/weather/WeatherProviderManager.js";
+import { WeatherAPIProvider } from "../../../src/services/weather/providers/WeatherAPIProvider.js";
+import { OpenWeatherMapProvider } from "../../../src/services/weather/providers/OpenWeatherMapProvider.js";
 import logger from "../../../src/logger/index.js";
 
-jest.mock("../../../src/entities/WeatherAPIProvider.js", () => {
+jest.mock("../../../src/services/weather/providers/WeatherAPIProvider.js", () => {
   return {
     WeatherAPIProvider: jest.fn().mockImplementation(() => ({
       setNext: jest.fn().mockReturnThis(),
@@ -12,7 +12,7 @@ jest.mock("../../../src/entities/WeatherAPIProvider.js", () => {
   };
 });
 
-jest.mock("../../../src/entities/OpenWeatherMapProvider.js", () => {
+jest.mock("../../../src/services/weather/providers/OpenWeatherMapProvider.js", () => {
   return {
     OpenWeatherMapProvider: jest.fn().mockImplementation(() => ({
       setNext: jest.fn().mockReturnThis(),

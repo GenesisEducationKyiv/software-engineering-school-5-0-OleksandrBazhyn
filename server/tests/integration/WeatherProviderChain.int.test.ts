@@ -1,13 +1,12 @@
-import { WeatherProviderManager } from "../../src/entities/WeatherProviderManager.js";
-import { mockState as weatherAPIState } from "../../src/entities/__mocks__/WeatherAPIProvider.js";
-import { mockState as openWeatherMapState } from "../../src/entities/__mocks__/OpenWeatherMapProvider.js";
+import { WeatherProviderManager } from "../../src/services/weather/WeatherProviderManager.js";
+import { mockState as weatherAPIState } from "../../src/services/weather/providers/__mocks__/WeatherAPIProvider.js";
+import { mockState as openWeatherMapState } from "../../src/services/weather/providers/__mocks__/OpenWeatherMapProvider.js";
 import { WeatherData } from "../../src/types.js";
 import logger from "../../src/logger/index.js";
 
-// Important: Mock both providers AND the manager
-jest.mock("../../src/entities/WeatherAPIProvider.js");
-jest.mock("../../src/entities/OpenWeatherMapProvider.js");
-jest.mock("../../src/entities/WeatherProviderManager.js");
+// Mock only the providers, NOT the manager for integration test
+jest.mock("../../src/services/weather/providers/WeatherAPIProvider.js");
+jest.mock("../../src/services/weather/providers/OpenWeatherMapProvider.js");
 
 describe("Weather Provider Chain Integration", () => {
   beforeEach(() => {

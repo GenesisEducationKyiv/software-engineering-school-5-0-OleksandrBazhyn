@@ -3,9 +3,9 @@ import {
   GeocodingResult,
   OpenWeatherMapGeocodingResponse,
   OpenWeatherMapWeatherResponse,
-} from "../types.js";
+} from "../../../types.js";
 import { BaseWeatherProvider } from "./BaseWeatherProvider.js";
-import { config } from "../config.js";
+import { config } from "../../../config.js";
 import { Logger } from "winston";
 
 export class OpenWeatherMapProvider extends BaseWeatherProvider {

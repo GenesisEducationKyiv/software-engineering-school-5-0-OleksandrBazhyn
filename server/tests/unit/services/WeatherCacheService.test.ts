@@ -1,5 +1,5 @@
-import { WeatherCacheService } from "../../../src/entities/WeatherCacheService.js";
-import { RedisClient } from "../../../src/entities/RedisClient.js";
+import { WeatherCacheService } from "../../../src/services/cache/WeatherCacheService.js";
+import { RedisClient } from "../../../src/services/cache/RedisClient.js";
 import { WeatherData } from "../../../src/types.js";
 
 describe("WeatherCacheService", () => {
