@@ -1,6 +1,15 @@
 import { Request, Response } from "express";
-import { SubscriptionServiceInterface, SubscriptionInput, WeatherProviderManagerInterface } from "../types.js";
-import { AlreadySubscribedError, NotConfirmedError, InvalidTokenError, CityNotFound } from "../errors/SubscriptionError.js";
+import {
+  SubscriptionServiceInterface,
+  SubscriptionInput,
+  WeatherProviderManagerInterface,
+} from "../types.js";
+import {
+  AlreadySubscribedError,
+  NotConfirmedError,
+  InvalidTokenError,
+  CityNotFound,
+} from "../errors/SubscriptionError.js";
 import { createLogger } from "../logger/index.js";
 
 const logger = createLogger("SubscriptionController");
@@ -8,7 +17,7 @@ const logger = createLogger("SubscriptionController");
 export class SubscriptionController {
   constructor(
     private subscriptionService: SubscriptionServiceInterface,
-    private weatherManager: WeatherProviderManagerInterface
+    private weatherManager: WeatherProviderManagerInterface,
   ) {}
 
   async subscribe(req: Request, res: Response) {
@@ -51,7 +60,7 @@ export class SubscriptionController {
 
   async confirm(req: Request, res: Response): Promise<Response> {
     const { token } = req.params;
-    
+
     try {
       const confirmed = await this.subscriptionService.confirm(token);
       if (confirmed) {
@@ -71,7 +80,7 @@ export class SubscriptionController {
 
   async unsubscribe(req: Request, res: Response): Promise<Response> {
     const { token } = req.params;
-    
+
     try {
       const unsubscribed = await this.subscriptionService.unsubscribe(token);
       if (unsubscribed) {
