@@ -1,5 +1,5 @@
 import { WebSocketServer, WebSocket } from "ws";
-import { WeatherProviderManagerInterface } from "./entities/WeatherProviderManager.js";
+import { WeatherProviderManagerInterface } from "./services/weather/WeatherProviderManager.js";
 import type { Server } from "http";
 import type {
   WeatherData,

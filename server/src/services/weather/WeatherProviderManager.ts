@@ -1,10 +1,10 @@
-import { WeatherProvider, WeatherData, WeatherProviderManagerInterface } from "../types.js";
-import { WeatherAPIProvider } from "./WeatherAPIProvider.js";
-import { OpenWeatherMapProvider } from "./OpenWeatherMapProvider.js";
-import { WeatherCacheService } from "./WeatherCacheService.js";
-import { RedisClient } from "./RedisClient.js";
+import { WeatherProvider, WeatherData, WeatherProviderManagerInterface } from "../../types.js";
+import { WeatherAPIProvider } from "./providers/WeatherAPIProvider.js";
+import { OpenWeatherMapProvider } from "./providers/OpenWeatherMapProvider.js";
+import { WeatherCacheService } from "../cache/WeatherCacheService.js";
+import { RedisClient } from "../cache/RedisClient.js";
 import { Logger } from "winston";
-import { createLogger } from "../logger/index.js";
+import { createLogger } from "../../logger/index.js";
 
 export class WeatherProviderManager implements WeatherProviderManagerInterface {
   private chainHead: WeatherProvider;

@@ -1,5 +1,5 @@
-import { WeatherData } from "../types.js";
-import { config } from "../config.js";
+import { WeatherData } from "../../../types.js";
+import { config } from "../../../config.js";
 import { BaseWeatherProvider } from "./BaseWeatherProvider.js";
 import { Logger } from "winston";
 

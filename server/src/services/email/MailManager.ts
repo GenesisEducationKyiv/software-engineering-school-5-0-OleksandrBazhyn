@@ -1,6 +1,6 @@
 import nodemailer from "nodemailer";
-import { WeatherData, Mailer } from "../types.js";
-import { config } from "../config.js";
+import { WeatherData, Mailer } from "../../types.js";
+import { config } from "../../config.js";
 import { Logger } from "winston";
 
 class MailManager implements Mailer {

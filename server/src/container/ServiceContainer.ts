@@ -1,8 +1,8 @@
-import { WeatherProviderManager } from "../entities/WeatherProviderManager.js";
-import SubscriptionService from "../entities/SubscriptionService.js";
-import MailManager from "../entities/MailManager.js";
-import SubscriptionDataProvider from "../entities/SubscriptionDataProvider.js";
-import { RedisClient } from "../entities/RedisClient.js";
+import { WeatherProviderManager } from "../services/weather/WeatherProviderManager.js";
+import SubscriptionService from "../services/subscription/SubscriptionService.js";
+import MailManager from "../services/email/MailManager.js";
+import SubscriptionDataProvider from "../services/subscription/SubscriptionDataProvider.js";
+import { RedisClient } from "../services/cache/RedisClient.js";
 import { AppServicesInterface } from "../types.js";
 import { config } from "../config.js";
 import { createLogger } from "../logger/index.js";

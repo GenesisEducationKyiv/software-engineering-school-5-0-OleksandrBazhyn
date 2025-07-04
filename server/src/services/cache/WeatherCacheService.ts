@@ -1,8 +1,8 @@
-import { WeatherData, WeatherCacheServiceInterface } from "../types.js";
+import { WeatherData, WeatherCacheServiceInterface } from "../../types.js";
 import { RedisClient } from "./RedisClient.js";
 import { cacheMetrics } from "./CacheMetrics.js";
 import { Logger } from "winston";
-import { createLogger } from "../logger/index.js";
+import { createLogger } from "../../logger/index.js";
 
 export class WeatherCacheService implements WeatherCacheServiceInterface {
   private redisClient: RedisClient;

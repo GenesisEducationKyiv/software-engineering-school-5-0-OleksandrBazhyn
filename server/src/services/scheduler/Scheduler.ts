@@ -1,9 +1,9 @@
 import cron from "node-cron";
 import EmailService from "./EmailService.js";
-import { Mailer, DataProvider } from "../types.js";
-import { WeatherProviderManager } from "./WeatherProviderManager.js";
+import { Mailer, DataProvider } from "../../types.js";
+import { WeatherProviderManager } from "../weather/WeatherProviderManager.js";
 import { Logger } from "winston";
-import { createLogger } from "../logger/index.js";
+import { createLogger } from "../../logger/index.js";
 
 class Scheduler {
   private logger: Logger;

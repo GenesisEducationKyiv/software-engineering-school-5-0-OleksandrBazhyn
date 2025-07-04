@@ -1,8 +1,8 @@
 import { createClient, RedisClientType } from "redis";
 import { Logger } from "winston";
-import { createLogger } from "../logger/index.js";
-import { config } from "../config.js";
-import { RedisClientInterface } from "../types.js";
+import { createLogger } from "../../logger/index.js";
+import { config } from "../../config.js";
+import { RedisClientInterface } from "../../types.js";
 
 export class RedisClient implements RedisClientInterface {
   private client: RedisClientType;
