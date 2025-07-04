@@ -4,7 +4,7 @@ import { jest, beforeAll, afterAll, describe, it, expect } from "@jest/globals";
 
 import { CityNotFound } from "../../src/errors/SubscriptionError.js";
 
-jest.mock("../../src/entities/MailManager.js");
+jest.mock("../../src/services/email/MailManager.js");
 
 const mockLogger = {
     info: jest.fn(),
@@ -14,10 +14,10 @@ const mockLogger = {
   } as any;
 
 import { createApiRoutes } from "../../src/routes/api.js";
-import MailManager from "../../src/entities/MailManager.js";
-import SubscriptionService from "../../src/entities/SubscriptionService.js";
-import SubscriptionDataProvider from "../../src/entities/SubscriptionDataProvider.js";
-import { WeatherProviderManager } from "../../src/entities/WeatherProviderManager.js";
+import MailManager from "../../src/services/email/MailManager.js";
+import SubscriptionService from "../../src/services/subscription/SubscriptionService.js";
+import SubscriptionDataProvider from "../../src/services/subscription/SubscriptionDataProvider.js";
+import { WeatherProviderManager } from "../../src/services/weather/WeatherProviderManager.js";
 import nodemailer from "nodemailer";
 import { createLogger } from "../../src/logger/index.js";
 
