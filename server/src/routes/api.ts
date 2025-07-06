@@ -77,7 +77,9 @@ export function createApiRoutes(
 
     try {
       await subscriptionService.subscribe({ email, city, frequency });
-      return res.status(200).json({ message: "Subscription successful. Confirmation email sent." });
+      return res.status(200).json({
+        message: "Subscription successful. Confirmation email sent.",
+      });
     } catch (err: unknown) {
       if (err instanceof AlreadySubscribedError) {
         return res.status(409).json({ error: err.message });
