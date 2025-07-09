@@ -10,7 +10,9 @@ describe("MailManager", () => {
 
   beforeEach(() => {
     sendMailMock = jest.fn().mockResolvedValue({});
-    mockTransporter = { sendMail: sendMailMock } as unknown as nodemailer.Transporter;
+    mockTransporter = {
+      sendMail: sendMailMock,
+    } as unknown as nodemailer.Transporter;
     mockLogger = {
       info: jest.fn(),
       error: jest.fn(),
@@ -28,7 +30,9 @@ describe("MailManager", () => {
 
     await mailer.sendConfirmationEmail("to@mail.com", "Kyiv", "token123");
 
-    expect(mockLogger.info).toHaveBeenCalledWith("Sending confirmation email to: to@mail.com");
+    expect(mockLogger.info).toHaveBeenCalledWith(
+      "Sending confirmation email to: to@mail.com",
+    );
     expect(sendMailMock).toHaveBeenCalledWith({
       from: config.SMTP_FROM,
       to: "to@mail.com",
@@ -45,7 +49,9 @@ describe("MailManager", () => {
 
     await mailer.sendWeatherEmail("to@mail.com", "Lviv", weather, "token456");
 
-    expect(mockLogger.info).toHaveBeenCalledWith("Sending weather email to: to@mail.com for city: Lviv");
+    expect(mockLogger.info).toHaveBeenCalledWith(
+      "Sending weather email to: to@mail.com for city: Lviv",
+    );
     expect(sendMailMock).toHaveBeenCalledWith({
       from: config.SMTP_FROM,
       to: "to@mail.com",

@@ -7,7 +7,7 @@ import prettierPlugin from "eslint-plugin-prettier";
 
 export default defineConfig([
   {
-    ignores: ["tests/**/*", "**/*.test.*", "**/*.spec.*"],
+    ignores: ["tests/**/*", "**/*.test.*", "**/*.spec.*", "**/__mocks__/**/*"],
   },
   {
     name: "server-js",

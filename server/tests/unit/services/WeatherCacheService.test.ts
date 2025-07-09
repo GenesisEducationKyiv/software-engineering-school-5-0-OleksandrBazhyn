@@ -49,7 +49,9 @@ describe("WeatherCacheService", () => {
 
       expect(result).toEqual(testWeatherData);
       expect(mockRedisClient.get).toHaveBeenCalledWith("weather:london");
-      expect(mockLogger.info).toHaveBeenCalledWith("Cache hit for weather data: London");
+      expect(mockLogger.info).toHaveBeenCalledWith(
+        "Cache hit for weather data: London",
+      );
     });
 
     it("should return null when no cached data available", async () => {
@@ -59,7 +61,9 @@ describe("WeatherCacheService", () => {
 
       expect(result).toBeNull();
       expect(mockRedisClient.get).toHaveBeenCalledWith("weather:london");
-      expect(mockLogger.debug).toHaveBeenCalledWith("Cache miss for weather data: London");
+      expect(mockLogger.debug).toHaveBeenCalledWith(
+        "Cache miss for weather data: London",
+      );
     });
 
     it("should handle JSON parse errors", async () => {
@@ -100,7 +104,9 @@ describe("WeatherCacheService", () => {
         JSON.stringify(testWeatherData),
         300,
       );
-      expect(mockLogger.info).toHaveBeenCalledWith("Weather data cached for London (TTL: 300s)");
+      expect(mockLogger.info).toHaveBeenCalledWith(
+        "Weather data cached for London (TTL: 300s)",
+      );
     });
 
     it("should use custom TTL when provided", async () => {
@@ -113,13 +119,17 @@ describe("WeatherCacheService", () => {
         JSON.stringify(testWeatherData),
         600,
       );
-      expect(mockLogger.info).toHaveBeenCalledWith("Weather data cached for London (TTL: 600s)");
+      expect(mockLogger.info).toHaveBeenCalledWith(
+        "Weather data cached for London (TTL: 600s)",
+      );
     });
 
     it("should handle Redis errors", async () => {
       mockRedisClient.set.mockRejectedValue(new Error("Redis error"));
 
-      await expect(cacheService.set("London", testWeatherData)).rejects.toThrow("Redis error");
+      await expect(cacheService.set("London", testWeatherData)).rejects.toThrow(
+        "Redis error",
+      );
       expect(mockLogger.error).toHaveBeenCalledWith(
         "Error caching weather data for London:",
         expect.any(Error),
@@ -134,13 +144,17 @@ describe("WeatherCacheService", () => {
       await cacheService.invalidate("London");
 
       expect(mockRedisClient.del).toHaveBeenCalledWith("weather:london");
-      expect(mockLogger.info).toHaveBeenCalledWith("Cache invalidated for London");
+      expect(mockLogger.info).toHaveBeenCalledWith(
+        "Cache invalidated for London",
+      );
     });
 
     it("should handle Redis errors", async () => {
       mockRedisClient.del.mockRejectedValue(new Error("Redis error"));
 
-      await expect(cacheService.invalidate("London")).rejects.toThrow("Redis error");
+      await expect(cacheService.invalidate("London")).rejects.toThrow(
+        "Redis error",
+      );
       expect(mockLogger.error).toHaveBeenCalledWith(
         "Error invalidating cache for London:",
         expect.any(Error),
@@ -176,7 +190,9 @@ describe("WeatherCacheService", () => {
       cacheService.setDefaultTTL(600);
 
       expect(cacheService.getDefaultTTL()).toBe(600);
-      expect(mockLogger.info).toHaveBeenCalledWith("Default cache TTL set to 600 seconds");
+      expect(mockLogger.info).toHaveBeenCalledWith(
+        "Default cache TTL set to 600 seconds",
+      );
     });
   });
 });

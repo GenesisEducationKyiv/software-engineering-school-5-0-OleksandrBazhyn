@@ -1,8 +1,8 @@
-import { TSArch } from 'tsarch';
+import { TSArch } from "tsarch";
 
-describe('Architecture', () => {
-  it('defines that all files in dog folder should be called ...Dog.ts', async () => {
-    const project = await TSArch.parseTypescriptProject('./src');
+describe("Architecture", () => {
+  it("defines that all files in dog folder should be called ...Dog.ts", async () => {
+    const project = await TSArch.parseTypescriptProject("./src");
 
     const rule = TSArch.defineThat()
       .files()

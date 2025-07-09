@@ -10,6 +10,7 @@ COPY jest.config.js ./
 
 RUN npm ci --omit=dev
 
+COPY public ./public
 COPY src ./src
 COPY db ./db
 
