@@ -30,6 +30,7 @@
 **Включає:**
 - [`SubscriptionService`](server/src/services/subscription/SubscriptionService.ts)
 - [`SubscriptionDataProvider`](server/src/services/subscription/SubscriptionDataProvider.ts)
+- Scheduler для автоматичних розсилок
 - Операції CRUD для підписок
 - Логіка підтвердження та відписки
 
