@@ -68,7 +68,7 @@
 - **Клієнт <-> Weather Service**: Одноразово отримати дані по погоді
 
 ### Асинхронна комунікація через Message Broker
-- **Subscription Service → Email Service**: Для задачі масової розсилки email Subscription Service публікує події у брокер (наприклад, send_weather_email), а Email Service підписаний на ці події та виконує відправку листів. Це дозволяє досягти асинхронності, масштабованості та підвищити fault tolerance системи.
+- **Subscription Service <-> Email Service**: Для задачі масової розсилки email Subscription Service публікує події у брокер (наприклад, send_weather_email), а Email Service підписаний на ці події та виконує відправку листів. Це дозволяє досягти асинхронності, масштабованості та підвищити fault tolerance системи.
 
 
 ### Рекомендований Message Broker
