@@ -12,7 +12,11 @@ class MailManager implements Mailer {
     this.logger = logger;
   }
 
-  async sendConfirmationEmail(email: string, city: string, token: string): Promise<void> {
+  async sendConfirmationEmail(
+    email: string,
+    city: string,
+    token: string,
+  ): Promise<void> {
     this.logger.info(`Sending confirmation email to: ${email}`);
     const link = `http://localhost:3000/api/v1/confirm/${token}`;
     await this.transporter.sendMail({

@@ -34,7 +34,11 @@ export function setupWebSocket(
     ws.on("message", (data: WebSocket.RawData) => {
       try {
         const msg: SubscriptionMessage = JSON.parse(data.toString());
-        if (msg.city && typeof msg.city === "string" && msg.city.trim() !== "") {
+        if (
+          msg.city &&
+          typeof msg.city === "string" &&
+          msg.city.trim() !== ""
+        ) {
           // Save this city as the client's subscription
           subscriptions.set(ws, msg.city.trim());
         }

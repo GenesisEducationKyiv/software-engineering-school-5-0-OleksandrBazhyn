@@ -13,7 +13,12 @@ class Scheduler {
 
   start(mailer: Mailer, dataProvider: DataProvider): void {
     const weatherManager = new WeatherProviderManager(this.logger);
-    const emailService = new EmailService(mailer, dataProvider, weatherManager, this.logger);
+    const emailService = new EmailService(
+      mailer,
+      dataProvider,
+      weatherManager,
+      this.logger,
+    );
 
     // Hourly (at the beginning of each hour)
     cron.schedule("0 * * * *", async () => {

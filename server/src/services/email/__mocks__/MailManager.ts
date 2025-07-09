@@ -5,7 +5,11 @@ let lastToken: string | undefined = undefined;
 class MockMailManager implements Mailer {
   constructor(_transporter: unknown, _logger: unknown) {}
 
-  async sendConfirmationEmail(_email: string, _city: string, token: string): Promise<void> {
+  async sendConfirmationEmail(
+    _email: string,
+    _city: string,
+    token: string,
+  ): Promise<void> {
     lastToken = token;
   }
 

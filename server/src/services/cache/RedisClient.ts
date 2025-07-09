@@ -74,7 +74,10 @@ export class RedisClient implements RedisClientInterface {
       const result = await this.client.exists(key);
       return result === 1;
     } catch (error) {
-      this.logger.error(`Error checking existence of key ${key} in Redis:`, error);
+      this.logger.error(
+        `Error checking existence of key ${key} in Redis:`,
+        error,
+      );
       return false;
     }
   }

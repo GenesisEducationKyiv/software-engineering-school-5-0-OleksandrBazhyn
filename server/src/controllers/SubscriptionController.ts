@@ -24,7 +24,12 @@ export class SubscriptionController {
     logger.info("Subscription request received:", req.body);
     const { email, city, frequency } = req.body as SubscriptionInput;
 
-    if (!email || !city || !frequency || !["daily", "hourly"].includes(frequency)) {
+    if (
+      !email ||
+      !city ||
+      !frequency ||
+      !["daily", "hourly"].includes(frequency)
+    ) {
       return res.status(400).json({ error: "Invalid input" });
     }
 
@@ -46,7 +51,9 @@ export class SubscriptionController {
 
     try {
       await this.subscriptionService.subscribe({ email, city, frequency });
-      return res.status(200).json({ message: "Subscription successful. Confirmation email sent." });
+      return res
+        .status(200)
+        .json({ message: "Subscription successful. Confirmation email sent." });
     } catch (err: unknown) {
       if (err instanceof AlreadySubscribedError) {
         return res.status(409).json({ error: err.message });

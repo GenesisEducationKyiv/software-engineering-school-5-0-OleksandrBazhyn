@@ -22,7 +22,10 @@ async function startServer() {
 
   const services = await createServices();
 
-  const apiRoutes = createApiRoutes(services.weatherManager, services.subscriptionService);
+  const apiRoutes = createApiRoutes(
+    services.weatherManager,
+    services.subscriptionService,
+  );
   app.use("/api/v1", apiRoutes);
 
   const server = http.createServer(app);

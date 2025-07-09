@@ -1,4 +1,7 @@
-import { WeatherProvider, WeatherProviderManagerInterface } from "../../../types.js";
+import {
+  WeatherProvider,
+  WeatherProviderManagerInterface,
+} from "../../../types.js";
 import { WeatherAPIProvider } from "../providers/WeatherAPIProvider.js";
 import { OpenWeatherMapProvider } from "../providers/OpenWeatherMapProvider.js";
 import { Logger } from "winston";

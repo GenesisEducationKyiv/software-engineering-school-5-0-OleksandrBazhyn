@@ -1,4 +1,8 @@
-import { WeatherProvider, WeatherData, WeatherProviderManagerInterface } from "../../types.js";
+import {
+  WeatherProvider,
+  WeatherData,
+  WeatherProviderManagerInterface,
+} from "../../types.js";
 import { WeatherAPIProvider } from "./providers/WeatherAPIProvider.js";
 import { OpenWeatherMapProvider } from "./providers/OpenWeatherMapProvider.js";
 import { WeatherCacheService } from "../cache/WeatherCacheService.js";
@@ -38,7 +42,10 @@ export class WeatherProviderManager implements WeatherProviderManagerInterface {
           return cachedData;
         }
       } catch (error) {
-        this.logger.error(`Cache error for ${city}, falling back to providers:`, error);
+        this.logger.error(
+          `Cache error for ${city}, falling back to providers:`,
+          error,
+        );
       }
     }
 
@@ -50,7 +57,10 @@ export class WeatherProviderManager implements WeatherProviderManagerInterface {
           await this.cacheService.set(city, weatherData);
           this.logger.debug(`Weather data cached for ${city}`);
         } catch (cacheError) {
-          this.logger.warn(`Failed to cache weather data for ${city}:`, cacheError);
+          this.logger.warn(
+            `Failed to cache weather data for ${city}:`,
+            cacheError,
+          );
         }
       }
       this.logger.debug(`Weather data retrieved for ${city}`, {

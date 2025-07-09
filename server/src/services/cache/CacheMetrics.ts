@@ -1,5 +1,9 @@
 import { Counter, Histogram, register } from "prom-client";
-import { CacheMetricsInterface, ParsedMetrics, MetricsData } from "../../types.js";
+import {
+  CacheMetricsInterface,
+  ParsedMetrics,
+  MetricsData,
+} from "../../types.js";
 
 class CacheMetrics implements CacheMetricsInterface {
   public cacheHits: Counter<string>;
@@ -52,8 +56,15 @@ class CacheMetrics implements CacheMetricsInterface {
     this.cacheErrors.inc({ cache_type: cacheType, operation });
   }
 
-  recordOperationDuration(cacheType: string, operation: string, duration: number): void {
-    this.cacheOperationDuration.observe({ cache_type: cacheType, operation }, duration);
+  recordOperationDuration(
+    cacheType: string,
+    operation: string,
+    duration: number,
+  ): void {
+    this.cacheOperationDuration.observe(
+      { cache_type: cacheType, operation },
+      duration,
+    );
   }
 
   async getMetrics(): Promise<string> {
@@ -71,7 +82,8 @@ class CacheMetrics implements CacheMetricsInterface {
         errors: parsed.cache_errors_total || 0,
         avgGetTime: parsed.avg_get_time || 0,
         avgSetTime: parsed.avg_set_time || 0,
-        totalOperations: (parsed.cache_hits_total || 0) + (parsed.cache_misses_total || 0),
+        totalOperations:
+          (parsed.cache_hits_total || 0) + (parsed.cache_misses_total || 0),
         hitRate: this.calculateHitRate(
           parsed.cache_hits_total || 0,
           parsed.cache_misses_total || 0,

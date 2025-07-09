@@ -22,44 +22,44 @@ describe("Weather Provider Chain Integration", () => {
       current: {
         temp_c: 20,
         humidity: 60,
-        condition: { text: "Default mock condition" }
-      }
+        condition: { text: "Default mock condition" },
+      },
     } as WeatherData;
-    
+
     // Configure the providers
     weatherAPIState.shouldFail = true;
     openWeatherMapState.weatherData = testData;
-    
+
     // Create a new instance of the manager with logger
     const manager = new WeatherProviderManager(logger);
     const result = await manager.getWeatherData("London");
-    
+
     expect(result).toEqual(testData);
   });
-  
+
   it("should use first provider when it works correctly", async () => {
     const testData = {
       current: {
         temp_c: 20,
         humidity: 60,
-        condition: { text: "Default mock condition" }
-      }
+        condition: { text: "Default mock condition" },
+      },
     } as WeatherData;
-    
+
     // Set the test data on the first provider
     weatherAPIState.weatherData = testData;
-    
+
     const manager = new WeatherProviderManager(logger);
     const result = await manager.getWeatherData("London");
-    
+
     expect(result).toEqual(testData);
   });
-  
+
   //it("should throw if all providers fail", async () => {
   //  // Make both providers fail
   //  weatherAPIState.shouldFail = true;
   //  openWeatherMapState.shouldFail = true;
-  //  
+  //
   //  const manager = new WeatherProviderManager(logger);
   //  await expect(manager.getWeatherData("London"))
   //    .rejects

@@ -26,7 +26,7 @@ describe("Scheduler", () => {
     jest.clearAllMocks();
     mailer = {} as Mailer;
     dataProvider = {} as DataProvider;
-    
+
     // Create mock logger
     mockLogger = {
       info: jest.fn(),
@@ -34,27 +34,42 @@ describe("Scheduler", () => {
       warn: jest.fn(),
       debug: jest.fn(),
     };
-    
+
     scheduler = new Scheduler(mockLogger);
   });
 
   it("should schedule hourly and daily jobs with correct cron expressions", () => {
     scheduler.start(mailer, dataProvider);
 
-    expect(cron.schedule).toHaveBeenCalledWith("0 * * * *", expect.any(Function));
-    expect(cron.schedule).toHaveBeenCalledWith("0 8 * * *", expect.any(Function));
-    expect(EmailService as jest.Mock).toHaveBeenCalledWith(mailer, dataProvider, expect.any(Object), expect.any(Object));
+    expect(cron.schedule).toHaveBeenCalledWith(
+      "0 * * * *",
+      expect.any(Function),
+    );
+    expect(cron.schedule).toHaveBeenCalledWith(
+      "0 8 * * *",
+      expect.any(Function),
+    );
+    expect(EmailService as jest.Mock).toHaveBeenCalledWith(
+      mailer,
+      dataProvider,
+      expect.any(Object),
+      expect.any(Object),
+    );
   });
 
   it("hourly job should call sendWeatherEmailsByFrequency('hourly') and log", async () => {
     scheduler.start(mailer, dataProvider);
     const [[, hourlyCallback]] = (cron.schedule as jest.Mock).mock.calls;
     const emailServiceInstance = (EmailService as jest.Mock).mock.instances[0];
-    emailServiceInstance.sendWeatherEmailsByFrequency = jest.fn().mockResolvedValue(undefined);
+    emailServiceInstance.sendWeatherEmailsByFrequency = jest
+      .fn()
+      .mockResolvedValue(undefined);
 
     await hourlyCallback();
 
-    expect(emailServiceInstance.sendWeatherEmailsByFrequency).toHaveBeenCalledWith("hourly");
+    expect(
+      emailServiceInstance.sendWeatherEmailsByFrequency,
+    ).toHaveBeenCalledWith("hourly");
     expect(mockLogger.info).toHaveBeenCalledWith("Hourly weather emails sent.");
   });
 
@@ -62,11 +77,15 @@ describe("Scheduler", () => {
     scheduler.start(mailer, dataProvider);
     const [[,], [, dailyCallback]] = (cron.schedule as jest.Mock).mock.calls;
     const emailServiceInstance = (EmailService as jest.Mock).mock.instances[0];
-    emailServiceInstance.sendWeatherEmailsByFrequency = jest.fn().mockResolvedValue(undefined);
+    emailServiceInstance.sendWeatherEmailsByFrequency = jest
+      .fn()
+      .mockResolvedValue(undefined);
 
     await dailyCallback();
 
-    expect(emailServiceInstance.sendWeatherEmailsByFrequency).toHaveBeenCalledWith("daily");
+    expect(
+      emailServiceInstance.sendWeatherEmailsByFrequency,
+    ).toHaveBeenCalledWith("daily");
     expect(mockLogger.info).toHaveBeenCalledWith("Daily weather emails sent.");
   });
 
@@ -79,7 +98,9 @@ describe("Scheduler", () => {
     scheduler.start(mailer, dataProvider);
     const [[, hourlyCallback]] = (cron.schedule as jest.Mock).mock.calls;
     const emailServiceInstance = (EmailService as jest.Mock).mock.instances[0];
-    emailServiceInstance.sendWeatherEmailsByFrequency = jest.fn().mockRejectedValue(new Error("Email service error"));
+    emailServiceInstance.sendWeatherEmailsByFrequency = jest
+      .fn()
+      .mockRejectedValue(new Error("Email service error"));
 
     await expect(hourlyCallback()).rejects.toThrow("Email service error");
   });
@@ -88,7 +109,9 @@ describe("Scheduler", () => {
     scheduler.start(mailer, dataProvider);
     const [[,], [, dailyCallback]] = (cron.schedule as jest.Mock).mock.calls;
     const emailServiceInstance = (EmailService as jest.Mock).mock.instances[0];
-    emailServiceInstance.sendWeatherEmailsByFrequency = jest.fn().mockRejectedValue(new Error("Email service error"));
+    emailServiceInstance.sendWeatherEmailsByFrequency = jest
+      .fn()
+      .mockRejectedValue(new Error("Email service error"));
 
     await expect(dailyCallback()).rejects.toThrow("Email service error");
   });
@@ -101,7 +124,7 @@ describe("Scheduler", () => {
       mailer,
       dataProvider,
       expect.any(Object), // WeatherProviderManager instance
-      mockLogger
+      mockLogger,
     );
   });
 
@@ -129,13 +152,14 @@ describe("Scheduler", () => {
       newMailer,
       newDataProvider,
       expect.any(Object),
-      mockLogger
+      mockLogger,
     );
   });
 
   it("should handle synchronous execution of cron callbacks", () => {
     scheduler.start(mailer, dataProvider);
-    const [[, hourlyCallback], [, dailyCallback]] = (cron.schedule as jest.Mock).mock.calls;
+    const [[, hourlyCallback], [, dailyCallback]] = (cron.schedule as jest.Mock)
+      .mock.calls;
 
     expect(typeof hourlyCallback).toBe("function");
     expect(typeof dailyCallback).toBe("function");

@@ -37,7 +37,9 @@ describe("SubscriptionService", () => {
 
       const result = await service.subscribe(testInput);
 
-      expect(dataProvider.checkSubscriptionExists).toHaveBeenCalledWith(testInput);
+      expect(dataProvider.checkSubscriptionExists).toHaveBeenCalledWith(
+        testInput,
+      );
       expect(dataProvider.insertSubscription).toHaveBeenCalledWith(
         testInput,
         expect.any(String),
@@ -55,7 +57,9 @@ describe("SubscriptionService", () => {
     it("should throw if already subscribed", async () => {
       dataProvider.checkSubscriptionExists.mockResolvedValue(true);
 
-      await expect(service.subscribe(testInput)).rejects.toThrow("Email already subscribed");
+      await expect(service.subscribe(testInput)).rejects.toThrow(
+        "Email already subscribed",
+      );
       expect(dataProvider.insertSubscription).not.toHaveBeenCalled();
       expect(mailer.sendConfirmationEmail).not.toHaveBeenCalled();
     });
@@ -64,7 +68,9 @@ describe("SubscriptionService", () => {
       dataProvider.checkSubscriptionExists.mockResolvedValue(false);
       dataProvider.insertSubscription.mockRejectedValue(new Error("DB error"));
 
-      await expect(service.subscribe(testInput)).rejects.toThrow("Failed to subscribe");
+      await expect(service.subscribe(testInput)).rejects.toThrow(
+        "Failed to subscribe",
+      );
       expect(mailer.sendConfirmationEmail).not.toHaveBeenCalled();
     });
 
@@ -73,7 +79,9 @@ describe("SubscriptionService", () => {
       dataProvider.insertSubscription.mockResolvedValue(undefined);
       mailer.sendConfirmationEmail.mockRejectedValue(new Error("Mail error"));
 
-      await expect(service.subscribe(testInput)).rejects.toThrow("Failed to subscribe");
+      await expect(service.subscribe(testInput)).rejects.toThrow(
+        "Failed to subscribe",
+      );
     });
   });
 
@@ -83,7 +91,10 @@ describe("SubscriptionService", () => {
 
       const result = await service.confirm("token123");
 
-      expect(dataProvider.updateSubscriptionStatus).toHaveBeenCalledWith("token123", true);
+      expect(dataProvider.updateSubscriptionStatus).toHaveBeenCalledWith(
+        "token123",
+        true,
+      );
       expect(result).toBe(true);
     });
 
@@ -96,7 +107,9 @@ describe("SubscriptionService", () => {
     });
 
     it("should propagate DB errors", async () => {
-      dataProvider.updateSubscriptionStatus.mockRejectedValue(new Error("DB error"));
+      dataProvider.updateSubscriptionStatus.mockRejectedValue(
+        new Error("DB error"),
+      );
 
       await expect(service.confirm("token123")).rejects.toThrow("DB error");
     });
