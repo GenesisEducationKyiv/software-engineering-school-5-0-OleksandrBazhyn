@@ -61,7 +61,6 @@
 
 ### gRPC
 - **Subscription Service <-> Weather Service**: Отримання погоди для підписок швидко
-- **Subscription Service <-> Email Service**: Команди на відправку листів
 
 ### Синхронна комунікація (HTTP/REST)
 - **Metrics Service <-> Усі сервіси**: Збір метрик
