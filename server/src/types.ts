@@ -50,11 +50,7 @@ export interface WebSocketInfoMessage {
 }
 
 export interface Mailer {
-  sendConfirmationEmail: (
-    email: string,
-    city: string,
-    token: string,
-  ) => Promise<void>;
+  sendConfirmationEmail: (email: string, city: string, token: string) => Promise<void>;
   sendWeatherEmail: (
     email: string,
     city: string,
@@ -70,21 +66,14 @@ export interface SubscriptionInput {
 }
 
 export interface DataProvider {
-  getSubscriptionsByFrequency: (
-    frequency: SubscriptionFrequency,
-  ) => Promise<Subscription[]>;
-  checkSubscriptionExists: (
-    subscription: SubscriptionInput,
-  ) => Promise<boolean>;
+  getSubscriptionsByFrequency: (frequency: SubscriptionFrequency) => Promise<Subscription[]>;
+  checkSubscriptionExists: (subscription: SubscriptionInput) => Promise<boolean>;
   insertSubscription: (
     subscription: SubscriptionInput,
     token: string,
     is_active?: boolean,
   ) => Promise<void>;
-  updateSubscriptionStatus: (
-    token: string,
-    isActive: boolean,
-  ) => Promise<boolean>;
+  updateSubscriptionStatus: (token: string, isActive: boolean) => Promise<boolean>;
   deleteSubscription: (token: string) => Promise<boolean>;
 }
 
@@ -122,11 +111,7 @@ export interface CacheMetricsInterface {
   recordHit(cacheType: string, keyPrefix: string): void;
   recordMiss(cacheType: string, keyPrefix: string): void;
   recordError(cacheType: string, operation: string): void;
-  recordOperationDuration(
-    cacheType: string,
-    operation: string,
-    duration: number,
-  ): void;
+  recordOperationDuration(cacheType: string, operation: string, duration: number): void;
   getMetrics(): Promise<string>;
 }
 

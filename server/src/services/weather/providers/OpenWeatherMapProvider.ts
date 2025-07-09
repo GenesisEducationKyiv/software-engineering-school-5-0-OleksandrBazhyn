@@ -16,12 +16,8 @@ export class OpenWeatherMapProvider extends BaseWeatherProvider {
     this.OPENWEATHERMAP_API_KEY = config.OPENWEATHERMAP_API_KEY || "";
 
     if (!this.OPENWEATHERMAP_API_KEY) {
-      this.logger.error(
-        "OPENWEATHERMAP_API_KEY is not set in environment variables.",
-      );
-      throw new Error(
-        "OPENWEATHERMAP_API_KEY is not set in environment variables.",
-      );
+      this.logger.error("OPENWEATHERMAP_API_KEY is not set in environment variables.");
+      throw new Error("OPENWEATHERMAP_API_KEY is not set in environment variables.");
     }
   }
 
@@ -33,12 +29,9 @@ export class OpenWeatherMapProvider extends BaseWeatherProvider {
     return this.transformToWeatherData(rawWeatherData);
   }
 
-  protected async getCoordinatesForCity(
-    city: string,
-  ): Promise<GeocodingResult> {
+  protected async getCoordinatesForCity(city: string): Promise<GeocodingResult> {
     const url = this.buildGeocodingUrl(city);
-    const response =
-      await this.makeApiRequest<OpenWeatherMapGeocodingResponse[]>(url);
+    const response = await this.makeApiRequest<OpenWeatherMapGeocodingResponse[]>(url);
     return this.parseGeocodingResponse(response, city);
   }
 
@@ -96,18 +89,13 @@ export class OpenWeatherMapProvider extends BaseWeatherProvider {
     }
   }
 
-  protected transformToWeatherData(
-    data: OpenWeatherMapWeatherResponse,
-  ): WeatherData {
+  protected transformToWeatherData(data: OpenWeatherMapWeatherResponse): WeatherData {
     return {
       current: {
         temp_c: data.main.temp,
         humidity: data.main.humidity,
         condition: {
-          text:
-            data.weather && data.weather.length > 0
-              ? data.weather[0].description
-              : "Unknown",
+          text: data.weather && data.weather.length > 0 ? data.weather[0].description : "Unknown",
         },
       },
     };

@@ -52,9 +52,7 @@ export abstract class BaseWeatherProvider implements WeatherProvider {
         }
         return this.nextProvider.getWeatherData(city);
       }
-      throw new Error(
-        "Failed to fetch weather data for " + city + " from all providers",
-      );
+      throw new Error("Failed to fetch weather data for " + city + " from all providers");
     }
   }
 

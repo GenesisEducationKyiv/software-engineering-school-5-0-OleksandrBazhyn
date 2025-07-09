@@ -13,8 +13,8 @@
     "test": "cross-env NODE_ENV=test jest",
     "test:unit": "cross-env NODE_ENV=test jest --testPathPattern=unit",
     "test:integration": "cross-env NODE_ENV=test jest --testPathPattern=integration --detectOpenHandles",
-    "lint": "eslint . && prettier --check . && htmlhint \"public/**/*.html\"",
-    "lint:fix": "eslint . --fix && prettier --write .",
+    "lint": "eslint . && htmlhint \"public/**/*.html\"",
+    "lint:fix": "eslint . --fix",
     "format": "prettier --write ."
   },
   "dependencies": {

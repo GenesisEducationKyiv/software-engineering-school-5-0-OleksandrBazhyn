@@ -7,12 +7,8 @@ import {
 import db from "../../../db/knex.js";
 
 class SubscriptionDataProvider implements DataProvider {
-  async getSubscriptionsByFrequency(
-    frequency: SubscriptionFrequency,
-  ): Promise<Subscription[]> {
-    const subscriptions: Subscription[] = await db<Subscription>(
-      "subscriptions",
-    )
+  async getSubscriptionsByFrequency(frequency: SubscriptionFrequency): Promise<Subscription[]> {
+    const subscriptions: Subscription[] = await db<Subscription>("subscriptions")
       .where("frequency", frequency)
       .andWhere("is_active", true);
 
@@ -23,12 +19,8 @@ class SubscriptionDataProvider implements DataProvider {
     return subscriptions;
   }
 
-  async checkSubscriptionExists(
-    subscription: SubscriptionInput,
-  ): Promise<boolean> {
-    const existing: Subscription | undefined = await db<Subscription>(
-      "subscriptions",
-    )
+  async checkSubscriptionExists(subscription: SubscriptionInput): Promise<boolean> {
+    const existing: Subscription | undefined = await db<Subscription>("subscriptions")
       .where("email", subscription.email)
       .andWhere("city", subscription.city)
       .andWhere("frequency", subscription.frequency)
@@ -62,10 +54,7 @@ class SubscriptionDataProvider implements DataProvider {
     }
   }
 
-  async updateSubscriptionStatus(
-    token: string,
-    isActive: boolean,
-  ): Promise<boolean> {
+  async updateSubscriptionStatus(token: string, isActive: boolean): Promise<boolean> {
     const updatedRows = await db<Subscription>("subscriptions")
       .where({ token })
       .update({ is_active: true });
@@ -75,16 +64,12 @@ class SubscriptionDataProvider implements DataProvider {
       return false;
     }
 
-    console.log(
-      `Subscription with token ${token} updated to active status: ${isActive}`,
-    );
+    console.log(`Subscription with token ${token} updated to active status: ${isActive}`);
     return true;
   }
 
   async deleteSubscription(token: string): Promise<boolean> {
-    const deletedRows = await db<Subscription>("subscriptions")
-      .where({ token })
-      .del();
+    const deletedRows = await db<Subscription>("subscriptions").where({ token }).del();
 
     if (deletedRows === 0) {
       console.warn(`No subscription found with token: ${token}`);

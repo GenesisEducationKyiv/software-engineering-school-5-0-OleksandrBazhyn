@@ -1,9 +1,5 @@
 import { Request, Response } from "express";
-import {
-  WeatherProviderManagerInterface,
-  WeatherData,
-  WeatherResponse,
-} from "../types.js";
+import { WeatherProviderManagerInterface, WeatherData, WeatherResponse } from "../types.js";
 import { CityNotFound } from "../errors/SubscriptionError.js";
 import { createLogger } from "../logger/index.js";
 
@@ -19,8 +15,7 @@ export class WeatherController {
     }
 
     try {
-      const weatherData: WeatherData | null =
-        await this.weatherManager.getWeatherData(city);
+      const weatherData: WeatherData | null = await this.weatherManager.getWeatherData(city);
 
       if (!weatherData || !weatherData.current) {
         return res.status(404).json({ error: "City not found" });

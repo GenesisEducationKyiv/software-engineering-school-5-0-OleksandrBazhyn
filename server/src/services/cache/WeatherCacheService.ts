@@ -22,9 +22,7 @@ export class WeatherCacheService implements WeatherCacheServiceInterface {
     const startTime = Date.now();
 
     try {
-      this.logger.debug(
-        `Attempting to get weather data for ${city} from cache`,
-      );
+      this.logger.debug(`Attempting to get weather data for ${city} from cache`);
 
       const cachedData = await this.redisClient.get(key);
       const duration = (Date.now() - startTime) / 1000;
@@ -38,10 +36,7 @@ export class WeatherCacheService implements WeatherCacheServiceInterface {
         try {
           return JSON.parse(cachedData) as WeatherData;
         } catch (parseError) {
-          this.logger.error(
-            `Error parsing cached data for ${city}:`,
-            parseError,
-          );
+          this.logger.error(`Error parsing cached data for ${city}:`, parseError);
           cacheMetrics.recordError("redis", "parse");
           await this.redisClient.del(key);
           return null;
@@ -55,19 +50,12 @@ export class WeatherCacheService implements WeatherCacheServiceInterface {
       const duration = (Date.now() - startTime) / 1000;
       cacheMetrics.recordOperationDuration("redis", "get", duration);
       cacheMetrics.recordError("redis", "get");
-      this.logger.error(
-        `Error getting weather data from cache for ${city}:`,
-        error,
-      );
+      this.logger.error(`Error getting weather data from cache for ${city}:`, error);
       return null;
     }
   }
 
-  async set(
-    city: string,
-    weatherData: WeatherData,
-    ttl?: number,
-  ): Promise<void> {
+  async set(city: string, weatherData: WeatherData, ttl?: number): Promise<void> {
     const key = this.getCacheKey(city);
     const startTime = Date.now();
 
@@ -80,9 +68,7 @@ export class WeatherCacheService implements WeatherCacheServiceInterface {
       const duration = (Date.now() - startTime) / 1000;
       cacheMetrics.recordOperationDuration("redis", "set", duration);
 
-      this.logger.info(
-        `Weather data cached for ${city} (TTL: ${ttl || this.defaultTTL}s)`,
-      );
+      this.logger.info(`Weather data cached for ${city} (TTL: ${ttl || this.defaultTTL}s)`);
     } catch (error) {
       const duration = (Date.now() - startTime) / 1000;
       cacheMetrics.recordOperationDuration("redis", "set", duration);
