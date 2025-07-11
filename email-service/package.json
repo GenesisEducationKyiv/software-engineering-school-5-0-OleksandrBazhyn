@@ -1,0 +1,44 @@
+{
+  "name": "email-service",
+  "version": "1.0.0",
+  "description": "Microservice for emails",
+  "main": "dist/src/app.ts",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/src/app.js",
+    "dev": "tsx src/app.ts",
+    "test": "cross-env NODE_ENV=test jest",
+    "test:unit": "cross-env NODE_ENV=test jest --testPathPattern=unit",
+    "test:integration": "cross-env NODE_ENV=test jest --testPathPattern=integration --detectOpenHandles",
+    "lint": "eslint . --ext .ts,.tsx,.cts,.mts,.js",
+    "lint:fix": "eslint . --ext .ts,.tsx,.cts,.mts,.js --fix",
+    "format": "prettier --write ."
+  },
+  "author": "Oleksandr Bazhyn",
+  "license": "ISC",
+  "dependencies": {
+    "@typescript-eslint/eslint-plugin": "^8.36.0",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.0",
+    "eslint-plugin-prettier": "^5.5.1",
+    "express": "^5.1.0",
+    "handlebars": "^4.7.8",
+    "htmlhint": "^1.6.3",
+    "http": "^0.0.1-security",
+    "nodemailer": "^7.0.5",
+    "tsx": "^4.20.3",
+    "winston": "^3.17.0"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.3",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^24.0.13",
+    "@types/nodemailer": "^6.4.17",
+    "cross-env": "^7.0.3",
+    "jest": "^30.0.4",
+    "smtp-tester": "^2.1.0",
+    "ts-jest": "^29.4.0"
+  }
+}
