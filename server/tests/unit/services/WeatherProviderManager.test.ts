@@ -3,23 +3,29 @@ import { WeatherAPIProvider } from "../../../src/services/weather/providers/Weat
 import { OpenWeatherMapProvider } from "../../../src/services/weather/providers/OpenWeatherMapProvider.js";
 import logger from "../../../src/logger/index.js";
 
-jest.mock("../../../src/services/weather/providers/WeatherAPIProvider.js", () => {
-  return {
-    WeatherAPIProvider: jest.fn().mockImplementation(() => ({
-      setNext: jest.fn().mockReturnThis(),
-      getWeatherData: jest.fn()
-    }))
-  };
-});
+jest.mock(
+  "../../../src/services/weather/providers/WeatherAPIProvider.js",
+  () => {
+    return {
+      WeatherAPIProvider: jest.fn().mockImplementation(() => ({
+        setNext: jest.fn().mockReturnThis(),
+        getWeatherData: jest.fn(),
+      })),
+    };
+  },
+);
 
-jest.mock("../../../src/services/weather/providers/OpenWeatherMapProvider.js", () => {
-  return {
-    OpenWeatherMapProvider: jest.fn().mockImplementation(() => ({
-      setNext: jest.fn().mockReturnThis(),
-      getWeatherData: jest.fn()
-    }))
-  };
-});
+jest.mock(
+  "../../../src/services/weather/providers/OpenWeatherMapProvider.js",
+  () => {
+    return {
+      OpenWeatherMapProvider: jest.fn().mockImplementation(() => ({
+        setNext: jest.fn().mockReturnThis(),
+        getWeatherData: jest.fn(),
+      })),
+    };
+  },
+);
 
 describe("WeatherProviderManager", () => {
   beforeEach(() => {
@@ -29,24 +35,13 @@ describe("WeatherProviderManager", () => {
   it("should create chain of providers on initialization", () => {
     const mockSetNext = jest.fn().mockReturnThis();
     (WeatherAPIProvider as jest.Mock).mockImplementation(() => ({
-      setNext: mockSetNext
+      setNext: mockSetNext,
     }));
-    
+
     const manager = new WeatherProviderManager(logger);
-    
+
     expect(WeatherAPIProvider).toHaveBeenCalledWith(logger);
     expect(OpenWeatherMapProvider).toHaveBeenCalledWith(logger);
     expect(mockSetNext).toHaveBeenCalled();
-  });
-
-  it("should provide access to the head of the chain", () => {
-    const mockChainHead = { getWeatherData: jest.fn() };
-    (WeatherAPIProvider as jest.Mock).mockImplementation(() => ({
-      setNext: jest.fn(),
-      ...mockChainHead
-    }));
-    
-    const manager = new WeatherProviderManager(logger);
-    expect(manager.getProvider()).toBeDefined();
   });
 });

@@ -22,11 +22,11 @@ jobs:
         working-directory: ./client
 
       - name: Run ESLint (server)
-        run: npx eslint ./
+        run: npm run lint
         working-directory: ./server
 
       - name: Run ESLint (client)
-        run: npx eslint ./
+        run: npm run lint
         working-directory: ./client
 
       - name: Run Prettier (all)
