@@ -44,15 +44,4 @@ describe("WeatherProviderManager", () => {
     expect(OpenWeatherMapProvider).toHaveBeenCalledWith(logger);
     expect(mockSetNext).toHaveBeenCalled();
   });
-
-  it("should provide access to the head of the chain", () => {
-    const mockChainHead = { getWeatherData: jest.fn() };
-    (WeatherAPIProvider as jest.Mock).mockImplementation(() => ({
-      setNext: jest.fn(),
-      ...mockChainHead,
-    }));
-
-    const manager = new WeatherProviderManager(logger);
-    expect(manager.getProvider()).toBeDefined();
-  });
 });

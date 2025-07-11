@@ -11,7 +11,6 @@ describe("EmailService", () => {
   let mailer: jest.Mocked<Mailer>;
   let dataProvider: jest.Mocked<DataProvider>;
   let weatherManager: any;
-  let weatherProvider: any;
   let service: EmailService;
   let mockLogger: any;
 
@@ -34,12 +33,7 @@ describe("EmailService", () => {
       deleteSubscription: jest.fn(),
     } as any;
 
-    weatherProvider = {
-      getWeatherData: jest.fn(),
-    };
-
     weatherManager = {
-      getProvider: jest.fn().mockReturnValue(weatherProvider),
       getWeatherData: jest.fn(),
     };
 
@@ -57,7 +51,6 @@ describe("EmailService", () => {
       mockLogger,
     );
 
-    // Prevent WEATHER_API_KEY warning in test output
     process.env.WEATHER_API_KEY = "dummy";
   });
 
@@ -100,12 +93,12 @@ describe("EmailService", () => {
 
       it("sends weather emails for all subscriptions", async () => {
         dataProvider.getSubscriptionsByFrequency.mockResolvedValue([testSub]);
-        weatherProvider.getWeatherData.mockResolvedValue(testWeather);
+        weatherManager.getWeatherData.mockResolvedValue(testWeather);
         mailer.sendWeatherEmail.mockResolvedValue();
 
         await service.sendWeatherEmailsByFrequency(frequency);
 
-        expect(weatherProvider.getWeatherData).toHaveBeenCalledWith("Kyiv");
+        expect(weatherManager.getWeatherData).toHaveBeenCalledWith("Kyiv");
         expect(mailer.sendWeatherEmail).toHaveBeenCalledWith(
           "user@mail.com",
           "Kyiv",
@@ -119,7 +112,7 @@ describe("EmailService", () => {
 
       it("skips subscription if weather data is missing", async () => {
         dataProvider.getSubscriptionsByFrequency.mockResolvedValue([testSub]);
-        weatherProvider.getWeatherData.mockResolvedValue(null);
+        weatherManager.getWeatherData.mockResolvedValue(null);
 
         await service.sendWeatherEmailsByFrequency(frequency);
 
@@ -131,7 +124,7 @@ describe("EmailService", () => {
 
       it("logs and continues if sending email fails", async () => {
         dataProvider.getSubscriptionsByFrequency.mockResolvedValue([testSub]);
-        weatherProvider.getWeatherData.mockResolvedValue(testWeather);
+        weatherManager.getWeatherData.mockResolvedValue(testWeather);
         mailer.sendWeatherEmail.mockRejectedValue(new Error("SMTP error"));
 
         await service.sendWeatherEmailsByFrequency(frequency);
@@ -154,7 +147,7 @@ describe("EmailService", () => {
           testSub,
           sub2,
         ]);
-        weatherProvider.getWeatherData
+        weatherManager.getWeatherData
           .mockResolvedValueOnce(testWeather)
           .mockResolvedValueOnce(null);
 
@@ -162,8 +155,8 @@ describe("EmailService", () => {
 
         await service.sendWeatherEmailsByFrequency(frequency);
 
-        expect(weatherProvider.getWeatherData).toHaveBeenCalledWith("Kyiv");
-        expect(weatherProvider.getWeatherData).toHaveBeenCalledWith("Lviv");
+        expect(weatherManager.getWeatherData).toHaveBeenCalledWith("Kyiv");
+        expect(weatherManager.getWeatherData).toHaveBeenCalledWith("Lviv");
         expect(mailer.sendWeatherEmail).toHaveBeenCalledTimes(1);
         expect(mailer.sendWeatherEmail).toHaveBeenCalledWith(
           "user@mail.com",
@@ -184,7 +177,7 @@ describe("EmailService", () => {
         dataProvider.getSubscriptionsByFrequency.mockResolvedValue([
           subNoToken,
         ]);
-        weatherProvider.getWeatherData.mockResolvedValue(testWeather);
+        weatherManager.getWeatherData.mockResolvedValue(testWeather);
 
         await service.sendWeatherEmailsByFrequency(frequency);
 
@@ -201,7 +194,8 @@ describe("EmailService", () => {
 
       it("should handle weatherManager.getWeatherData returning undefined", async () => {
         dataProvider.getSubscriptionsByFrequency.mockResolvedValue([testSub]);
-        weatherProvider.getWeatherData.mockResolvedValue(undefined);
+        
+        weatherManager.getWeatherData.mockResolvedValue(undefined);
 
         await service.sendWeatherEmailsByFrequency(frequency);
 
@@ -213,7 +207,7 @@ describe("EmailService", () => {
 
       it("should handle mailer.sendWeatherEmail returning undefined", async () => {
         dataProvider.getSubscriptionsByFrequency.mockResolvedValue([testSub]);
-        weatherProvider.getWeatherData.mockResolvedValue(testWeather);
+        weatherManager.getWeatherData.mockResolvedValue(testWeather);
         mailer.sendWeatherEmail.mockResolvedValue(undefined);
 
         await service.sendWeatherEmailsByFrequency(frequency);
@@ -228,7 +222,7 @@ describe("EmailService", () => {
 
   it("logs and continues if getWeatherData throws", async () => {
     dataProvider.getSubscriptionsByFrequency.mockResolvedValue([testSub]);
-    weatherProvider.getWeatherData.mockRejectedValue(new Error("API error"));
+    weatherManager.getWeatherData.mockRejectedValue(new Error("API error"));
 
     await service.sendWeatherEmailsByFrequency("daily");
 
@@ -267,18 +261,18 @@ describe("EmailService", () => {
   it("should handle empty city in subscription gracefully", async () => {
     const subWithNoCity = { ...testSub, city: "" };
     dataProvider.getSubscriptionsByFrequency.mockResolvedValue([subWithNoCity]);
-    weatherProvider.getWeatherData.mockResolvedValue(null);
+    weatherManager.getWeatherData.mockResolvedValue(null);
 
     await service.sendWeatherEmailsByFrequency("daily");
 
-    expect(weatherProvider.getWeatherData).toHaveBeenCalledWith("");
+    expect(weatherManager.getWeatherData).toHaveBeenCalledWith("");
     expect(mailer.sendWeatherEmail).not.toHaveBeenCalled();
     expect(errorSpy).toHaveBeenCalledWith("No weather data found for city: ");
   });
 
   it("should handle mailer.sendWeatherEmail throwing synchronously", async () => {
     dataProvider.getSubscriptionsByFrequency.mockResolvedValue([testSub]);
-    weatherProvider.getWeatherData.mockResolvedValue(testWeather);
+    weatherManager.getWeatherData.mockResolvedValue(testWeather);
     mailer.sendWeatherEmail.mockImplementation(() => {
       throw new Error("Sync error");
     });
@@ -294,7 +288,7 @@ describe("EmailService", () => {
 
   it("should handle weatherManager.getWeatherData throwing synchronously", async () => {
     dataProvider.getSubscriptionsByFrequency.mockResolvedValue([testSub]);
-    weatherProvider.getWeatherData.mockImplementation(() => {
+    weatherManager.getWeatherData.mockImplementation(() => {
       throw new Error("Sync weather error");
     });
 
@@ -310,7 +304,7 @@ describe("EmailService", () => {
   it("should not send email if subscription is inactive", async () => {
     const inactiveSub = { ...testSub, is_active: false };
     dataProvider.getSubscriptionsByFrequency.mockResolvedValue([inactiveSub]);
-    weatherProvider.getWeatherData.mockResolvedValue(testWeather);
+    weatherManager.getWeatherData.mockResolvedValue(testWeather);
 
     await service.sendWeatherEmailsByFrequency("daily");
 
@@ -327,13 +321,13 @@ describe("EmailService", () => {
       token: "token-2",
     };
     dataProvider.getSubscriptionsByFrequency.mockResolvedValue([sub1, sub2]);
-    weatherProvider.getWeatherData.mockResolvedValue(testWeather);
+    weatherManager.getWeatherData.mockResolvedValue(testWeather);
     mailer.sendWeatherEmail.mockResolvedValue();
 
     await service.sendWeatherEmailsByFrequency("daily");
 
-    expect(weatherProvider.getWeatherData).toHaveBeenCalledWith("Kyiv");
-    expect(weatherProvider.getWeatherData).toHaveBeenCalledWith("Lviv");
+    expect(weatherManager.getWeatherData).toHaveBeenCalledWith("Kyiv");
+    expect(weatherManager.getWeatherData).toHaveBeenCalledWith("Lviv");
     expect(mailer.sendWeatherEmail).toHaveBeenCalledTimes(2);
     expect(mailer.sendWeatherEmail).toHaveBeenCalledWith(
       "user@mail.com",
@@ -358,7 +352,7 @@ describe("EmailService", () => {
       token: "token-2",
     };
     dataProvider.getSubscriptionsByFrequency.mockResolvedValue([sub1, sub2]);
-    weatherProvider.getWeatherData.mockResolvedValue(null);
+    weatherManager.getWeatherData.mockResolvedValue(null);
 
     await service.sendWeatherEmailsByFrequency("daily");
 
@@ -396,7 +390,7 @@ describe("EmailService", () => {
       frequency: "" as unknown as SubscriptionFrequency,
     };
     dataProvider.getSubscriptionsByFrequency.mockResolvedValue([subNoFreq]);
-    weatherProvider.getWeatherData.mockResolvedValue(testWeather);
+    weatherManager.getWeatherData.mockResolvedValue(testWeather);
 
     await expect(
       service.sendWeatherEmailsByFrequency(
@@ -424,7 +418,7 @@ describe("EmailService", () => {
       token: "token-123",
     };
     dataProvider.getSubscriptionsByFrequency.mockResolvedValue([testSub, sub2]);
-    weatherProvider.getWeatherData.mockResolvedValue(testWeather);
+    weatherManager.getWeatherData.mockResolvedValue(testWeather);
 
     await service.sendWeatherEmailsByFrequency("daily");
 

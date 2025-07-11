@@ -25,7 +25,7 @@ export class WeatherProviderManager implements WeatherProviderManagerInterface {
     this.chainHead = weatherAPIProvider;
   }
 
-  public getProvider(): WeatherProvider {
+  private getProvider(): WeatherProvider {
     return this.chainHead;
   }
 
@@ -64,7 +64,7 @@ export class WeatherProviderManager implements WeatherProviderManagerInterface {
     }
   }
 
-  public getCacheService(): WeatherCacheService | null {
+  private getCacheService(): WeatherCacheService | null {
     if (!this.cacheService) {
       this.logger.warn("Cache service is not initialized.");
       return null;

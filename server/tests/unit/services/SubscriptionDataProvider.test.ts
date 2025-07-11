@@ -83,14 +83,12 @@ describe("SubscriptionDataProvider", () => {
       const mockKnex: MockKnex = {
         where: jest.fn().mockReturnThis(),
         andWhere: jest.fn().mockReturnThis(),
-        first: jest
-          .fn()
-          .mockResolvedValue({
-            ...testSubscription,
-            id: 1,
-            token: testToken,
-            is_active: true,
-          }),
+        first: jest.fn().mockResolvedValue({
+          ...testSubscription,
+          id: 1,
+          token: testToken,
+          is_active: true,
+        }),
       };
       (db as unknown as jest.Mock).mockReturnValueOnce(mockKnex);
 
