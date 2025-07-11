@@ -194,6 +194,7 @@ describe("EmailService", () => {
 
       it("should handle weatherManager.getWeatherData returning undefined", async () => {
         dataProvider.getSubscriptionsByFrequency.mockResolvedValue([testSub]);
+        
         weatherManager.getWeatherData.mockResolvedValue(undefined);
 
         await service.sendWeatherEmailsByFrequency(frequency);
