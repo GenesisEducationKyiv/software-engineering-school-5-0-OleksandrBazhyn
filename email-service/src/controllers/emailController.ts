@@ -1,14 +1,15 @@
 import { Logger } from "winston";
-import { Mailer, WeatherData, ConfirmationPayload, WeatherPayload } from "../types.js";
+import { WeatherData, ConfirmationPayload, WeatherPayload } from "../types.js";
 import { Request, Response } from "express";
+import { EmailQueue } from "../services/emailQueue.js";
 
 export class EmailController {
   private logger: Logger;
-  private emailService: Mailer;
+  private emailQueue: EmailQueue;
 
-  constructor(logger: Logger, emailService: Mailer) {
+  constructor(logger: Logger, emailQueue: EmailQueue) {
     this.logger = logger;
-    this.emailService = emailService;
+    this.emailQueue = emailQueue;
   }
 
   private isValidEmail(email: string): boolean {
@@ -63,9 +64,8 @@ export class EmailController {
         return;
       }
       const { email, city, confirmUrl } = req.body;
-      await this.emailService.sendConfirmationEmail(email, city, confirmUrl);
-      this.logger.info(`Confirmation email sent to ${email} for city ${city}`);
-      res.status(200).json({ message: "Confirmation email was sent" });
+      this.emailQueue.enqueue({ type: "confirmation", email, city, confirmUrl });
+      res.status(202).json({ message: "Confirmation email queued" });
     } catch (err) {
       this.logger.error("Failed to send confirmation email", { error: err });
       res.status(500).json({ error: "Internal server error" });
@@ -90,9 +90,13 @@ export class EmailController {
         humidity,
         description,
       };
-      await this.emailService.sendWeatherEmail(email, weatherData, unsubscribeUrl);
-      this.logger.info(`Weather email sent to ${email} for city ${city}`);
-      res.status(200).json({ message: "Weather email sent" });
+      this.emailQueue.enqueue({
+        type: "weather",
+        email,
+        weatherData,
+        unsubscribeUrl,
+      });
+      res.status(202).json({ message: "Weather email queued" });
     } catch (err) {
       this.logger.error("Failed to send weather email", { error: err });
       res.status(500).json({ error: "Internal server error" });
