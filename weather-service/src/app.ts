@@ -4,9 +4,11 @@ import express from "express";
 import { WeatherController } from "./controllers/WeatherController.js";
 import WeatherProviderManager from "./services/WeatherProviderManager.js";
 import { RedisClient } from "./services/cache/RedisClient.js";
+import { WeatherGrpcServer } from "./grpc/WeatherGrpcServer.js";
 import { ErrorResponse, HealthResponse } from "./types.js";
 
 const PORT = Number(config.PORT) || 3000;
+const GRPC_PORT = Number(config.GRPC_PORT) || 50051;
 const logger = createLogger("WeatherService");
 
 async function startWeatherService() {
@@ -28,6 +30,10 @@ async function startWeatherService() {
 
   const weatherManager = new WeatherProviderManager(logger, redisClient || undefined);
   const weatherController = new WeatherController(weatherManager);
+
+  // Start gRPC server
+  const grpcServer = new WeatherGrpcServer(weatherManager, logger);
+  await grpcServer.start(GRPC_PORT);
 
   app.get("/api/v1/weather", async (req, res) => {
     try {
@@ -93,6 +99,8 @@ async function startWeatherService() {
       logger.info("HTTP server closed");
     });
 
+    await grpcServer.stop();
+
     if (redisClient) {
       await redisClient.disconnect();
       logger.info("Redis client disconnected");
@@ -107,6 +115,8 @@ async function startWeatherService() {
     server.close(() => {
       logger.info("HTTP server closed");
     });
+
+    await grpcServer.stop();
 
     if (redisClient) {
       await redisClient.disconnect();

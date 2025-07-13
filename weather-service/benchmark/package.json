@@ -1,0 +1,15 @@
+{
+  "name": "weather-service-benchmark",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Performance benchmark for Weather Service HTTP vs gRPC",
+  "scripts": {
+    "benchmark": "node performance-test.js",
+    "test": "node performance-test.js"
+  },
+  "dependencies": {
+    "@grpc/grpc-js": "^1.10.6",
+    "@grpc/proto-loader": "^0.7.10",
+    "axios": "^1.6.0"
+  }
+}

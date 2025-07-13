@@ -8,6 +8,7 @@ const isTestEnvironment =
 const getTestDefault = (name: string): string => {
   const defaults: Record<string, string> = {
     PORT: "3000",
+    GRPC_PORT: "50051",
     WEATHER_API_KEY: "test-api-key",
     OPENWEATHERMAP_API_KEY: "test-openweather-key",
     REDIS_URL: "redis://localhost:6379",
@@ -31,6 +32,7 @@ const required = (name: string, value: unknown): string => {
 
 export const config = {
   PORT: Number(required("PORT", process.env.PORT)) || 3000,
+  GRPC_PORT: Number(required("GRPC_PORT", process.env.GRPC_PORT)) || 50051,
   WEATHER_API_KEY: required("WEATHER_API_KEY", process.env.WEATHER_API_KEY),
   OPENWEATHERMAP_API_KEY: required("OPENWEATHERMAP_API_KEY", process.env.OPENWEATHERMAP_API_KEY),
   REDIS_URL: required("REDIS_URL", process.env.REDIS_URL) || "redis://localhost:6379",
