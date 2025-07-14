@@ -330,7 +330,7 @@ npm run load-test                    # Вбудований load test 1000 RPS
 artillery quick --count 100 --num 10 http://localhost:3000/api/v1/health
 
 # gRPC load testing
-ghz --insecure --proto ./proto/weather.proto \
+ghz --insecure --proto ../grpc-shared/proto/weather.proto \
     --call weather.WeatherService.GetWeather \
     -d '{"city":"Prague"}' \
     -c 50 -n 1000 localhost:50051
@@ -355,17 +355,25 @@ weather-benchmark/
 ├── simple-test.js                    # Швидкий benchmark (5-20 iterations)
 ├── comprehensive-test.js             # Детальний benchmark (75+ iterations)
 ├── performance-test.js               # Оригінальний stress test
-├── proto/weather.proto               # gRPC protocol definition
 ├── benchmark-results.json            # Результати простого тесту
 ├── comprehensive-benchmark-results.json  # Детальні результати
 └── README.md                         # Інструкції з запуску
+```
+
+### Centralized Protocol Definitions
+```
+grpc-shared/
+├── proto/weather.proto               # gRPC protocol definition
+├── clients/                          # gRPC clients
+├── examples/                         # Usage examples
+└── README.md                         # Documentation
 ```
 
 ### Weather Service Components
 - [Weather Service Main App](.../weather-service/src/app.ts) - HTTP + gRPC servers
 - [gRPC Server Implementation](../weather-service/src/grpc/WeatherGrpcServer.ts)
 - [HTTP REST Controller](.../weather-service/src/controllers/WeatherController.ts)
-- [Protocol Buffer Definition](.../weather-service/proto/weather.proto)
+- [Protocol Buffer Definition](../../grpc-shared/proto/weather.proto)
 
 ### Test Results Files
 - [Simple Test Results](.../weather-benchmark/benchmark-results.json)
