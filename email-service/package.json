@@ -2,7 +2,7 @@
   "name": "email-service",
   "version": "1.0.0",
   "description": "Microservice for emails",
-  "main": "dist/src/app.ts",
+  "main": "dist/src/app.js",
   "type": "module",
   "scripts": {
     "build": "tsc",
@@ -39,6 +39,7 @@
     "cross-env": "^7.0.3",
     "jest": "^30.0.4",
     "smtp-tester": "^2.1.0",
-    "ts-jest": "^29.4.0"
+    "ts-jest": "^29.4.0",
+    "tsc": "^2.0.4"
   }
 }
