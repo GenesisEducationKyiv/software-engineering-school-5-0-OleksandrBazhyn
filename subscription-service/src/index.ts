@@ -90,15 +90,6 @@ function createExpressApp(
   const apiRoutes = createApiRoutes(subscriptionService, weatherClient, emailClient);
   app.use("/api/subscriptions", apiRoutes);
 
-  // Health check endpoint
-  app.get("/health", (req, res) => {
-    res.json({
-      service: "subscription-service",
-      status: "healthy",
-      timestamp: new Date().toISOString(),
-    });
-  });
-
   // 404 handler
   app.use("*", (req, res) => {
     res.status(404).json({ error: "Endpoint not found" });
