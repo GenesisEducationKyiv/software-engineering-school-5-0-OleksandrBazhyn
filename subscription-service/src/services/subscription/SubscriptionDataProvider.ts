@@ -6,7 +6,15 @@ import {
 } from "../../types.js";
 import db from "../../../db/knex.js";
 
-class SubscriptionDataProvider implements DataProvider {
+export class SubscriptionDataProvider implements DataProvider {
+  async disconnect(): Promise<void> {
+    await db.destroy();
+  }
+
+  async getActiveSubscriptions(): Promise<Subscription[]> {
+    return db<Subscription>("subscriptions").where("is_active", true);
+  }
+
   async getSubscriptionsByFrequency(frequency: SubscriptionFrequency): Promise<Subscription[]> {
     const subscriptions: Subscription[] = await db<Subscription>("subscriptions")
       .where("frequency", frequency)
@@ -80,5 +88,3 @@ class SubscriptionDataProvider implements DataProvider {
     return true;
   }
 }
-
-export default new SubscriptionDataProvider();

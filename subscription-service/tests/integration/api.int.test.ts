@@ -12,8 +12,6 @@ const mockLogger = {
 import { createApiRoutes } from "../../src/routes/api.js";
 import { SubscriptionService } from "../../src/services/subscription/SubscriptionService.js";
 import { SubscriptionDataProvider } from "../../src/services/subscription/SubscriptionDataProvider.js";
-import { WeatherGrpcClient } from "../../src/clients/WeatherGrpcClient.js";
-import { EmailServiceClient } from "../../src/clients/EmailServiceClient.js";
 
 let app: Express;
 
@@ -102,6 +100,4 @@ describe("SubscriptionService Integration", () => {
     // Mock only external services
     service = new SubscriptionService(dataProvider, mockWeatherClient, mockEmailClient);
   });
-
-  // Test with real database operations...
 });

@@ -1,8 +1,10 @@
 import cron from "node-cron";
 import Scheduler from "../../../src/services/scheduler/Scheduler.js";
-import EmailService from "../../../src/services/email/EmailService.js";
-import { Mailer, DataProvider } from "../../../src/types.js";
+import { DataProvider } from "../../../src/types.js";
 import { Logger } from "winston";
+
+import { EmailServiceClient } from "../../../src/clients/EmailServiceClient.js";
+import { WeatherGrpcClient } from "../../../src/clients/WeatherGrpcClient.js";
 
 jest.mock("node-cron");
 jest.mock("../../../src/services/email/EmailService.js");

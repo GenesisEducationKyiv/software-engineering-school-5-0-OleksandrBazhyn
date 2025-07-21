@@ -1,16 +1,13 @@
 import express, { Router, Request, Response } from "express";
-import {
-  SubscriptionInput,
-  SubscriptionServiceInterface,
-} from "../types.js";
+import { SubscriptionInput, SubscriptionServiceInterface } from "../types.js";
 import {
   AlreadySubscribedError,
   NotConfirmedError,
   InvalidTokenError,
 } from "../errors/SubscriptionError.js";
 import { createLogger } from "../logger/index.js";
-import { WeatherGrpcClient } from "../clients/WeatherGrpcClient";
-import { EmailServiceClient } from "../clients/EmailServiceClient";
+import { WeatherGrpcClient } from "../clients/WeatherGrpcClient.js";
+import { EmailServiceClient } from "../clients/EmailServiceClient.js";
 
 const logger = createLogger("API");
 
@@ -91,7 +88,7 @@ export function createApiRoutes(
       status: weatherHealthy && emailHealthy ? "healthy" : "degraded",
       services: {
         weather: weatherHealthy ? "up" : "down",
-        email: emailHealthy ? "up" : "down"
+        email: emailHealthy ? "up" : "down",
       },
       timestamp: new Date().toISOString(),
     };

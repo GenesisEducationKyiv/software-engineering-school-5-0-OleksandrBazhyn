@@ -8,12 +8,6 @@ const isTestEnvironment =
 const getTestDefault = (name: string): string => {
   const defaults: Record<string, string> = {
     PORT: "3000",
-    SMTP_HOST: "smtp.example.com",
-    SMTP_PORT: "587",
-    SMTP_USER: "test@example.com",
-    SMTP_PASS: "testpassword",
-    SMTP_FROM: "noreply@example.com",
-    WEATHER_API_KEY: "test-api-key",
     PGPORT: "5432",
     PGDATABASE: "weather_db",
     PGHOST: "localhost",
@@ -22,6 +16,8 @@ const getTestDefault = (name: string): string => {
     REDIS_URL: "redis://localhost:6379",
     REDIS_ENABLED: "true",
     NODE_ENV: "test",
+    WEATHER_SERVICE_URL: "http://localhost:3001",
+    EMAIL_SERVICE_URL: "http://localhost:3002",
   };
 
   return defaults[name] || "mock-value";
@@ -40,19 +36,14 @@ const required = (name: string, value: unknown): string => {
 
 export const config = {
   PORT: Number(required("PORT", process.env.PORT)) || 3000,
-  SMTP_HOST: required("SMTP_HOST", process.env.SMTP_HOST),
-  SMTP_PORT: Number(required("SMTP_PORT", process.env.SMTP_PORT)) || 587,
-  SMTP_USER: required("SMTP_USER", process.env.SMTP_USER),
-  SMTP_PASS: required("SMTP_PASS", process.env.SMTP_PASS),
-  SMTP_FROM: required("SMTP_FROM", process.env.SMTP_FROM),
-  WEATHER_API_KEY: required("WEATHER_API_KEY", process.env.WEATHER_API_KEY),
   PGPORT: Number(required("PGPORT", process.env.PGPORT)) || 5432,
   PGDATABASE: required("PGDATABASE", process.env.PGDATABASE),
   PGHOST: required("PGHOST", process.env.PGHOST),
   PGUSER: required("PGUSER", process.env.PGUSER),
   PGPASSWORD: required("PGPASSWORD", process.env.PGPASSWORD),
-  OPENWEATHERMAP_API_KEY: required("OPENWEATHERMAP_API_KEY", process.env.OPENWEATHERMAP_API_KEY),
   REDIS_URL: required("REDIS_URL", process.env.REDIS_URL) || "redis://localhost:6379",
   NODE_ENV: required("NODE_ENV", process.env.NODE_ENV),
   REDIS_ENABLED: process.env.REDIS_ENABLED !== "false" && !isTestEnvironment,
+  WEATHER_SERVICE_URL: required("WEATHER_SERVICE_URL", process.env.WEATHER_SERVICE_URL),
+  EMAIL_SERVICE_URL: required("EMAIL_SERVICE_URL", process.env.EMAIL_SERVICE_URL),
 };

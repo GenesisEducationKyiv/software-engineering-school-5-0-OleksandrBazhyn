@@ -1,46 +1,34 @@
 import {
   SubscriptionInput,
-  Mailer,
   DataProvider,
   SubscriptionServiceInterface,
+  Subscription,
+  SubscriptionFrequency,
 } from "../../types.js";
 import { AlreadySubscribedError, InvalidTokenError } from "../../errors/SubscriptionError.js";
-import { Logger } from "winston";
+import { WeatherGrpcClient } from "../../clients/WeatherGrpcClient.js";
+import { EmailServiceClient, EmailRequest } from "../../clients/EmailServiceClient.js";
+import { logger } from "../../logger/index.js";
 import crypto from "crypto";
-import { WeatherGrpcClient } from "../../clients/WeatherGrpcClient";
-import { EmailServiceClient, EmailRequest } from "../../clients/EmailServiceClient";
-import { logger } from "../../logger";
 
 export class SubscriptionService implements SubscriptionServiceInterface {
-  private dataProvider: DataProvider;
-  private weatherClient: WeatherGrpcClient;
-  private emailClient: EmailServiceClient;
-  private logger: Logger;
-
   constructor(
-    dataProvider: DataProvider,
-    weatherClient: WeatherGrpcClient,
-    emailClient: EmailServiceClient,
-    logger: Logger,
-  ) {
-    this.dataProvider = dataProvider;
-    this.weatherClient = weatherClient;
-    this.emailClient = emailClient;
-    this.logger = logger;
-  }
+    private dataProvider: DataProvider,
+    private weatherClient: WeatherGrpcClient,
+    private emailClient: EmailServiceClient,
+  ) {}
 
-  // Remove mailer dependency - now uses emailClient
   async subscribe(subscription: SubscriptionInput): Promise<{ token: string }> {
     const existing = await this.dataProvider.checkSubscriptionExists(subscription);
     if (existing) {
       throw new AlreadySubscribedError(subscription.email, subscription.city);
     }
+
     const token = crypto.randomUUID();
+
     try {
-      this.logger.info(`Inserting subscription for ${subscription.email} in ${subscription.city}`);
       await this.dataProvider.insertSubscription(subscription, token, false);
 
-      // Use email service instead of direct mailer
       const emailRequest: EmailRequest = {
         to: subscription.email,
         subject: `Confirm your weather subscription for ${subscription.city}`,
@@ -49,17 +37,17 @@ export class SubscriptionService implements SubscriptionServiceInterface {
           confirmationLink: `${process.env.FRONTEND_URL}/confirm/${token}`,
         },
       };
-      await this.emailClient.sendEmail(emailRequest);
 
+      await this.emailClient.sendEmail(emailRequest);
       return { token };
     } catch (error) {
-      this.logger.error("Error inserting subscription:", error);
+      logger.error("Error creating subscription:", error);
       throw new Error("Failed to subscribe");
     }
   }
 
   async confirm(token: string): Promise<boolean> {
-    this.logger.info(`Confirming subscription with token: ${token}`);
+    logger.info(`Confirming subscription with token: ${token}`);
     const updated = await this.dataProvider.updateSubscriptionStatus(token, true);
     if (!updated) {
       throw new InvalidTokenError();
@@ -68,7 +56,7 @@ export class SubscriptionService implements SubscriptionServiceInterface {
   }
 
   async unsubscribe(token: string): Promise<boolean> {
-    this.logger.info(`Unsubscribing with token: ${token}`);
+    logger.info(`Unsubscribing with token: ${token}`);
     const deleted = await this.dataProvider.deleteSubscription(token);
     if (!deleted) {
       throw new InvalidTokenError();
@@ -76,86 +64,34 @@ export class SubscriptionService implements SubscriptionServiceInterface {
     return true;
   }
 
+  async getSubscriptionsByFrequency(frequency: SubscriptionFrequency): Promise<Subscription[]> {
+    return await this.dataProvider.getSubscriptionsByFrequency(frequency);
+  }
+
   async sendWeatherUpdateToSubscription(subscription: Subscription): Promise<void> {
     try {
-      // Get weather data via gRPC
+      // 1. Отримати погоду через gRPC
       const weatherData = await this.weatherClient.getWeather(subscription.city);
 
-      // Send email request to email service queue
-      const emailRequest: EmailRequest = {
+      // 2. Відправити email через Email Service
+      const emailRequest = {
         to: subscription.email,
-        subject: `Weather Update for ${subscription.city}`,
-        type: "weather",
+        subject: `Weather update for ${subscription.city}`,
+        type: "weather-update" as const,
         data: {
-          weatherData: {
-            city: subscription.city,
-            temperature: weatherData.temperature,
-            description: weatherData.description,
-            humidity: weatherData.humidity,
-            windSpeed: weatherData.windSpeed,
-            pressure: weatherData.pressure,
-          },
+          city: subscription.city,
+          temperature: weatherData.temperature,
+          description: weatherData.description,
+          humidity: weatherData.humidity,
         },
       };
 
-      const success = await this.emailClient.sendEmail(emailRequest);
-      if (success) {
-        logger.info(`Weather update queued for ${subscription.email} in ${subscription.city}`);
-      } else {
-        logger.error(`Failed to queue weather update for ${subscription.email}`);
-      }
+      await this.emailClient.sendEmail(emailRequest);
+      logger.info(`Weather update sent to ${subscription.email}`);
     } catch (error) {
-      logger.error(`Failed to send weather update for subscription ${subscription.id}:`, error);
+      logger.error(`Failed to send weather update to ${subscription.email}:`, error);
       throw error;
     }
-  }
-
-  async confirmSubscription(confirmationToken: string): Promise<boolean> {
-    const success = await this.subscriptionDataProvider.confirmSubscription(confirmationToken);
-
-    if (success) {
-      const subscription =
-        await this.subscriptionDataProvider.getSubscriptionByToken(confirmationToken);
-      if (subscription) {
-        // Send confirmation email via email service
-        const emailRequest: EmailRequest = {
-          to: subscription.email,
-          subject: "Weather Subscription Confirmed!",
-          type: "confirmation",
-          data: {
-            confirmationLink: `${process.env.FRONTEND_URL}/confirmed`,
-          },
-        };
-        await this.emailClient.sendEmail(emailRequest);
-      }
-    }
-
-    return success;
-  }
-
-  async unsubscribe(unsubscribeToken: string): Promise<boolean> {
-    const subscription =
-      await this.subscriptionDataProvider.getSubscriptionByUnsubscribeToken(unsubscribeToken);
-    if (!subscription) {
-      return false;
-    }
-
-    const success = await this.subscriptionDataProvider.deleteSubscription(subscription.id);
-
-    if (success) {
-      // Send unsubscribe confirmation email
-      const emailRequest: EmailRequest = {
-        to: subscription.email,
-        subject: "Successfully Unsubscribed from Weather Updates",
-        type: "unsubscribe",
-        data: {
-          unsubscribeLink: `${process.env.FRONTEND_URL}/unsubscribed`,
-        },
-      };
-      await this.emailClient.sendEmail(emailRequest);
-    }
-
-    return success;
   }
 }
 
