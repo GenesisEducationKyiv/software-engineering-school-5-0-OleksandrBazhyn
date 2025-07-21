@@ -11,8 +11,9 @@ import {
   HealthCheckResponse,
 } from "../types";
 import { Logger } from "winston";
+import { WeatherGrpcClientInterface } from "../types.js";
 
-export class WeatherGrpcClient {
+export class WeatherGrpcClient implements WeatherGrpcClientInterface {
   private client: WeatherServiceClient;
   private isConnected = false;
   private logger: Logger;

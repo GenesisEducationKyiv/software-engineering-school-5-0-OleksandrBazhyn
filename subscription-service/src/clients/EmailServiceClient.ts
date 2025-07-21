@@ -1,8 +1,8 @@
 import axios, { AxiosInstance } from "axios";
 import type { Logger } from "winston";
-import { EmailRequest } from "../types.js";
+import { EmailRequest, EmailServiceInterface } from "../types.js";
 
-export class EmailServiceClient {
+export class EmailServiceClient implements EmailServiceInterface {
   private client: AxiosInstance;
   private logger: Logger;
 

@@ -15,10 +15,10 @@ export class SubscriptionController {
 
   async subscribe(req: Request, res: Response): Promise<void> {
     try {
-      logger.info("Subscription request received", { 
+      logger.info("Subscription request received", {
         email: req.body.email,
         city: req.body.city,
-        frequency: req.body.frequency 
+        frequency: req.body.frequency,
       });
 
       // Валідація через окремий валідатор
@@ -29,14 +29,13 @@ export class SubscriptionController {
       }
 
       const subscriptionInput = req.body as SubscriptionInput;
-      
+
       const result = await this.subscriptionService.subscribe(subscriptionInput);
-      
+
       res.status(201).json({
         message: "Subscription successful. Confirmation email sent.",
         token: result.token, // Можна повернути для тестування
       });
-      
     } catch (error) {
       this.handleSubscriptionError(error, res);
     }
@@ -45,23 +44,22 @@ export class SubscriptionController {
   async confirm(req: Request, res: Response): Promise<void> {
     try {
       const { token } = req.params;
-      
+
       if (!token) {
         res.status(400).json({ error: "Token is required" });
         return;
       }
 
       const confirmed = await this.subscriptionService.confirm(token);
-      
+
       if (confirmed) {
-        res.status(200).json({ 
+        res.status(200).json({
           message: "Subscription confirmed successfully",
-          confirmed: true 
+          confirmed: true,
         });
       } else {
         res.status(400).json({ error: "Invalid token" });
       }
-      
     } catch (error) {
       this.handleConfirmationError(error, res);
     }
@@ -70,23 +68,22 @@ export class SubscriptionController {
   async unsubscribe(req: Request, res: Response): Promise<void> {
     try {
       const { token } = req.params;
-      
+
       if (!token) {
         res.status(400).json({ error: "Token is required" });
         return;
       }
 
       const unsubscribed = await this.subscriptionService.unsubscribe(token);
-      
+
       if (unsubscribed) {
-        res.status(200).json({ 
+        res.status(200).json({
           message: "Unsubscribed successfully",
-          unsubscribed: true 
+          unsubscribed: true,
         });
       } else {
         res.status(400).json({ error: "Invalid token" });
       }
-      
     } catch (error) {
       this.handleUnsubscribeError(error, res);
     }

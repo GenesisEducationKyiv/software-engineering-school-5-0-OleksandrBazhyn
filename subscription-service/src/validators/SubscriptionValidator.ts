@@ -18,7 +18,7 @@ export function validateSubscriptionInput(input: any): string | null {
   }
 
   // Валідація city
-  if (typeof input.city !== 'string' || input.city.trim().length < 2) {
+  if (typeof input.city !== "string" || input.city.trim().length < 2) {
     return "City name must be at least 2 characters long";
   }
 
@@ -35,7 +35,7 @@ export function validateSubscriptionInput(input: any): string | null {
 }
 
 export function validateToken(token: string): string | null {
-  if (!token || typeof token !== 'string') {
+  if (!token || typeof token !== "string") {
     return "Token is required";
   }
 

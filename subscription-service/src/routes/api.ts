@@ -27,8 +27,8 @@ export function createApiRoutes(
   router.get("/confirm/:token", (req, res) => subscriptionController.confirm(req, res));
   router.get("/unsubscribe/:token", (req, res) => subscriptionController.unsubscribe(req, res));
 
-  router.get("/health", (req, res) => healthController.checkHealth(req, res));
-  router.get("/health/service", (req, res) => healthController.checkServiceHealth(req, res));
+  router.get("/health", (req, res) => healthController.checkExternalServices(req, res));
+  router.get("/health/service", (req, res) => healthController.checkInternalService(req, res));
 
   return router;
 }

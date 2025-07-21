@@ -103,3 +103,31 @@ export interface EmailRequest {
     humidity?: number;
   };
 }
+
+export interface EmailServiceInterface {
+  sendEmail(request: EmailRequest): Promise<boolean>;
+  healthCheck(): Promise<boolean>;
+}
+
+export interface WeatherGrpcClientInterface {
+  getWeather(city: string): Promise<WeatherData>;
+  healthCheck(): Promise<boolean>;
+  disconnect(): void;
+}
+
+export interface ServiceHealthStatus {
+  status: "up" | "down" | "unknown";
+  responseTime?: number;
+  error?: string;
+  lastCheck: string;
+}
+
+export interface HealthResponse {
+  service: string;
+  status: "healthy" | "degraded" | "error";
+  services: {
+    weather: ServiceHealthStatus;
+    email: ServiceHealthStatus;
+  };
+  timestamp: string;
+}
