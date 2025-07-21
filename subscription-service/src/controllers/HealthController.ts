@@ -6,6 +6,7 @@ import {
   HealthResponse,
 } from "../types.js";
 import { Logger } from "winston";
+import { config } from "../config.js";
 
 export class HealthController {
   constructor(
@@ -58,9 +59,9 @@ export class HealthController {
       const health = {
         service: "subscription-service",
         status: "healthy",
-        version: process.env.npm_package_version || "unknown",
+        version: config.NPM_PACKAGE_VERSION || "unknown",
         uptime: Math.floor(process.uptime()),
-        environment: process.env.NODE_ENV || "unknown",
+        environment: config.NODE_ENV || "unknown",
         resources: {
           memory: {
             used: Math.round(memoryUsage.heapUsed / 1024 / 1024) + "MB",

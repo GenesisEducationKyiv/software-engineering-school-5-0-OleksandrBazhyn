@@ -18,6 +18,7 @@ const getTestDefault = (name: string): string => {
     NODE_ENV: "test",
     WEATHER_SERVICE_URL: "http://localhost:3001",
     EMAIL_SERVICE_URL: "http://localhost:3002",
+    NPM_PACKAGE_VERSION: "0.0.0",
   };
 
   return defaults[name] || "mock-value";
@@ -46,4 +47,5 @@ export const config = {
   REDIS_ENABLED: process.env.REDIS_ENABLED !== "false" && !isTestEnvironment,
   WEATHER_SERVICE_URL: required("WEATHER_SERVICE_URL", process.env.WEATHER_SERVICE_URL),
   EMAIL_SERVICE_URL: required("EMAIL_SERVICE_URL", process.env.EMAIL_SERVICE_URL),
+  NPM_PACKAGE_VERSION: required("NPM_PACKAGE_VERSION", process.env.npm_package_version),
 };
