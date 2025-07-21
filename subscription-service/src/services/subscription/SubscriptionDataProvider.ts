@@ -1,4 +1,4 @@
-import type {
+import {
   SubscriptionFrequency,
   Subscription,
   SubscriptionInput,
@@ -48,39 +48,37 @@ class SubscriptionDataProvider implements DataProvider {
         token: _token,
         is_active: _is_active,
       });
-      console.log("Subscription inserted successfully");
     } catch (error) {
       console.error("Error inserting subscription:", error);
-      throw error;
+      throw new Error("Failed to insert subscription");
     }
   }
 
   async updateSubscriptionStatus(token: string, isActive: boolean): Promise<boolean> {
-    try {
-      console.log(`Updating subscription status for token: ${token} to ${isActive}`);
-      const updated = await db<Subscription>("subscriptions").where("token", token).update({
-        is_active: isActive,
-        updated_at: new Date().toISOString(),
-      });
-      console.log(`Subscription status updated, affected rows: ${updated}`);
-      return updated > 0;
-    } catch (error) {
-      console.error("Error updating subscription status:", error);
-      throw error;
+    const updatedRows = await db<Subscription>("subscriptions")
+      .where({ token })
+      .update({ is_active: true });
+
+    if (updatedRows === 0) {
+      console.warn(`No subscription found with token: ${token}`);
+      return false;
     }
+
+    console.log(`Subscription with token ${token} updated to active status: ${isActive}`);
+    return true;
   }
 
   async deleteSubscription(token: string): Promise<boolean> {
-    try {
-      console.log(`Deleting subscription with token: ${token}`);
-      const deleted = await db<Subscription>("subscriptions").where("token", token).del();
-      console.log(`Subscription deleted, affected rows: ${deleted}`);
-      return deleted > 0;
-    } catch (error) {
-      console.error("Error deleting subscription:", error);
-      throw error;
+    const deletedRows = await db<Subscription>("subscriptions").where({ token }).del();
+
+    if (deletedRows === 0) {
+      console.warn(`No subscription found with token: ${token}`);
+      return false;
     }
+
+    console.log(`Subscription with token ${token} deleted successfully`);
+    return true;
   }
 }
 
-export default SubscriptionDataProvider;
+export default new SubscriptionDataProvider();

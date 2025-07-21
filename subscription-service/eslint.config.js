@@ -7,10 +7,10 @@ import prettierPlugin from "eslint-plugin-prettier";
 
 export default defineConfig([
   {
-    ignores: ["tests/**/*", "**/*.test.*", "**/*.spec.*", "dist/**/*"],
+    ignores: ["tests/**/*", "**/*.test.*", "**/*.spec.*"],
   },
   {
-    name: "subscription-service-js",
+    name: "server-js",
     files: ["**/*.{js,mjs,cjs,jsx}"],
     languageOptions: {
       ecmaVersion: "latest",
@@ -40,7 +40,7 @@ export default defineConfig([
     },
   },
   {
-    name: "subscription-service-ts",
+    name: "server-ts",
     files: ["**/*.{ts,tsx,mts,cts}"],
     languageOptions: {
       ecmaVersion: "latest",

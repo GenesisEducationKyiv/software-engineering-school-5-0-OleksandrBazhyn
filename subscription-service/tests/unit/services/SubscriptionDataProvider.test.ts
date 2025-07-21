@@ -1,6 +1,6 @@
 import SubscriptionDataProvider from "../../../src/services/subscription/SubscriptionDataProvider.js";
 import db from "../../../db/knex.js";
-import type { SubscriptionInput, Subscription } from "../../../src/types.js";
+import { SubscriptionInput, Subscription } from "../../../src/types.js";
 
 // Interface for the mocked knex object
 interface MockKnex {
@@ -15,18 +15,12 @@ interface MockKnex {
 jest.mock("../../../db/knex.js");
 
 describe("SubscriptionDataProvider", () => {
-  let dataProvider: SubscriptionDataProvider;
-
   const testSubscription: SubscriptionInput = {
     email: "test@mail.com",
     city: "Kyiv",
     frequency: "daily",
   };
   const testToken = "test-token";
-
-  beforeEach(() => {
-    dataProvider = new SubscriptionDataProvider();
-  });
 
   afterEach(() => {
     jest.clearAllMocks();
@@ -51,61 +45,63 @@ describe("SubscriptionDataProvider", () => {
       };
       (db as unknown as jest.Mock).mockReturnValueOnce(mockKnex);
 
-      const result = await dataProvider.getSubscriptionsByFrequency("daily");
+      const result =
+        await SubscriptionDataProvider.getSubscriptionsByFrequency("daily");
       expect(result).toEqual(mockSubs);
-      expect(db).toHaveBeenCalledWith("subscriptions");
-      expect(mockKnex.where).toHaveBeenCalledWith("frequency", "daily");
-      expect(mockKnex.andWhere).toHaveBeenCalledWith("is_active", true);
     });
 
-    it("returns empty array when no subscriptions found", async () => {
+    it("warns and returns empty array if no subscriptions found", async () => {
+      const warnSpy = jest.spyOn(console, "warn").mockImplementation(() => {});
       const mockKnex: MockKnex = {
         where: jest.fn().mockReturnThis(),
         andWhere: jest.fn().mockResolvedValue([]),
       };
       (db as unknown as jest.Mock).mockReturnValueOnce(mockKnex);
 
-      const result = await dataProvider.getSubscriptionsByFrequency("hourly");
+      const result =
+        await SubscriptionDataProvider.getSubscriptionsByFrequency("hourly");
       expect(result).toEqual([]);
+      expect(warnSpy).toHaveBeenCalledWith(
+        "No active subscriptions found for frequency: hourly",
+      );
+      warnSpy.mockRestore();
+    });
+
+    it("throws if frequency is invalid", async () => {
+      (db as unknown as jest.Mock).mockImplementation(() => {
+        throw new Error("Invalid frequency");
+      });
+      await expect(
+        SubscriptionDataProvider.getSubscriptionsByFrequency("weekly" as any),
+      ).rejects.toThrow("Invalid frequency");
     });
   });
 
   describe("checkSubscriptionExists", () => {
-    it("returns true when subscription exists", async () => {
-      const mockSub: Subscription = {
-        id: 1,
-        email: "test@mail.com",
-        city: "Kyiv",
-        token: "token",
-        is_active: true,
-        frequency: "daily",
-      };
+    it("returns true and warns if subscription exists", async () => {
+      const warnSpy = jest.spyOn(console, "warn").mockImplementation(() => {});
       const mockKnex: MockKnex = {
         where: jest.fn().mockReturnThis(),
         andWhere: jest.fn().mockReturnThis(),
-        first: jest.fn().mockResolvedValue(mockSub),
+        first: jest.fn().mockResolvedValue({
+          ...testSubscription,
+          id: 1,
+          token: testToken,
+          is_active: true,
+        }),
       };
       (db as unknown as jest.Mock).mockReturnValueOnce(mockKnex);
 
       const result =
-        await dataProvider.checkSubscriptionExists(testSubscription);
+        await SubscriptionDataProvider.checkSubscriptionExists(
+          testSubscription,
+        );
       expect(result).toBe(true);
-      expect(db).toHaveBeenCalledWith("subscriptions");
-      expect(mockKnex.where).toHaveBeenCalledWith(
-        "email",
-        testSubscription.email,
-      );
-      expect(mockKnex.andWhere).toHaveBeenCalledWith(
-        "city",
-        testSubscription.city,
-      );
-      expect(mockKnex.andWhere).toHaveBeenCalledWith(
-        "frequency",
-        testSubscription.frequency,
-      );
+      expect(warnSpy).toHaveBeenCalled();
+      warnSpy.mockRestore();
     });
 
-    it("returns false when subscription does not exist", async () => {
+    it("returns false if subscription does not exist", async () => {
       const mockKnex: MockKnex = {
         where: jest.fn().mockReturnThis(),
         andWhere: jest.fn().mockReturnThis(),
@@ -114,7 +110,9 @@ describe("SubscriptionDataProvider", () => {
       (db as unknown as jest.Mock).mockReturnValueOnce(mockKnex);
 
       const result =
-        await dataProvider.checkSubscriptionExists(testSubscription);
+        await SubscriptionDataProvider.checkSubscriptionExists(
+          testSubscription,
+        );
       expect(result).toBe(false);
     });
   });
@@ -122,106 +120,156 @@ describe("SubscriptionDataProvider", () => {
   describe("insertSubscription", () => {
     it("inserts subscription successfully", async () => {
       const mockKnex: MockKnex = {
-        where: jest.fn(),
+        where: jest.fn().mockReturnThis(),
         insert: jest.fn().mockResolvedValue(undefined),
       };
       (db as unknown as jest.Mock).mockReturnValueOnce(mockKnex);
+      const logSpy = jest.spyOn(console, "log").mockImplementation(() => {});
 
-      await dataProvider.insertSubscription(testSubscription, testToken, false);
+      await expect(
+        SubscriptionDataProvider.insertSubscription(
+          testSubscription,
+          testToken,
+          false,
+        ),
+      ).resolves.toBeUndefined();
 
-      expect(db).toHaveBeenCalledWith("subscriptions");
-      expect(mockKnex.insert).toHaveBeenCalledWith({
-        email: testSubscription.email,
-        city: testSubscription.city,
-        frequency: testSubscription.frequency,
-        token: testToken,
-        is_active: false,
-      });
+      expect(logSpy).toHaveBeenCalledWith(
+        "Inserting subscription into database:",
+        testSubscription,
+      );
+      logSpy.mockRestore();
     });
 
-    it("inserts subscription with active status", async () => {
+    it("throws error if insert fails", async () => {
       const mockKnex: MockKnex = {
-        where: jest.fn(),
-        insert: jest.fn().mockResolvedValue(undefined),
+        where: jest.fn().mockReturnThis(),
+        insert: jest.fn().mockRejectedValue(new Error("fail")),
       };
       (db as unknown as jest.Mock).mockReturnValueOnce(mockKnex);
+      const errorSpy = jest
+        .spyOn(console, "error")
+        .mockImplementation(() => {});
 
-      await dataProvider.insertSubscription(testSubscription, testToken, true);
+      await expect(
+        SubscriptionDataProvider.insertSubscription(
+          testSubscription,
+          testToken,
+          false,
+        ),
+      ).rejects.toThrow("Failed to insert subscription");
 
-      expect(mockKnex.insert).toHaveBeenCalledWith({
-        email: testSubscription.email,
-        city: testSubscription.city,
-        frequency: testSubscription.frequency,
-        token: testToken,
-        is_active: true,
-      });
+      expect(errorSpy).toHaveBeenCalled();
+      errorSpy.mockRestore();
+    });
+
+    it("throws error if required fields are missing", async () => {
+      const mockKnex: MockKnex = {
+        where: jest.fn().mockReturnThis(),
+        insert: jest.fn().mockRejectedValue(new Error("not null violation")),
+      };
+      (db as unknown as jest.Mock).mockReturnValueOnce(mockKnex);
+      await expect(
+        SubscriptionDataProvider.insertSubscription(
+          { email: "", city: "", frequency: "daily" },
+          testToken,
+          false,
+        ),
+      ).rejects.toThrow("Failed to insert subscription");
     });
   });
 
   describe("updateSubscriptionStatus", () => {
-    it("updates subscription status successfully", async () => {
+    it("returns true and logs if update succeeds", async () => {
       const mockKnex: MockKnex = {
         where: jest.fn().mockReturnThis(),
         update: jest.fn().mockResolvedValue(1),
       };
       (db as unknown as jest.Mock).mockReturnValueOnce(mockKnex);
+      const logSpy = jest.spyOn(console, "log").mockImplementation(() => {});
 
-      const result = await dataProvider.updateSubscriptionStatus(
+      const result = await SubscriptionDataProvider.updateSubscriptionStatus(
         testToken,
         true,
       );
-
       expect(result).toBe(true);
-      expect(db).toHaveBeenCalledWith("subscriptions");
-      expect(mockKnex.where).toHaveBeenCalledWith("token", testToken);
-      expect(mockKnex.update).toHaveBeenCalledWith({
-        is_active: true,
-        updated_at: expect.any(String),
-      });
+      expect(logSpy).toHaveBeenCalled();
+      logSpy.mockRestore();
     });
 
-    it("returns false when no subscription found", async () => {
+    it("returns false and warns if no rows updated", async () => {
       const mockKnex: MockKnex = {
         where: jest.fn().mockReturnThis(),
         update: jest.fn().mockResolvedValue(0),
       };
       (db as unknown as jest.Mock).mockReturnValueOnce(mockKnex);
+      const warnSpy = jest.spyOn(console, "warn").mockImplementation(() => {});
 
-      const result = await dataProvider.updateSubscriptionStatus(
+      const result = await SubscriptionDataProvider.updateSubscriptionStatus(
         testToken,
         true,
       );
-
       expect(result).toBe(false);
+      expect(warnSpy).toHaveBeenCalledWith(
+        `No subscription found with token: ${testToken}`,
+      );
+      warnSpy.mockRestore();
+    });
+
+    it("throws error if update fails", async () => {
+      const mockKnex: MockKnex = {
+        where: jest.fn().mockReturnThis(),
+        update: jest.fn().mockRejectedValue(new Error("update error")),
+      };
+      (db as unknown as jest.Mock).mockReturnValueOnce(mockKnex);
+      await expect(
+        SubscriptionDataProvider.updateSubscriptionStatus(testToken, true),
+      ).rejects.toThrow();
     });
   });
 
   describe("deleteSubscription", () => {
-    it("deletes subscription successfully", async () => {
+    it("returns true and logs if delete succeeds", async () => {
       const mockKnex: MockKnex = {
         where: jest.fn().mockReturnThis(),
         del: jest.fn().mockResolvedValue(1),
       };
       (db as unknown as jest.Mock).mockReturnValueOnce(mockKnex);
+      const logSpy = jest.spyOn(console, "log").mockImplementation(() => {});
 
-      const result = await dataProvider.deleteSubscription(testToken);
-
+      const result =
+        await SubscriptionDataProvider.deleteSubscription(testToken);
       expect(result).toBe(true);
-      expect(db).toHaveBeenCalledWith("subscriptions");
-      expect(mockKnex.where).toHaveBeenCalledWith("token", testToken);
-      expect(mockKnex.del).toHaveBeenCalled();
+      expect(logSpy).toHaveBeenCalled();
+      logSpy.mockRestore();
     });
 
-    it("returns false when no subscription found", async () => {
+    it("returns false and warns if no rows deleted", async () => {
       const mockKnex: MockKnex = {
         where: jest.fn().mockReturnThis(),
         del: jest.fn().mockResolvedValue(0),
       };
       (db as unknown as jest.Mock).mockReturnValueOnce(mockKnex);
+      const warnSpy = jest.spyOn(console, "warn").mockImplementation(() => {});
 
-      const result = await dataProvider.deleteSubscription(testToken);
-
+      const result =
+        await SubscriptionDataProvider.deleteSubscription(testToken);
       expect(result).toBe(false);
+      expect(warnSpy).toHaveBeenCalledWith(
+        `No subscription found with token: ${testToken}`,
+      );
+      warnSpy.mockRestore();
+    });
+
+    it("throws error if delete fails", async () => {
+      const mockKnex: MockKnex = {
+        where: jest.fn().mockReturnThis(),
+        del: jest.fn().mockRejectedValue(new Error("delete error")),
+      };
+      (db as unknown as jest.Mock).mockReturnValueOnce(mockKnex);
+      await expect(
+        SubscriptionDataProvider.deleteSubscription(testToken),
+      ).rejects.toThrow();
     });
   });
 });

@@ -8,15 +8,16 @@ COPY knexfile.cjs ./
 COPY .env.docker ./
 COPY jest.config.js ./
 
-RUN npm ci --omit=dev
+RUN apt-get update && apt-get install -y netcat-openbsd
+
+RUN npm ci
 
 COPY src ./src
 COPY db ./db
-
-RUN npm run build
+COPY tests ./tests
 
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
 ENTRYPOINT ["/entrypoint.sh"]
-CMD ["npm", "run", "start"]
+CMD ["npm", "run", "test:integration"]

@@ -1,7 +1,7 @@
 import { config } from "../config.js";
 import buildDevLogger from "./dev-logger.js";
 import buildProdLogger from "./prod-logger.js";
-import type { Logger } from "winston";
+import { Logger } from "winston";
 
 let baseLogger: Logger;
 if (config.NODE_ENV === "development") {

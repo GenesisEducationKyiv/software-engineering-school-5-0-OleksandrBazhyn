@@ -42,19 +42,3 @@ export class CityNotFound extends Error {
     Object.setPrototypeOf(this, CityNotFound.prototype);
   }
 }
-
-export class WeatherServiceError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = "WeatherServiceError";
-    Object.setPrototypeOf(this, WeatherServiceError.prototype);
-  }
-}
-
-export class EmailServiceError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = "EmailServiceError";
-    Object.setPrototypeOf(this, EmailServiceError.prototype);
-  }
-}
