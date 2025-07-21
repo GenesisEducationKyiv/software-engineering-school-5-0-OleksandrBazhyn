@@ -17,9 +17,12 @@ export class SubscriptionController {
   async subscribe(req: Request, res: Response): Promise<void> {
     try {
       this.logger.info("Subscription request received", {
-        email: req.body.email,
+        email: req.body.email?.substring(0, 5) + "***", // Mask email
         city: req.body.city,
         frequency: req.body.frequency,
+        ip: req.ip,
+        userAgent: req.get("User-Agent")?.substring(0, 50),
+        requestId: req.headers["x-request-id"] || "unknown",
       });
 
       const validationError = validateSubscriptionInput(req.body);
@@ -30,11 +33,10 @@ export class SubscriptionController {
 
       const subscriptionInput = req.body as SubscriptionInput;
 
-      const result = await this.subscriptionService.subscribe(subscriptionInput);
+      await this.subscriptionService.subscribe(subscriptionInput);
 
       res.status(201).json({
         message: "Subscription successful. Confirmation email sent.",
-        token: result.token,
       });
     } catch (error) {
       this.handleSubscriptionError(error, res);

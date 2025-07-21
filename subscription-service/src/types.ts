@@ -131,3 +131,16 @@ export interface HealthResponse {
   };
   timestamp: string;
 }
+
+export interface ValidationResult {
+  isValid: boolean;
+  errors: string[];
+  field?: string;
+}
+
+export interface UnvalidatedSubscriptionInput {
+  email?: unknown;
+  city?: unknown;
+  frequency?: unknown;
+  [key: string]: unknown;
+}
