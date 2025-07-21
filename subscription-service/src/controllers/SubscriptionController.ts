@@ -5,23 +5,23 @@ import {
   NotConfirmedError,
   InvalidTokenError,
 } from "../errors/SubscriptionError.js";
-import { createLogger } from "../logger/index.js";
 import { validateSubscriptionInput } from "../validators/SubscriptionValidator.js";
-
-const logger = createLogger("SubscriptionController");
+import { Logger } from "winston";
 
 export class SubscriptionController {
-  constructor(private subscriptionService: SubscriptionServiceInterface) {}
+  constructor(
+    private subscriptionService: SubscriptionServiceInterface,
+    private logger: Logger,
+  ) {}
 
   async subscribe(req: Request, res: Response): Promise<void> {
     try {
-      logger.info("Subscription request received", {
+      this.logger.info("Subscription request received", {
         email: req.body.email,
         city: req.body.city,
         frequency: req.body.frequency,
       });
 
-      // Валідація через окремий валідатор
       const validationError = validateSubscriptionInput(req.body);
       if (validationError) {
         res.status(400).json({ error: validationError });
@@ -34,7 +34,7 @@ export class SubscriptionController {
 
       res.status(201).json({
         message: "Subscription successful. Confirmation email sent.",
-        token: result.token, // Можна повернути для тестування
+        token: result.token,
       });
     } catch (error) {
       this.handleSubscriptionError(error, res);
@@ -95,7 +95,7 @@ export class SubscriptionController {
     } else if (error instanceof InvalidTokenError) {
       res.status(400).json({ error: error.message });
     } else {
-      logger.error("Subscription error:", error);
+      this.logger.error("Subscription error:", error);
       res.status(500).json({ error: "Internal server error" });
     }
   }
@@ -104,7 +104,7 @@ export class SubscriptionController {
     if (error instanceof NotConfirmedError || error instanceof InvalidTokenError) {
       res.status(400).json({ error: error.message });
     } else {
-      logger.error("Confirmation error:", error);
+      this.logger.error("Confirmation error:", error);
       res.status(500).json({ error: "Internal server error" });
     }
   }
@@ -113,7 +113,7 @@ export class SubscriptionController {
     if (error instanceof InvalidTokenError) {
       res.status(400).json({ error: error.message });
     } else {
-      logger.error("Unsubscribe error:", error);
+      this.logger.error("Unsubscribe error:", error);
       res.status(500).json({ error: "Internal server error" });
     }
   }
