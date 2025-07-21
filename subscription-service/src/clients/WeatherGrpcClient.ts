@@ -7,8 +7,8 @@ import {
   WeatherResponse,
   WeatherServiceClient,
   WeatherProtoGrpcObject,
-  HealthCheckRequest,
-  HealthCheckResponse,
+  GrpcHealthRequest,
+  GrpcHealthResponse,
 } from "../types";
 import { Logger } from "winston";
 import { WeatherGrpcClientInterface } from "../types.js";
@@ -94,9 +94,11 @@ export class WeatherGrpcClient implements WeatherGrpcClientInterface {
         resolve(false);
       }, 3000);
 
+      const request: GrpcHealthRequest = { service: "weather" };
+
       this.client.HealthCheck(
-        { service: "weather" },
-        (error: grpc.ServiceError | null, response: HealthCheckResponse) => {
+        request,
+        (error: grpc.ServiceError | null, response: GrpcHealthResponse) => {
           clearTimeout(timeout);
 
           if (error) {

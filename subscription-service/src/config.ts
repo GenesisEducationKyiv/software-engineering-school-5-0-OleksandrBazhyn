@@ -48,4 +48,10 @@ export const config = {
   WEATHER_SERVICE_URL: required("WEATHER_SERVICE_URL", process.env.WEATHER_SERVICE_URL),
   EMAIL_SERVICE_URL: required("EMAIL_SERVICE_URL", process.env.EMAIL_SERVICE_URL),
   NPM_PACKAGE_VERSION: required("NPM_PACKAGE_VERSION", process.env.npm_package_version),
+  email: {
+    timeout: Number(process.env.EMAIL_SERVICE_TIMEOUT) || 10000,
+  },
+  health: {
+    timeout: Number(process.env.HEALTH_CHECK_TIMEOUT) || 3000,
+  },
 };
