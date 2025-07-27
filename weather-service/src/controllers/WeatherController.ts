@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { WeatherProviderManagerInterface, WeatherData, WeatherResponse } from "../types.js";
-import { CityNotFound } from "../errors/SubscriptionError.js";
+import { CityNotFound } from "../errors/index.js";
 import { createLogger } from "../logger/index.js";
 
 const logger = createLogger("WeatherController");

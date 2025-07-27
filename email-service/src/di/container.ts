@@ -29,10 +29,7 @@ class Container {
 
   get emailController(): EmailController {
     if (!this._emailController) {
-      this._emailController = new EmailController(
-        createLogger("EmailController"),
-        this.emailQueue,
-      );
+      this._emailController = new EmailController(createLogger("EmailController"), this.emailQueue);
     }
     return this._emailController;
   }
