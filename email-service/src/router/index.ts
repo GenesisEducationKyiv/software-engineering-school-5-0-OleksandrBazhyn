@@ -4,8 +4,19 @@ const router = Router();
 
 const emailController = container.emailController;
 
-router.post("/send", (req: Request, res: Response) => {
-  emailController.sendConfirmationEmail(req, res);
+router.post("/send", async (req: Request, res: Response) => {
+  if (req.body.confirmUrl) {
+    await emailController.sendConfirmationEmail(req, res);
+  } else if (
+    req.body.temperature !== undefined &&
+    req.body.humidity !== undefined &&
+    req.body.description &&
+    req.body.unsubscribeUrl
+  ) {
+    await emailController.sendWeatherEmail(req, res);
+  } else {
+    res.status(400).json({ error: "Invalid email payload" });
+  }
 });
 
 router.get("/health", (req: Request, res: Response) => {

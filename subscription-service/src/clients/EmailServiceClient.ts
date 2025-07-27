@@ -3,24 +3,27 @@ import {
   EmailServiceInterface,
   ConfirmationEmailRequest,
   WeatherEmailRequest,
-  HttpHealthResponse,        // ✅ Specific HTTP health type
-  EmailServiceResponse,      // ✅ Unified response type
-  EmailRequest,              // ✅ Legacy compatibility
+  HttpHealthResponse,
+  EmailServiceResponse,
+  EmailRequest,
 } from "../types.js";
-import { createLogger } from "../logger/index.js";
 import { config } from "../config.js";
+import { Logger } from "winston";
 
 export class EmailServiceClient implements EmailServiceInterface {
   private client: AxiosInstance;
-  private logger = createLogger("EmailServiceClient");
+  private baseURL: string;
+  private logger: Logger;
 
-  constructor(private baseURL: string) {
+  constructor(baseURL: string, logger: Logger) {
+    this.baseURL = baseURL;
+    this.logger = logger;
     this.client = axios.create({
       baseURL,
       timeout: config.email?.timeout || 10000,
       headers: {
         "Content-Type": "application/json",
-        "User-Agent": `${config.SERVICE_NAME}/${config.SERVICE_VERSION}`,
+        "User-Agent": `subscription-service/${config.NPM_PACKAGE_VERSION}`,
       },
     });
 
@@ -30,10 +33,9 @@ export class EmailServiceClient implements EmailServiceInterface {
   async sendConfirmationEmail(email: string, city: string, confirmUrl: string): Promise<boolean> {
     const request: ConfirmationEmailRequest = {
       email,
-      city, 
+      city,
       confirmUrl,
     };
-
     return this.sendEmailRequest("/api/v1/emails/send", request, "confirmation");
   }
 
@@ -43,7 +45,7 @@ export class EmailServiceClient implements EmailServiceInterface {
     temperature: number,
     humidity: number,
     description: string,
-    unsubscribeUrl: string
+    unsubscribeUrl: string,
   ): Promise<boolean> {
     const request: WeatherEmailRequest = {
       email,
@@ -53,20 +55,17 @@ export class EmailServiceClient implements EmailServiceInterface {
       description,
       unsubscribeUrl,
     };
-
     return this.sendEmailRequest("/api/v1/emails/send", request, "weather");
   }
 
-  // ✅ Legacy compatibility method
   async sendEmail(request: EmailRequest): Promise<boolean> {
     if (request.type === "confirmation") {
       return this.sendConfirmationEmail(
         request.to,
         request.data.city || "Unknown",
-        request.data.confirmationLink || "#"
+        request.data.confirmationLink || "#",
       );
-    } 
-    
+    }
     if (request.type === "weather-update") {
       return this.sendWeatherEmail(
         request.to,
@@ -74,33 +73,27 @@ export class EmailServiceClient implements EmailServiceInterface {
         request.data.temperature || 0,
         request.data.humidity || 0,
         request.data.description || "No description",
-        "#" // unsubscribe URL not in legacy format
+        "#",
       );
     }
-
-    this.logger.error("Unsupported email type:", request.type);
+    this.logger.error("Unsupported email type:", { type: request.type });
     return false;
   }
 
   async healthCheck(): Promise<boolean> {
     try {
-      this.logger.debug("Performing health check on email service");
-      
-      // ✅ Use specific HTTP health response type
+      this.logger.debug("Checking email service health");
       const response = await this.client.get<HttpHealthResponse>("/api/v1/emails/health", {
         timeout: config.health?.timeout || 3000,
       });
-
-      const isHealthy = response.status === 200 && 
-                       response.data?.status === "Email service is healthy";
-
+      const isHealthy =
+        response.status === 200 && response.data?.status === "Email service is healthy";
       if (!isHealthy) {
         this.logger.warn("Email service health check failed", {
           status: response.status,
           responseStatus: response.data?.status,
         });
       }
-
       return isHealthy;
     } catch (error) {
       this.logger.warn("Email service health check error:", {
@@ -114,45 +107,39 @@ export class EmailServiceClient implements EmailServiceInterface {
   private async sendEmailRequest(
     endpoint: string,
     request: ConfirmationEmailRequest | WeatherEmailRequest,
-    type: string
+    type: string,
   ): Promise<boolean> {
-    // Validate request
     const validationError = this.validateEmailRequest(request, type);
     if (validationError) {
       this.logger.error("Invalid email request:", {
         error: validationError,
         type,
-        email: request.email?.substring(0, 5) + "***",
+        email: this.maskEmail(request.email),
       });
       return false;
     }
-
     try {
-      this.logger.info("Sending email", {
+      this.logger.info("Sending email request", {
         type,
-        email: request.email.substring(0, 5) + "***",
+        email: this.maskEmail(request.email),
         city: request.city,
       });
-
       const response = await this.client.post<EmailServiceResponse>(endpoint, request);
-
-      // ✅ Email service returns 202 for queued emails
       if (response.status === 202) {
         this.logger.info("Email queued successfully", {
           type,
-          email: request.email.substring(0, 5) + "***",
+          email: this.maskEmail(request.email),
           message: response.data?.message,
         });
         return true;
       }
-
       this.logger.warn("Email service returned unexpected status", {
         status: response.status,
         message: response.data?.message,
         type,
+        email: this.maskEmail(request.email),
       });
       return false;
-
     } catch (error) {
       this.handleEmailError(error, request, type);
       return false;
@@ -161,34 +148,30 @@ export class EmailServiceClient implements EmailServiceInterface {
 
   private validateEmailRequest(
     request: ConfirmationEmailRequest | WeatherEmailRequest,
-    type: string
+    type: string,
   ): string | null {
     if (!request.email?.trim()) {
       return "Missing or empty email";
     }
-
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(request.email)) {
       return "Invalid email format";
     }
-
     if (!request.city?.trim()) {
       return "Missing or empty city";
     }
-
     if (type === "confirmation") {
       const confirmReq = request as ConfirmationEmailRequest;
       if (!confirmReq.confirmUrl?.trim()) {
         return "Missing confirmation URL";
       }
     }
-
     if (type === "weather") {
       const weatherReq = request as WeatherEmailRequest;
-      if (weatherReq.temperature === null || weatherReq.temperature === undefined) {
-        return "Missing temperature";
+      if (typeof weatherReq.temperature !== "number") {
+        return "Missing or invalid temperature";
       }
-      if (weatherReq.humidity === null || weatherReq.humidity === undefined) {
-        return "Missing humidity";
+      if (typeof weatherReq.humidity !== "number") {
+        return "Missing or invalid humidity";
       }
       if (!weatherReq.description?.trim()) {
         return "Missing weather description";
@@ -197,47 +180,56 @@ export class EmailServiceClient implements EmailServiceInterface {
         return "Missing unsubscribe URL";
       }
     }
-
     return null;
   }
 
   private handleEmailError(
     error: unknown,
     request: ConfirmationEmailRequest | WeatherEmailRequest,
-    type: string
+    type: string,
   ): void {
+    const emailMask = this.maskEmail(request.email);
     if (axios.isAxiosError(error)) {
       const axiosError = error as AxiosError;
-      
-      if (axiosError.code === 'ECONNREFUSED') {
-        this.logger.error("Email service is not available", {
-          baseURL: this.baseURL,
-          type,
-          email: request.email.substring(0, 5) + "***",
-        });
-      } else if (axiosError.code === 'ETIMEDOUT') {
-        this.logger.error("Email service request timed out", {
-          timeout: this.client.defaults.timeout,
-          type,
-          email: request.email.substring(0, 5) + "***",
-        });
-      } else {
-        this.logger.error("Email service request failed", {
-          status: axiosError.response?.status,
-          statusText: axiosError.response?.statusText,
-          message: axiosError.message,
-          responseData: axiosError.response?.data,
-          type,
-          email: request.email.substring(0, 5) + "***",
-        });
+      switch (axiosError.code) {
+        case "ECONNREFUSED":
+          this.logger.error("Email service is unavailable", {
+            baseURL: this.baseURL,
+            type,
+            email: emailMask,
+          });
+          break;
+        case "ETIMEDOUT":
+          this.logger.error("Email service request timed out", {
+            timeout: this.client.defaults.timeout,
+            type,
+            email: emailMask,
+          });
+          break;
+        default:
+          this.logger.error("Email service request failed", {
+            status: axiosError.response?.status,
+            statusText: axiosError.response?.statusText,
+            message: axiosError.message,
+            responseData: axiosError.response?.data,
+            type,
+            email: emailMask,
+          });
       }
     } else {
       this.logger.error("Unexpected error sending email", {
         error: error instanceof Error ? error.message : String(error),
         type,
-        email: request.email.substring(0, 5) + "***",
+        email: emailMask,
       });
     }
+  }
+
+  private maskEmail(email: string): string {
+    if (!email || email.length < 5) {
+      return "***";
+    }
+    return email.substring(0, 3) + "***@" + email.split("@")[1];
   }
 
   private setupInterceptors(): void {
@@ -246,16 +238,22 @@ export class EmailServiceClient implements EmailServiceInterface {
         this.logger.debug("Email service request", {
           method: config.method?.toUpperCase(),
           url: `${config.baseURL}${config.url}`,
+          timestamp: new Date().toISOString(),
         });
         return config;
-      }
+      },
+      (error) => {
+        this.logger.error("Email service request setup failed:", error);
+        return Promise.reject(error);
+      },
     );
-
     this.client.interceptors.response.use(
       (response) => {
         this.logger.debug("Email service response", {
           status: response.status,
+          statusText: response.statusText,
           url: response.config.url,
+          timestamp: new Date().toISOString(),
         });
         return response;
       },
@@ -263,11 +261,13 @@ export class EmailServiceClient implements EmailServiceInterface {
         if (axios.isAxiosError(error)) {
           this.logger.debug("Email service error response", {
             status: error.response?.status,
+            statusText: error.response?.statusText,
             url: error.config?.url,
+            timestamp: new Date().toISOString(),
           });
         }
         return Promise.reject(error);
-      }
+      },
     );
   }
 }

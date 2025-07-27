@@ -51,7 +51,16 @@ export const config = {
   email: {
     timeout: Number(process.env.EMAIL_SERVICE_TIMEOUT) || 10000,
   },
+  weather: {
+    grpcUrl: process.env.WEATHER_GRPC_URL || "localhost:50051",
+    timeout: Number(process.env.WEATHER_TIMEOUT) || 5000,
+    protoPath: process.env.WEATHER_PROTO_PATH, // Optional override
+    keepaliveTime: Number(process.env.WEATHER_KEEPALIVE_TIME) || 30000,
+    keepaliveTimeout: Number(process.env.WEATHER_KEEPALIVE_TIMEOUT) || 3000,
+    retries: Number(process.env.WEATHER_RETRIES) || 3,
+  },
   health: {
     timeout: Number(process.env.HEALTH_CHECK_TIMEOUT) || 3000,
+    interval: Number(process.env.HEALTH_CHECK_INTERVAL) || 30000,
   },
-};
+} as const;

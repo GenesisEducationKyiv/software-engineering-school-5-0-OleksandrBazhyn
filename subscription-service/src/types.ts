@@ -2,7 +2,6 @@ import * as grpc from "@grpc/grpc-js";
 
 export type SubscriptionFrequency = "daily" | "hourly";
 
-// ✅ Subscription types
 export interface Subscription {
   id: string;
   email: string;
@@ -21,22 +20,24 @@ export interface SubscriptionInput {
 }
 
 export interface SubscriptionServiceInterface {
-  subscribe(subscription: SubscriptionInput): Promise<{ token: string; id: string }>;
+  subscribe(subscription: SubscriptionInput): Promise<{ token: string }>;
   confirm(token: string): Promise<boolean>;
   unsubscribe(token: string): Promise<boolean>;
 }
 
-// ✅ Database interface
 export interface DataProvider {
   checkSubscriptionExists(subscription: SubscriptionInput): Promise<boolean>;
-  insertSubscription(subscription: SubscriptionInput, token: string, confirmed: boolean): Promise<void>;
+  insertSubscription(
+    subscription: SubscriptionInput,
+    token: string,
+    confirmed: boolean,
+  ): Promise<void>;
   updateSubscriptionStatus(token: string, confirmed: boolean): Promise<boolean>;
   deleteSubscription(token: string): Promise<boolean>;
   getActiveSubscriptions(): Promise<Subscription[]>;
   getSubscriptionsByFrequency(frequency: SubscriptionFrequency): Promise<Subscription[]>;
 }
 
-// ✅ Validation types
 export interface ValidationResult {
   isValid: boolean;
   errors: string[];
@@ -50,39 +51,43 @@ export interface UnvalidatedSubscriptionInput {
   [key: string]: unknown;
 }
 
-// ✅ Weather service types (gRPC)
 export interface WeatherRequest {
   city: string;
 }
 
-export interface WeatherResponseData {
+export interface WeatherData {
   temperature: number;
-  description: string;
   humidity: number;
+  description: string;
+  city: string;
+  timestamp: number;
 }
 
 export interface WeatherResponse {
   success: boolean;
-  data?: WeatherResponseData;
-  error_message?: string;
+  error_message: string;
+  data: WeatherData | null;
 }
 
-export interface WeatherData {
-  temperature: number;
-  description: string;
-  humidity: number;
+export interface WeatherBatchRequest {
+  cities: string[];
 }
 
-// ✅ gRPC Health Check (different from HTTP health)
+export interface WeatherBatchResponse {
+  success: boolean;
+  error_message: string;
+  data: WeatherData[];
+}
+
 export interface GrpcHealthRequest {
   service: string;
 }
 
 export interface GrpcHealthResponse {
-  status: number; // 0 = NOT_SERVING, 1 = SERVING
+  status: number; // 0=UNKNOWN, 1=SERVING, 2=NOT_SERVING, 3=SERVICE_UNKNOWN
+  message?: string;
 }
 
-// ✅ gRPC service interfaces
 export interface WeatherServiceClient extends grpc.Client {
   GetWeather(
     request: WeatherRequest,
@@ -97,7 +102,10 @@ export interface WeatherServiceClient extends grpc.Client {
 
 export interface WeatherProtoGrpcObject {
   weather: {
-    WeatherService: new (address: string, credentials: grpc.ChannelCredentials) => WeatherServiceClient;
+    WeatherService: new (
+      address: string,
+      credentials: grpc.ChannelCredentials,
+    ) => WeatherServiceClient;
   };
 }
 
@@ -107,7 +115,6 @@ export interface WeatherGrpcClientInterface {
   disconnect(): void;
 }
 
-// ✅ Email service types (HTTP)
 export interface ConfirmationEmailRequest {
   email: string;
   city: string;
@@ -123,9 +130,8 @@ export interface WeatherEmailRequest {
   unsubscribeUrl: string;
 }
 
-// ✅ HTTP responses
 export interface HttpHealthResponse {
-  status: string; // "Email service is healthy" etc.
+  status: string;
   timestamp?: string;
 }
 
@@ -134,7 +140,6 @@ export interface EmailServiceResponse {
   messageId?: string;
 }
 
-// ✅ Legacy email interface (for backward compatibility)
 export interface EmailRequest {
   to: string;
   subject: string;
@@ -145,11 +150,11 @@ export interface EmailRequest {
     temperature?: number;
     description?: string;
     humidity?: number;
+    unsubscribeLink?: string;
   };
 }
 
 export interface EmailServiceInterface {
-  // Modern specific methods
   sendConfirmationEmail(email: string, city: string, confirmUrl: string): Promise<boolean>;
   sendWeatherEmail(
     email: string,
@@ -157,15 +162,12 @@ export interface EmailServiceInterface {
     temperature: number,
     humidity: number,
     description: string,
-    unsubscribeUrl: string
+    unsubscribeUrl: string,
   ): Promise<boolean>;
-  
-  // Legacy generic method
   sendEmail(request: EmailRequest): Promise<boolean>;
   healthCheck(): Promise<boolean>;
 }
 
-// ✅ Health check types (unified)
 export interface ServiceHealthStatus {
   status: "up" | "down" | "unknown";
   responseTime?: number;

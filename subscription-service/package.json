@@ -28,7 +28,8 @@
     "node-cron": "^4.0.5",
     "pg": "^8.16.0",
     "uuid": "^11.1.0",
-    "winston": "^3.17.0"
+    "winston": "^3.17.0",
+    "grpc-shared": "file:../grpc-shared"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.1",

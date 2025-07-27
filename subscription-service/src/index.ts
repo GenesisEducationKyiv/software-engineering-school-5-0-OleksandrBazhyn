@@ -14,10 +14,7 @@ import { config } from "./config.js";
 const logger = createLogger("SubscriptionService");
 
 async function initializeClients() {
-  const weatherClient = new WeatherGrpcClient(
-    config.WEATHER_SERVICE_URL,
-    createLogger("WeatherClient"),
-  );
+  const weatherClient = new WeatherGrpcClient(config.weather.grpcUrl);
 
   const emailClient = new EmailServiceClient(config.EMAIL_SERVICE_URL, createLogger("EmailClient"));
 
