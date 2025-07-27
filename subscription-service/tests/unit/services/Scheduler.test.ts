@@ -1,5 +1,5 @@
 import cron from "node-cron";
-import Scheduler from "../../../src/services/scheduler/Scheduler.js";
+import { Scheduler } from "../../../src/services/scheduler/Scheduler.js";
 import { DataProvider } from "../../../src/types.js";
 import { Logger } from "winston";
 

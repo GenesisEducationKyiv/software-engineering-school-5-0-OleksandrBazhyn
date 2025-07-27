@@ -11,10 +11,13 @@ import { createLogger } from "./logger/index.js";
 import createApiRoutes from "./routes/api.js";
 import { config } from "./config.js";
 
-const logger = createLogger("SubscriptionService");
+const logger = createLogger("App");
 
 async function initializeClients() {
-  const weatherClient = new WeatherGrpcClient(config.weather.grpcUrl);
+  const weatherClient = new WeatherGrpcClient(
+    createLogger("WeatherClient"),
+    config.weather.grpcUrl,
+  );
 
   const emailClient = new EmailServiceClient(config.EMAIL_SERVICE_URL, createLogger("EmailClient"));
 
@@ -51,9 +54,10 @@ function initializeServices(weatherClient: WeatherGrpcClient, emailClient: Email
     subscriptionDataProvider,
     weatherClient,
     emailClient,
+    createLogger("SubscriptionService"),
   );
 
-  const scheduler = new WeatherScheduler(subscriptionService, weatherClient, emailClient);
+  const scheduler = new WeatherScheduler(subscriptionService, createLogger("WeatherScheduler"));
 
   return {
     subscriptionDataProvider,
@@ -108,10 +112,6 @@ function setupGracefulShutdown(
       // Stop accepting new connections
       server.close(async () => {
         logger.info("HTTP server closed");
-
-        // Stop scheduler first
-        scheduler.stopScheduler();
-        logger.info("Scheduler stopped");
 
         // Close external connections
         weatherClient.disconnect();

@@ -12,18 +12,20 @@ import {
   GrpcHealthResponse,
   WeatherGrpcClientInterface,
 } from "../types.js";
-import { createLogger } from "../logger/index.js";
 import { config } from "../config.js";
+import { Logger } from "winston";
 
 export class WeatherGrpcClient implements WeatherGrpcClientInterface {
   private client: WeatherServiceClient | null = null;
   private isConnected = false;
-  private logger = createLogger("WeatherGrpcClient");
   private reconnectAttempts = 0;
   private reconnectTimeout?: NodeJS.Timeout;
   private readonly maxReconnectAttempts = 3;
 
-  constructor(private weatherServiceUrl: string = config.weather.grpcUrl) {}
+  constructor(
+    private logger: Logger,
+    private weatherServiceUrl: string = config.weather.grpcUrl,
+  ) {}
 
   async initialize(): Promise<void> {
     await this.initializeClient();

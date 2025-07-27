@@ -4,18 +4,20 @@ import {
   SubscriptionServiceInterface,
   Subscription,
   SubscriptionFrequency,
+  EmailRequest,
 } from "../../types.js";
 import { AlreadySubscribedError, InvalidTokenError } from "../../errors/SubscriptionError.js";
 import { WeatherGrpcClient } from "../../clients/WeatherGrpcClient.js";
-import { EmailServiceClient, EmailRequest } from "../../clients/EmailServiceClient.js";
-import { logger } from "../../logger/index.js";
+import { EmailServiceClient } from "../../clients/EmailServiceClient.js";
 import crypto from "crypto";
+import { Logger } from "winston";
 
 export class SubscriptionService implements SubscriptionServiceInterface {
   constructor(
     private dataProvider: DataProvider,
     private weatherClient: WeatherGrpcClient,
     private emailClient: EmailServiceClient,
+    private logger: Logger,
   ) {}
 
   async subscribe(subscription: SubscriptionInput): Promise<{ token: string }> {
@@ -41,13 +43,13 @@ export class SubscriptionService implements SubscriptionServiceInterface {
       await this.emailClient.sendEmail(emailRequest);
       return { token };
     } catch (error) {
-      logger.error("Error creating subscription:", error);
+      this.logger.error("Error creating subscription:", error);
       throw new Error("Failed to subscribe");
     }
   }
 
   async confirm(token: string): Promise<boolean> {
-    logger.info(`Confirming subscription with token: ${token}`);
+    this.logger.info(`Confirming subscription with token: ${token}`);
     const updated = await this.dataProvider.updateSubscriptionStatus(token, true);
     if (!updated) {
       throw new InvalidTokenError();
@@ -56,7 +58,7 @@ export class SubscriptionService implements SubscriptionServiceInterface {
   }
 
   async unsubscribe(token: string): Promise<boolean> {
-    logger.info(`Unsubscribing with token: ${token}`);
+    this.logger.info(`Unsubscribing with token: ${token}`);
     const deleted = await this.dataProvider.deleteSubscription(token);
     if (!deleted) {
       throw new InvalidTokenError();
@@ -70,14 +72,12 @@ export class SubscriptionService implements SubscriptionServiceInterface {
 
   async sendWeatherUpdateToSubscription(subscription: Subscription): Promise<void> {
     try {
-      // 1. Отримати погоду через gRPC
       const weatherData = await this.weatherClient.getWeather(subscription.city);
 
-      // 2. Відправити email через Email Service
-      const emailRequest = {
+      const emailRequest: EmailRequest = {
         to: subscription.email,
         subject: `Weather update for ${subscription.city}`,
-        type: "weather-update" as const,
+        type: "weather-update",
         data: {
           city: subscription.city,
           temperature: weatherData.temperature,
@@ -87,9 +87,9 @@ export class SubscriptionService implements SubscriptionServiceInterface {
       };
 
       await this.emailClient.sendEmail(emailRequest);
-      logger.info(`Weather update sent to ${subscription.email}`);
+      this.logger.info(`Weather update sent to ${subscription.email}`);
     } catch (error) {
-      logger.error(`Failed to send weather update to ${subscription.email}:`, error);
+      this.logger.error(`Failed to send weather update to ${subscription.email}:`, error);
       throw error;
     }
   }

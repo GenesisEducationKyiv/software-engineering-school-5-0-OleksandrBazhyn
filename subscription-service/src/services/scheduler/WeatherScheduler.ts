@@ -1,14 +1,11 @@
 import cron from "node-cron";
 import { SubscriptionService } from "../subscription/SubscriptionService.js";
-import { WeatherGrpcClient } from "../../clients/WeatherGrpcClient.js";
-import { EmailServiceClient } from "../../clients/EmailServiceClient.js";
-import { logger } from "../../logger/index.js";
+import { Logger } from "winston";
 
 export class WeatherScheduler {
   constructor(
     private subscriptionService: SubscriptionService,
-    private weatherClient: WeatherGrpcClient,
-    private emailClient: EmailServiceClient,
+    private logger: Logger,
   ) {}
 
   startScheduler(): void {
@@ -16,9 +13,9 @@ export class WeatherScheduler {
     cron.schedule("0 8 * * *", async () => {
       try {
         await this.sendWeatherUpdates("daily");
-        logger.info("Daily weather updates sent");
+        this.logger.info("Daily weather updates sent");
       } catch (error) {
-        logger.error("Failed to send daily updates:", error);
+        this.logger.error("Failed to send daily updates:", error);
       }
     });
 
@@ -26,9 +23,9 @@ export class WeatherScheduler {
     cron.schedule("0 * * * *", async () => {
       try {
         await this.sendWeatherUpdates("hourly");
-        logger.info("Hourly weather updates sent");
+        this.logger.info("Hourly weather updates sent");
       } catch (error) {
-        logger.error("Failed to send hourly updates:", error);
+        this.logger.error("Failed to send hourly updates:", error);
       }
     });
   }
@@ -41,18 +38,11 @@ export class WeatherScheduler {
         try {
           await this.subscriptionService.sendWeatherUpdateToSubscription(subscription);
         } catch (error) {
-          logger.error(`Failed to send update for ${subscription.email}:`, error);
+          this.logger.error(`Failed to send update for ${subscription.email}:`, error);
         }
       }
     } catch (error) {
-      logger.error(`Failed to get ${frequency} subscriptions:`, error);
+      this.logger.error(`Failed to get ${frequency} subscriptions:`, error);
     }
-  }
-
-  stopScheduler(): void {
-    cron.getTasks().forEach((task) => {
-      task.destroy();
-    });
-    logger.info("Weather scheduler stopped");
   }
 }
