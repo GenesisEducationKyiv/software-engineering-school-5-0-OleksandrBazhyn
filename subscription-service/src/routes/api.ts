@@ -5,6 +5,7 @@ import { SubscriptionServiceInterface } from "../types.js";
 import { WeatherGrpcClient } from "../clients/WeatherGrpcClient.js";
 import { EmailServiceClient } from "../clients/EmailServiceClient.js";
 import { createLogger } from "../logger/index.js";
+import client from "prom-client";
 
 export function createApiRoutes(
   subscriptionService: SubscriptionServiceInterface,
@@ -29,6 +30,13 @@ export function createApiRoutes(
 
   router.get("/health", (req, res) => healthController.checkExternalServices(req, res));
   router.get("/health/service", (req, res) => healthController.checkInternalService(req, res));
+
+  client.collectDefaultMetrics();
+
+  router.get("/metrics", async (req, res) => {
+    res.set("Content-Type", client.register.contentType);
+    res.end(await client.register.metrics());
+  });
 
   return router;
 }

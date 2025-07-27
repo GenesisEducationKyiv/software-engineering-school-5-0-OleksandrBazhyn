@@ -1,0 +1,13 @@
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: 'weather-service'
+    static_configs:
+      - targets: ['host.docker.internal:3003']
+  - job_name: 'subscription-service'
+    static_configs:
+      - targets: ['host.docker.internal:3000']
+  - job_name: 'email-service'
+    static_configs:
+      - targets: ['host.docker.internal:3002']
