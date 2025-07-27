@@ -1,0 +1,141 @@
+{
+  "timestamp": "2025-07-13T19:03:34.250Z",
+  "summary": {
+    "http": {
+      "healthChecks": {
+        "avg": 4.25538,
+        "min": 1.0692,
+        "max": 13.8351,
+        "successRate": 100,
+        "total": 5
+      },
+      "singleRequests": {
+        "avg": 99.42569999999999,
+        "min": 63.2453,
+        "max": 162.0392,
+        "successRate": 100,
+        "total": 3
+      },
+      "batchRequests": {
+        "avg": 48.052,
+        "min": 48.052,
+        "max": 48.052,
+        "successRate": 100,
+        "total": 1
+      }
+    },
+    "grpc": {
+      "healthChecks": {
+        "avg": 5.4443399999999995,
+        "min": 1.5821,
+        "max": 20.3649,
+        "successRate": 100,
+        "total": 5
+      },
+      "singleRequests": {
+        "avg": 48.2789,
+        "min": 42.2318,
+        "max": 57.5484,
+        "successRate": 100,
+        "total": 3
+      },
+      "batchRequests": {
+        "avg": 139.269,
+        "min": 139.269,
+        "max": 139.269,
+        "successRate": 100,
+        "total": 1
+      }
+    }
+  },
+  "detailed": {
+    "http": {
+      "healthChecks": [
+        {
+          "duration": 13.8351,
+          "success": true
+        },
+        {
+          "duration": 3.6901,
+          "success": true
+        },
+        {
+          "duration": 1.5754,
+          "success": true
+        },
+        {
+          "duration": 1.1071,
+          "success": true
+        },
+        {
+          "duration": 1.0692,
+          "success": true
+        }
+      ],
+      "singleRequests": [
+        {
+          "duration": 162.0392,
+          "success": true
+        },
+        {
+          "duration": 63.2453,
+          "success": true
+        },
+        {
+          "duration": 72.9926,
+          "success": true
+        }
+      ],
+      "batchRequests": [
+        {
+          "duration": 48.052,
+          "success": true
+        }
+      ]
+    },
+    "grpc": {
+      "healthChecks": [
+        {
+          "duration": 20.3649,
+          "success": true
+        },
+        {
+          "duration": 1.9723,
+          "success": true
+        },
+        {
+          "duration": 1.6469,
+          "success": true
+        },
+        {
+          "duration": 1.6555,
+          "success": true
+        },
+        {
+          "duration": 1.5821,
+          "success": true
+        }
+      ],
+      "singleRequests": [
+        {
+          "duration": 45.0565,
+          "success": true
+        },
+        {
+          "duration": 42.2318,
+          "success": true
+        },
+        {
+          "duration": 57.5484,
+          "success": true
+        }
+      ],
+      "batchRequests": [
+        {
+          "duration": 139.269,
+          "success": true
+        }
+      ]
+    }
+  }
+}

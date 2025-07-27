@@ -1,0 +1,1052 @@
+{
+  "timestamp": "2025-07-13T18:49:12.791Z",
+  "testConfiguration": {
+    "healthCheckIterations": 20,
+    "singleRequestIterations": 75,
+    "batchRequestIterations": 10,
+    "errorHandlingIterations": 10,
+    "cities": [
+      "Prague",
+      "London",
+      "Paris",
+      "Berlin",
+      "Madrid"
+    ],
+    "batchCities": [
+      "Prague",
+      "London",
+      "Paris",
+      "Berlin",
+      "Madrid",
+      "Rome"
+    ]
+  },
+  "summary": {
+    "http": {
+      "healthChecks": {
+        "avg": 1.8776149999999998,
+        "min": 0.6489,
+        "max": 15.0194,
+        "median": 1.0262,
+        "p95": 15.0194,
+        "successRate": 100,
+        "total": 20,
+        "stdDev": 3.1074688394696732
+      },
+      "singleRequests": {
+        "avg": 45.355925333333346,
+        "min": 39.0946,
+        "max": 140.6348,
+        "median": 40.7639,
+        "p95": 81.0402,
+        "successRate": 100,
+        "total": 75,
+        "stdDev": 16.268442679036355
+      },
+      "batchRequests": {
+        "avg": 50.086130000000004,
+        "min": 44.2009,
+        "max": 67.2444,
+        "median": 49.7481,
+        "p95": 67.2444,
+        "successRate": 100,
+        "total": 10,
+        "stdDev": 6.277361682275444
+      },
+      "errorHandling": {
+        "avg": 90.98698999999999,
+        "min": 71.6687,
+        "max": 257.4941,
+        "median": 72.1942,
+        "p95": 257.4941,
+        "successRate": 0,
+        "total": 10,
+        "stdDev": 55.50943135735495
+      }
+    },
+    "grpc": {
+      "healthChecks": {
+        "avg": 2.5031999999999996,
+        "min": 1.0539,
+        "max": 21.1766,
+        "median": 1.4404,
+        "p95": 21.1766,
+        "successRate": 100,
+        "total": 20,
+        "stdDev": 4.301379773514541
+      },
+      "singleRequests": {
+        "avg": 41.27096133333333,
+        "min": 39.1397,
+        "max": 83.7179,
+        "median": 40.1634,
+        "p95": 44.267,
+        "successRate": 100,
+        "total": 75,
+        "stdDev": 5.155355298170201
+      },
+      "batchRequests": {
+        "avg": 55.003009999999996,
+        "min": 42.8315,
+        "max": 149.9517,
+        "median": 44.0466,
+        "p95": 149.9517,
+        "successRate": 100,
+        "total": 10,
+        "stdDev": 31.691563640263947
+      },
+      "errorHandling": {
+        "avg": 72.90974000000001,
+        "min": 71.3535,
+        "max": 77.5087,
+        "median": 71.6106,
+        "p95": 77.5087,
+        "successRate": 100,
+        "total": 10,
+        "stdDev": 2.116488395526893
+      }
+    }
+  },
+  "detailed": {
+    "http": {
+      "healthChecks": [
+        {
+          "duration": 15.0194,
+          "success": true
+        },
+        {
+          "duration": 4.0312,
+          "success": true
+        },
+        {
+          "duration": 1.7095,
+          "success": true
+        },
+        {
+          "duration": 1.3392,
+          "success": true
+        },
+        {
+          "duration": 1.2468,
+          "success": true
+        },
+        {
+          "duration": 1.1412,
+          "success": true
+        },
+        {
+          "duration": 1.2368,
+          "success": true
+        },
+        {
+          "duration": 1.0262,
+          "success": true
+        },
+        {
+          "duration": 2.09,
+          "success": true
+        },
+        {
+          "duration": 1.351,
+          "success": true
+        },
+        {
+          "duration": 0.8476,
+          "success": true
+        },
+        {
+          "duration": 0.7224,
+          "success": true
+        },
+        {
+          "duration": 0.7554,
+          "success": true
+        },
+        {
+          "duration": 0.7417,
+          "success": true
+        },
+        {
+          "duration": 0.6489,
+          "success": true
+        },
+        {
+          "duration": 0.6558,
+          "success": true
+        },
+        {
+          "duration": 0.824,
+          "success": true
+        },
+        {
+          "duration": 0.7071,
+          "success": true
+        },
+        {
+          "duration": 0.7209,
+          "success": true
+        },
+        {
+          "duration": 0.7372,
+          "success": true
+        }
+      ],
+      "singleRequests": [
+        {
+          "duration": 140.6348,
+          "success": true
+        },
+        {
+          "duration": 40.5738,
+          "success": true
+        },
+        {
+          "duration": 40.534,
+          "success": true
+        },
+        {
+          "duration": 41.704,
+          "success": true
+        },
+        {
+          "duration": 42.0977,
+          "success": true
+        },
+        {
+          "duration": 43.7355,
+          "success": true
+        },
+        {
+          "duration": 42.3746,
+          "success": true
+        },
+        {
+          "duration": 42.3342,
+          "success": true
+        },
+        {
+          "duration": 40.669,
+          "success": true
+        },
+        {
+          "duration": 40.5939,
+          "success": true
+        },
+        {
+          "duration": 40.3157,
+          "success": true
+        },
+        {
+          "duration": 41.6121,
+          "success": true
+        },
+        {
+          "duration": 40.2943,
+          "success": true
+        },
+        {
+          "duration": 39.809,
+          "success": true
+        },
+        {
+          "duration": 39.8666,
+          "success": true
+        },
+        {
+          "duration": 42.3329,
+          "success": true
+        },
+        {
+          "duration": 88.7541,
+          "success": true
+        },
+        {
+          "duration": 40.0962,
+          "success": true
+        },
+        {
+          "duration": 39.6611,
+          "success": true
+        },
+        {
+          "duration": 40.7639,
+          "success": true
+        },
+        {
+          "duration": 81.0402,
+          "success": true
+        },
+        {
+          "duration": 39.6851,
+          "success": true
+        },
+        {
+          "duration": 40.3304,
+          "success": true
+        },
+        {
+          "duration": 42.3416,
+          "success": true
+        },
+        {
+          "duration": 39.5976,
+          "success": true
+        },
+        {
+          "duration": 115.1776,
+          "success": true
+        },
+        {
+          "duration": 43.2778,
+          "success": true
+        },
+        {
+          "duration": 40.0356,
+          "success": true
+        },
+        {
+          "duration": 39.0946,
+          "success": true
+        },
+        {
+          "duration": 39.4634,
+          "success": true
+        },
+        {
+          "duration": 40.8477,
+          "success": true
+        },
+        {
+          "duration": 39.4661,
+          "success": true
+        },
+        {
+          "duration": 43.5688,
+          "success": true
+        },
+        {
+          "duration": 41.4527,
+          "success": true
+        },
+        {
+          "duration": 40.9099,
+          "success": true
+        },
+        {
+          "duration": 40.6917,
+          "success": true
+        },
+        {
+          "duration": 39.1273,
+          "success": true
+        },
+        {
+          "duration": 39.8089,
+          "success": true
+        },
+        {
+          "duration": 39.8923,
+          "success": true
+        },
+        {
+          "duration": 41.0409,
+          "success": true
+        },
+        {
+          "duration": 40.9092,
+          "success": true
+        },
+        {
+          "duration": 78.9462,
+          "success": true
+        },
+        {
+          "duration": 39.792,
+          "success": true
+        },
+        {
+          "duration": 42.8482,
+          "success": true
+        },
+        {
+          "duration": 40.3174,
+          "success": true
+        },
+        {
+          "duration": 41.5607,
+          "success": true
+        },
+        {
+          "duration": 45.7808,
+          "success": true
+        },
+        {
+          "duration": 40.032,
+          "success": true
+        },
+        {
+          "duration": 40.3271,
+          "success": true
+        },
+        {
+          "duration": 42.4503,
+          "success": true
+        },
+        {
+          "duration": 40.1246,
+          "success": true
+        },
+        {
+          "duration": 40.9933,
+          "success": true
+        },
+        {
+          "duration": 40.4771,
+          "success": true
+        },
+        {
+          "duration": 39.6488,
+          "success": true
+        },
+        {
+          "duration": 41.5274,
+          "success": true
+        },
+        {
+          "duration": 42.5015,
+          "success": true
+        },
+        {
+          "duration": 39.8283,
+          "success": true
+        },
+        {
+          "duration": 40.1056,
+          "success": true
+        },
+        {
+          "duration": 39.6116,
+          "success": true
+        },
+        {
+          "duration": 41.2154,
+          "success": true
+        },
+        {
+          "duration": 58.6543,
+          "success": true
+        },
+        {
+          "duration": 42.2752,
+          "success": true
+        },
+        {
+          "duration": 40.0211,
+          "success": true
+        },
+        {
+          "duration": 40.2955,
+          "success": true
+        },
+        {
+          "duration": 41.2328,
+          "success": true
+        },
+        {
+          "duration": 40.9236,
+          "success": true
+        },
+        {
+          "duration": 39.3278,
+          "success": true
+        },
+        {
+          "duration": 40.2134,
+          "success": true
+        },
+        {
+          "duration": 49.1301,
+          "success": true
+        },
+        {
+          "duration": 45.9665,
+          "success": true
+        },
+        {
+          "duration": 42.8993,
+          "success": true
+        },
+        {
+          "duration": 39.7107,
+          "success": true
+        },
+        {
+          "duration": 43.6992,
+          "success": true
+        },
+        {
+          "duration": 40.7208,
+          "success": true
+        },
+        {
+          "duration": 42.019,
+          "success": true
+        }
+      ],
+      "batchRequests": [
+        {
+          "duration": 51.5079,
+          "success": true
+        },
+        {
+          "duration": 44.4879,
+          "success": true
+        },
+        {
+          "duration": 67.2444,
+          "success": true
+        },
+        {
+          "duration": 44.2009,
+          "success": true
+        },
+        {
+          "duration": 50.7609,
+          "success": true
+        },
+        {
+          "duration": 48.6175,
+          "success": true
+        },
+        {
+          "duration": 46.0706,
+          "success": true
+        },
+        {
+          "duration": 46.7772,
+          "success": true
+        },
+        {
+          "duration": 49.7481,
+          "success": true
+        },
+        {
+          "duration": 51.4459,
+          "success": true
+        }
+      ],
+      "errorHandling": [
+        {
+          "duration": 257.4941,
+          "success": false
+        },
+        {
+          "duration": 72.5232,
+          "success": false
+        },
+        {
+          "duration": 71.7779,
+          "success": false
+        },
+        {
+          "duration": 73.0456,
+          "success": false
+        },
+        {
+          "duration": 72.1627,
+          "success": false
+        },
+        {
+          "duration": 71.6687,
+          "success": false
+        },
+        {
+          "duration": 72.1942,
+          "success": false
+        },
+        {
+          "duration": 72.1118,
+          "success": false
+        },
+        {
+          "duration": 71.9997,
+          "success": false
+        },
+        {
+          "duration": 74.892,
+          "success": false
+        }
+      ]
+    },
+    "grpc": {
+      "healthChecks": [
+        {
+          "duration": 21.1766,
+          "success": true
+        },
+        {
+          "duration": 2.1382,
+          "success": true
+        },
+        {
+          "duration": 1.6384,
+          "success": true
+        },
+        {
+          "duration": 1.5844,
+          "success": true
+        },
+        {
+          "duration": 1.8447,
+          "success": true
+        },
+        {
+          "duration": 1.4404,
+          "success": true
+        },
+        {
+          "duration": 1.8764,
+          "success": true
+        },
+        {
+          "duration": 1.3775,
+          "success": true
+        },
+        {
+          "duration": 2.3122,
+          "success": true
+        },
+        {
+          "duration": 2.2423,
+          "success": true
+        },
+        {
+          "duration": 1.3882,
+          "success": true
+        },
+        {
+          "duration": 1.0895,
+          "success": true
+        },
+        {
+          "duration": 1.2407,
+          "success": true
+        },
+        {
+          "duration": 1.7371,
+          "success": true
+        },
+        {
+          "duration": 1.0539,
+          "success": true
+        },
+        {
+          "duration": 1.2372,
+          "success": true
+        },
+        {
+          "duration": 1.1358,
+          "success": true
+        },
+        {
+          "duration": 1.3963,
+          "success": true
+        },
+        {
+          "duration": 1.0822,
+          "success": true
+        },
+        {
+          "duration": 1.072,
+          "success": true
+        }
+      ],
+      "singleRequests": [
+        {
+          "duration": 43.0145,
+          "success": true
+        },
+        {
+          "duration": 42.9279,
+          "success": true
+        },
+        {
+          "duration": 39.5895,
+          "success": true
+        },
+        {
+          "duration": 44.0997,
+          "success": true
+        },
+        {
+          "duration": 41.0138,
+          "success": true
+        },
+        {
+          "duration": 41.1013,
+          "success": true
+        },
+        {
+          "duration": 43.0649,
+          "success": true
+        },
+        {
+          "duration": 39.6544,
+          "success": true
+        },
+        {
+          "duration": 40.2331,
+          "success": true
+        },
+        {
+          "duration": 39.3237,
+          "success": true
+        },
+        {
+          "duration": 45.0954,
+          "success": true
+        },
+        {
+          "duration": 43.4846,
+          "success": true
+        },
+        {
+          "duration": 39.3622,
+          "success": true
+        },
+        {
+          "duration": 40.112,
+          "success": true
+        },
+        {
+          "duration": 41.1478,
+          "success": true
+        },
+        {
+          "duration": 40.5394,
+          "success": true
+        },
+        {
+          "duration": 41.6568,
+          "success": true
+        },
+        {
+          "duration": 40.0902,
+          "success": true
+        },
+        {
+          "duration": 40.1634,
+          "success": true
+        },
+        {
+          "duration": 39.3629,
+          "success": true
+        },
+        {
+          "duration": 39.5408,
+          "success": true
+        },
+        {
+          "duration": 42.6262,
+          "success": true
+        },
+        {
+          "duration": 40.0789,
+          "success": true
+        },
+        {
+          "duration": 39.6264,
+          "success": true
+        },
+        {
+          "duration": 43.6748,
+          "success": true
+        },
+        {
+          "duration": 39.5054,
+          "success": true
+        },
+        {
+          "duration": 39.4844,
+          "success": true
+        },
+        {
+          "duration": 41.9481,
+          "success": true
+        },
+        {
+          "duration": 40.4259,
+          "success": true
+        },
+        {
+          "duration": 42.5509,
+          "success": true
+        },
+        {
+          "duration": 44.9154,
+          "success": true
+        },
+        {
+          "duration": 39.4252,
+          "success": true
+        },
+        {
+          "duration": 39.4771,
+          "success": true
+        },
+        {
+          "duration": 41.1308,
+          "success": true
+        },
+        {
+          "duration": 40.6505,
+          "success": true
+        },
+        {
+          "duration": 42.7275,
+          "success": true
+        },
+        {
+          "duration": 40.644,
+          "success": true
+        },
+        {
+          "duration": 40.0853,
+          "success": true
+        },
+        {
+          "duration": 44.267,
+          "success": true
+        },
+        {
+          "duration": 39.5008,
+          "success": true
+        },
+        {
+          "duration": 39.1614,
+          "success": true
+        },
+        {
+          "duration": 39.644,
+          "success": true
+        },
+        {
+          "duration": 40.5108,
+          "success": true
+        },
+        {
+          "duration": 39.3234,
+          "success": true
+        },
+        {
+          "duration": 39.5942,
+          "success": true
+        },
+        {
+          "duration": 40.2576,
+          "success": true
+        },
+        {
+          "duration": 39.6842,
+          "success": true
+        },
+        {
+          "duration": 39.4746,
+          "success": true
+        },
+        {
+          "duration": 41.3873,
+          "success": true
+        },
+        {
+          "duration": 39.5437,
+          "success": true
+        },
+        {
+          "duration": 39.8497,
+          "success": true
+        },
+        {
+          "duration": 39.1397,
+          "success": true
+        },
+        {
+          "duration": 39.7348,
+          "success": true
+        },
+        {
+          "duration": 42.9553,
+          "success": true
+        },
+        {
+          "duration": 39.5226,
+          "success": true
+        },
+        {
+          "duration": 39.168,
+          "success": true
+        },
+        {
+          "duration": 39.5226,
+          "success": true
+        },
+        {
+          "duration": 40.2762,
+          "success": true
+        },
+        {
+          "duration": 83.7179,
+          "success": true
+        },
+        {
+          "duration": 39.6368,
+          "success": true
+        },
+        {
+          "duration": 39.4593,
+          "success": true
+        },
+        {
+          "duration": 39.6343,
+          "success": true
+        },
+        {
+          "duration": 41.1953,
+          "success": true
+        },
+        {
+          "duration": 41.1022,
+          "success": true
+        },
+        {
+          "duration": 39.8634,
+          "success": true
+        },
+        {
+          "duration": 41.2146,
+          "success": true
+        },
+        {
+          "duration": 40.5603,
+          "success": true
+        },
+        {
+          "duration": 39.446,
+          "success": true
+        },
+        {
+          "duration": 39.8597,
+          "success": true
+        },
+        {
+          "duration": 40.6849,
+          "success": true
+        },
+        {
+          "duration": 39.4584,
+          "success": true
+        },
+        {
+          "duration": 40.897,
+          "success": true
+        },
+        {
+          "duration": 39.4414,
+          "success": true
+        },
+        {
+          "duration": 42.386,
+          "success": true
+        },
+        {
+          "duration": 40.6916,
+          "success": true
+        }
+      ],
+      "batchRequests": [
+        {
+          "duration": 149.9517,
+          "success": true
+        },
+        {
+          "duration": 43.5829,
+          "success": true
+        },
+        {
+          "duration": 45.9266,
+          "success": true
+        },
+        {
+          "duration": 44.0128,
+          "success": true
+        },
+        {
+          "duration": 43.5768,
+          "success": true
+        },
+        {
+          "duration": 43.1905,
+          "success": true
+        },
+        {
+          "duration": 44.0466,
+          "success": true
+        },
+        {
+          "duration": 44.1853,
+          "success": true
+        },
+        {
+          "duration": 48.7254,
+          "success": true
+        },
+        {
+          "duration": 42.8315,
+          "success": true
+        }
+      ],
+      "errorHandling": [
+        {
+          "duration": 72.3503,
+          "success": true
+        },
+        {
+          "duration": 71.6106,
+          "success": true
+        },
+        {
+          "duration": 71.5596,
+          "success": true
+        },
+        {
+          "duration": 74.0946,
+          "success": true
+        },
+        {
+          "duration": 76.0898,
+          "success": true
+        },
+        {
+          "duration": 71.4498,
+          "success": true
+        },
+        {
+          "duration": 71.5304,
+          "success": true
+        },
+        {
+          "duration": 77.5087,
+          "success": true
+        },
+        {
+          "duration": 71.5501,
+          "success": true
+        },
+        {
+          "duration": 71.3535,
+          "success": true
+        }
+      ]
+    }
+  }
+}

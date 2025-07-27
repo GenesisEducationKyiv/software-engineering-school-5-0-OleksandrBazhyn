@@ -79,6 +79,33 @@
 
 ## Структура проекту
 
-- `server/` — бекенд (Node.js, Express, Knex)
+- `server/` — основний бекенд (Node.js, Express, Knex)
 - `client/` — фронтенд (React, Vite)
+- `weather-service/` — окремий мікросервіс погоди (HTTP + gRPC)
+- `email-service/` — сервіс email розсилки
+- `weather-benchmark/` — інструменти для performance testing
+- `grpc-shared/` — централізована gRPC інфраструктура
+  - `proto/` — protobuf definitions
+  - `clients/` — reusable gRPC clients
+- `docs/` — документація та результати тестування
 - `db/migrations/` — міграції бази даних
+
+## Мікросервісна архітектура
+
+### Weather Service (порт 3000)
+- **HTTP REST API:** `/api/v1/weather`, `/api/v1/health`
+- **gRPC Server:** localhost:50051
+- **Features:** Caching, Fallback providers, Dual protocol support
+
+### Benchmark Infrastructure
+```bash
+cd weather-benchmark
+npm run quick          # 2-3 min quick test
+npm run comprehensive  # 5-10 min detailed analysis  
+npm run high-load      # 1000 concurrent requests simulation
+```
+
+### Performance Results
+- **gRPC:** 98.4% compliance with 1000 RPS requirement
+- **HTTP:** Suitable for frontend, degrades under high load
+- **Documentation:** See `docs/PERFORMANCE_SUMMARY.md`

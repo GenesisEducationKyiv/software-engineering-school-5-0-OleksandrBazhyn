@@ -1,0 +1,34 @@
+{
+  "name": "grpc-shared",
+  "version": "1.0.0",
+  "description": "Shared gRPC infrastructure for Weather Service microservices",
+  "type": "module",
+  "main": "clients/node/WeatherGrpcClient.js",
+  "exports": {
+    ".": "./clients/node/WeatherGrpcClient.js",
+    "./client": "./clients/node/WeatherGrpcClient.js",
+    "./proto": "./proto/weather.proto"
+  },
+  "scripts": {
+    "example": "node clients/examples/weather-client-example.js",
+    "test": "echo \"No tests specified\" && exit 0"
+  },
+  "dependencies": {
+    "@grpc/grpc-js": "^1.9.0",
+    "@grpc/proto-loader": "^0.7.0"
+  },
+  "keywords": [
+    "grpc",
+    "weather", 
+    "microservices",
+    "protobuf",
+    "client"
+  ],
+  "author": "Weather Service Team",
+  "license": "MIT",
+  "files": [
+    "proto/",
+    "clients/",
+    "README.md"
+  ]
+}

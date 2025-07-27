@@ -1,0 +1,66 @@
+syntax = "proto3";
+
+package weather;
+
+// Weather service definition
+service WeatherService {
+  // Get weather data for a city
+  rpc GetWeather(WeatherRequest) returns (WeatherResponse);
+  
+  // Get weather for multiple cities (for batch operations)
+  rpc GetWeatherBatch(WeatherBatchRequest) returns (WeatherBatchResponse);
+  
+  // Health check
+  rpc HealthCheck(HealthCheckRequest) returns (HealthCheckResponse);
+}
+
+// Request message for getting weather
+message WeatherRequest {
+  string city = 1;
+}
+
+// Response message with weather data
+message WeatherResponse {
+  bool success = 1;
+  string error_message = 2;
+  WeatherData data = 3;
+}
+
+// Weather data structure
+message WeatherData {
+  double temperature = 1;
+  int32 humidity = 2;
+  string description = 3;
+  string city = 4;
+  int64 timestamp = 5;
+}
+
+// Batch request for multiple cities
+message WeatherBatchRequest {
+  repeated string cities = 1;
+}
+
+// Batch response with multiple weather data
+message WeatherBatchResponse {
+  bool success = 1;
+  string error_message = 2;
+  repeated WeatherData data = 3;
+}
+
+// Health check request
+message HealthCheckRequest {
+  string service = 1;
+}
+
+// Health check response
+message HealthCheckResponse {
+  enum Status {
+    UNKNOWN = 0;
+    SERVING = 1;
+    NOT_SERVING = 2;
+    SERVICE_UNKNOWN = 3;
+  }
+  
+  Status status = 1;
+  string message = 2;
+}
