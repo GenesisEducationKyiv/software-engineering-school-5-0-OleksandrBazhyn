@@ -91,7 +91,7 @@ export class EmailController {
         description,
       };
       this.emailQueue.enqueue({
-        type: "weather",
+        type: "weather-update",
         email,
         weatherData,
         unsubscribeUrl,
