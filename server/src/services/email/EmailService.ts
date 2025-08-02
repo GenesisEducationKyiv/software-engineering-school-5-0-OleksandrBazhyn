@@ -42,9 +42,7 @@ class EmailService {
 
     for (const sub of subscriptions) {
       try {
-        const weather: WeatherData | null = await this.weatherManager
-          .getProvider()
-          .getWeatherData(sub.city);
+        const weather: WeatherData | null = await this.weatherManager.getWeatherData(sub.city);
         if (!weather) {
           this.logger.error(`No weather data found for city: ${sub.city}`);
           continue;

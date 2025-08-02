@@ -128,7 +128,6 @@ export interface SubscriptionServiceInterface {
 }
 
 export interface WeatherProviderManagerInterface {
-  getProvider(): WeatherProvider;
   getWeatherData(city: string): Promise<WeatherData | null>;
 }
 

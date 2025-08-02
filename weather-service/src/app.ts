@@ -6,6 +6,7 @@ import WeatherProviderManager from "./services/WeatherProviderManager.js";
 import { RedisClient } from "./services/cache/RedisClient.js";
 import { WeatherGrpcServer } from "./grpc/WeatherGrpcServer.js";
 import { ErrorResponse, HealthResponse } from "./types.js";
+import client from "prom-client";
 
 const PORT = Number(config.PORT) || 3000;
 const GRPC_PORT = Number(config.GRPC_PORT) || 50051;
@@ -61,6 +62,13 @@ async function startWeatherService() {
     };
 
     res.status(200).json(healthResponse);
+  });
+
+  client.collectDefaultMetrics();
+
+  app.get("/metrics", async (req, res) => {
+    res.set("Content-Type", client.register.contentType);
+    res.end(await client.register.metrics());
   });
 
   // Cache invalidation endpoint

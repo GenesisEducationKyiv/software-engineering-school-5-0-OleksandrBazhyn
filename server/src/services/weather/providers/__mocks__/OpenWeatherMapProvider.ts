@@ -30,7 +30,9 @@ export class OpenWeatherMapProvider implements WeatherProvider {
       if (this.nextProvider) {
         return this.nextProvider.getWeatherData(city);
       }
-      throw new Error(`Failed to fetch weather data for ${city} from all providers`);
+      throw new Error(
+        `Failed to fetch weather data for ${city} from all providers`,
+      );
     }
 
     // Return custom weather data if provided
