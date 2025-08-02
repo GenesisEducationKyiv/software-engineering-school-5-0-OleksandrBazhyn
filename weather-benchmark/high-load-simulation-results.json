@@ -1,0 +1,41 @@
+{
+  "timestamp": "2025-07-13T18:08:07.577Z",
+  "configuration": {
+    "concurrentUsers": 50,
+    "requestsPerUser": 20,
+    "testDurationMs": 10000,
+    "cities": [
+      "Prague",
+      "London",
+      "Paris",
+      "Berlin",
+      "Madrid"
+    ]
+  },
+  "systemRequirements": {
+    "targetRPS": 1000,
+    "maxLatency": "200ms"
+  },
+  "results": {
+    "http": {
+      "totalRequests": 1000,
+      "successful": 1000,
+      "failed": 0,
+      "successRate": 100,
+      "rps": 263.5046113306983,
+      "avgLatency": 3540.482,
+      "p95Latency": 3661,
+      "duration": 3795
+    },
+    "grpc": {
+      "totalRequests": 1000,
+      "successful": 1000,
+      "failed": 0,
+      "successRate": 100,
+      "rps": 984.251968503937,
+      "avgLatency": 946.262,
+      "p95Latency": 993,
+      "duration": 1016
+    }
+  }
+}

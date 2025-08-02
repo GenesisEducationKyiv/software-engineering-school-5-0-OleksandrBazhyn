@@ -1,0 +1,24 @@
+{
+  "name": "weather-service-benchmark",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Performance benchmark for Weather Service HTTP vs gRPC",
+  "scripts": {
+    "benchmark": "node performance-test.js",
+    "quick": "node simple-test.js",
+    "comprehensive": "node comprehensive-test.js",
+    "load-test": "node load-test.js",
+    "high-load": "node high-load-test.js",
+    "test:all": "npm run quick && npm run comprehensive",
+    "test:production": "npm run high-load",
+    "clean": "del *-results.json",
+    "start": "echo Weather Service Benchmark Suite Available commands: && echo   npm run quick        - Quick benchmark 2-3 min && echo   npm run comprehensive - Full benchmark 5-10 min && echo   npm run high-load     - High load simulation 1000 concurrent && echo   npm run load-test     - Production load test 1000 RPS && echo   npm run benchmark    - Original stress test && echo   npm run test:all     - Run all tests && echo   npm run clean        - Clean result files",
+    "install-deps": "npm install",
+    "test": "node performance-test.js"
+  },
+  "dependencies": {
+    "@grpc/grpc-js": "^1.10.6",
+    "@grpc/proto-loader": "^0.7.10",
+    "axios": "^1.6.0"
+  }
+}
