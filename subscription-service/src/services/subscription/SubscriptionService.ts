@@ -5,6 +5,7 @@ import {
   Subscription,
   SubscriptionFrequency,
   EmailRequest,
+  MessageBroker,
 } from "../../types.js";
 import { AlreadySubscribedError, InvalidTokenError } from "../../errors/SubscriptionError.js";
 import { WeatherGrpcClient } from "../../clients/WeatherGrpcClient.js";
@@ -18,6 +19,7 @@ export class SubscriptionService implements SubscriptionServiceInterface {
     private weatherClient: WeatherGrpcClient,
     private emailClient: EmailServiceClient,
     private logger: Logger,
+    private messageBroker: MessageBroker,
   ) {}
 
   async subscribe(subscription: SubscriptionInput): Promise<{ token: string }> {
@@ -54,15 +56,42 @@ export class SubscriptionService implements SubscriptionServiceInterface {
     if (!updated) {
       throw new InvalidTokenError();
     }
+
+    const subscription = await this.dataProvider.getSubscriptionByToken(token);
+    if (subscription) {
+      await this.messageBroker.publish(
+        "subscription_confirmed",
+        JSON.stringify({
+          type: "subscription_confirmed",
+          email: subscription.email,
+          city: subscription.city,
+          frequency: subscription.frequency,
+        }),
+      );
+    }
+
     return true;
   }
 
   async unsubscribe(token: string): Promise<boolean> {
     this.logger.info(`Unsubscribing with token: ${token}`);
+    const subscription = await this.dataProvider.getSubscriptionByToken(token);
     const deleted = await this.dataProvider.deleteSubscription(token);
     if (!deleted) {
       throw new InvalidTokenError();
     }
+
+    if (subscription) {
+      await this.messageBroker.publish(
+        "subscription_unsubscribed",
+        JSON.stringify({
+          type: "subscription_unsubscribed",
+          email: subscription.email,
+          city: subscription.city,
+        }),
+      );
+    }
+
     return true;
   }
 
