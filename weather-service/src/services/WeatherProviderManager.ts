@@ -4,6 +4,7 @@ import { OpenWeatherMapProvider } from "./providers/OpenWeatherMapProvider.js";
 import { WeatherCacheService } from "./cache/WeatherCacheService.js";
 import { RedisClient } from "./cache/RedisClient.js";
 import { Logger } from "winston";
+import { cacheOperationsTotal, weatherRequestsByCity, errorRate } from "../metrics/index.js";
 
 export class WeatherProviderManager implements WeatherProviderManagerInterface {
   private chainHead: WeatherProvider;
@@ -30,15 +31,40 @@ export class WeatherProviderManager implements WeatherProviderManagerInterface {
   }
 
   public async getWeatherData(city: string): Promise<WeatherData | null> {
+    const startTime = Date.now();
+
+    // Track requests by city
+    weatherRequestsByCity.inc({ city });
+
+    this.logger.debug("Getting weather data", {
+      city,
+      service: "WeatherProviderManager",
+    });
+
     if (this.cacheService) {
       try {
         const cachedData = await this.cacheService.get(city);
+
         if (cachedData) {
-          this.logger.info(`Returning cached weather data for ${city}`);
+          cacheOperationsTotal.inc({ operation: "hit", status: "success" });
+          this.logger.info("Returning cached weather data", {
+            city,
+            duration: Date.now() - startTime,
+            source: "cache",
+          });
           return cachedData;
         }
+
+        cacheOperationsTotal.inc({ operation: "miss", status: "success" });
+        this.logger.debug("Cache miss for city", { city });
       } catch (error) {
-        this.logger.error(`Cache error for ${city}, falling back to providers:`, error);
+        cacheOperationsTotal.inc({ operation: "miss", status: "error" });
+        errorRate.inc({ type: "cache", service: "get" });
+        this.logger.error("Cache error, falling back to providers", {
+          city,
+          error: error instanceof Error ? error.message : String(error),
+          stack: error instanceof Error ? error.stack : undefined,
+        });
       }
     }
 
@@ -48,18 +74,35 @@ export class WeatherProviderManager implements WeatherProviderManagerInterface {
       if (weatherData && this.cacheService) {
         try {
           await this.cacheService.set(city, weatherData);
-          this.logger.debug(`Weather data cached for ${city}`);
+          cacheOperationsTotal.inc({ operation: "set", status: "success" });
+          this.logger.debug("Weather data cached successfully", { city });
         } catch (cacheError) {
-          this.logger.warn(`Failed to cache weather data for ${city}:`, cacheError);
+          cacheOperationsTotal.inc({ operation: "set", status: "error" });
+          errorRate.inc({ type: "cache", service: "set" });
+          this.logger.warn("Failed to cache weather data", {
+            city,
+            error: cacheError instanceof Error ? cacheError.message : String(cacheError),
+          });
         }
       }
-      this.logger.debug(`Weather data retrieved for ${city}`, {
+
+      const duration = Date.now() - startTime;
+      this.logger.info("Weather data retrieved successfully", {
+        city,
+        duration,
         provider: this.chainHead.constructor.name,
-        data: weatherData,
+        source: "provider",
       });
+
       return weatherData;
     } catch (error) {
-      this.logger.error(`Failed to get weather data for ${city}:`, error);
+      errorRate.inc({ type: "provider", service: "weather" });
+      this.logger.error("Failed to get weather data", {
+        city,
+        duration: Date.now() - startTime,
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+      });
       return null;
     }
   }
