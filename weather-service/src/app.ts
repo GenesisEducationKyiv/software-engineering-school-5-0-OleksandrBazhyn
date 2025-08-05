@@ -93,7 +93,7 @@ async function startWeatherService() {
         city: req.query.city,
         requestId: req.requestId,
       });
-      
+
       const response = await weatherController.getWeather(req, res);
       if (!res.headersSent) {
         const duration = Date.now() - startTime;
@@ -114,7 +114,7 @@ async function startWeatherService() {
         requestId: req.requestId,
       });
       errorRate.inc({ type: "api", service: "weather" });
-      
+
       if (!res.headersSent) {
         return res.status(500).json({
           error: "Internal server error",
