@@ -53,7 +53,11 @@ function buildDevLogger() {
     format: format.combine(
       format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
       format.errors({ stack: true }),
-      new SamplingFormat({ sampleRate: 1.0 }), // 100% sampling in dev
+      new SamplingFormat({
+        sampleRate: 1.0, // 100% sampling in dev
+        highVolumePatterns: ["health check", "heartbeat", "ping", "metrics scraped"],
+        criticalPatterns: ["database connection", "authentication failed", "payment", "security"],
+      }),
     ),
     transports: [
       new transports.Console({

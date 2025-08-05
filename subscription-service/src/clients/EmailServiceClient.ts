@@ -7,6 +7,7 @@ import {
   EmailServiceResponse,
   EmailRequest,
 } from "../types.js";
+import { emailsSentTotal } from "../metrics/index.js";
 import { config } from "../config.js";
 import { Logger } from "winston";
 
@@ -59,25 +60,63 @@ export class EmailServiceClient implements EmailServiceInterface {
   }
 
   async sendEmail(request: EmailRequest): Promise<boolean> {
-    if (request.type === "confirmation") {
-      return this.sendConfirmationEmail(
-        request.to,
-        request.data.city || "Unknown",
-        request.data.confirmationLink || "#",
-      );
+    const startTime = Date.now();
+
+    this.logger.info("Email request received", {
+      type: request.type,
+      to: this.maskEmail(request.to),
+    });
+
+    try {
+      let result = false;
+
+      if (request.type === "confirmation") {
+        result = await this.sendConfirmationEmail(
+          request.to,
+          request.data.city || "Unknown",
+          request.data.confirmationLink || "#",
+        );
+      } else if (request.type === "weather-update") {
+        result = await this.sendWeatherEmail(
+          request.to,
+          request.data.city || "Unknown",
+          request.data.temperature || 0,
+          request.data.humidity || 0,
+          request.data.description || "No description",
+          "#",
+        );
+      } else {
+        this.logger.error("Unsupported email type", { type: request.type });
+        emailsSentTotal.inc({ type: request.type, status: "failed" });
+        return false;
+      }
+
+      const duration = Date.now() - startTime;
+      const status = result ? "success" : "failed";
+
+      emailsSentTotal.inc({ type: request.type, status });
+
+      this.logger.info("Email request completed", {
+        type: request.type,
+        to: this.maskEmail(request.to),
+        status,
+        duration,
+      });
+
+      return result;
+    } catch (error) {
+      const duration = Date.now() - startTime;
+      emailsSentTotal.inc({ type: request.type, status: "failed" });
+
+      this.logger.error("Email request failed", {
+        type: request.type,
+        to: this.maskEmail(request.to),
+        duration,
+        error: error instanceof Error ? error.message : String(error),
+      });
+
+      return false;
     }
-    if (request.type === "weather-update") {
-      return this.sendWeatherEmail(
-        request.to,
-        request.data.city || "Unknown",
-        request.data.temperature || 0,
-        request.data.humidity || 0,
-        request.data.description || "No description",
-        "#",
-      );
-    }
-    this.logger.error("Unsupported email type:", { type: request.type });
-    return false;
   }
 
   async healthCheck(): Promise<boolean> {

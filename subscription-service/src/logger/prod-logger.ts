@@ -42,6 +42,21 @@ function buildProdLogger() {
       new SamplingFormat({
         sampleRate: 0.1, // 10% sampling for info/debug, 100% for warn/error
         levels: ["info", "debug"],
+        highVolumePatterns: [
+          "health check",
+          "heartbeat",
+          "ping",
+          "metrics scraped",
+          "scheduled job",
+        ],
+        criticalPatterns: [
+          "database connection",
+          "authentication failed",
+          "payment",
+          "security",
+          "crash",
+          "out of memory",
+        ],
       }),
     ),
     transports: [
