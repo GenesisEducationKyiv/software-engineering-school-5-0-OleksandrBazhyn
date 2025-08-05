@@ -24,4 +24,8 @@ export class EmailQueue {
   isEmpty(): boolean {
     return this.queue.length === 0;
   }
+
+  size(): number {
+    return this.queue.length;
+  }
 }

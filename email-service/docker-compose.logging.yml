@@ -1,0 +1,37 @@
+# Docker Compose configuration for log management
+version: '3.8'
+
+services:
+  email-service:
+    build: .
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./logs:/app/logs
+      - ./log-config:/app/log-config
+    environment:
+      - NODE_ENV=production
+      - LOG_LEVEL=info
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+        labels: "service=email-service"
+
+  # Log rotation service
+  logrotate:
+    image: alpine:latest
+    volumes:
+      - ./logs:/logs
+      - ./scripts:/scripts
+    command: >
+      sh -c "
+        apk add --no-cache logrotate &&
+        echo '0 0 * * * /usr/sbin/logrotate /scripts/logrotate.conf' | crontab - &&
+        crond -f
+      "
+
+volumes:
+  logs:
+    driver: local
