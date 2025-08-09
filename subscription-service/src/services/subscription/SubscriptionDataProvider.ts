@@ -12,13 +12,13 @@ export class SubscriptionDataProvider implements DataProvider {
   }
 
   async getActiveSubscriptions(): Promise<Subscription[]> {
-    return db<Subscription>("subscriptions").where("is_active", true);
+    return db<Subscription>("subscriptions").where("confirmed", true);
   }
 
   async getSubscriptionsByFrequency(frequency: SubscriptionFrequency): Promise<Subscription[]> {
     const subscriptions: Subscription[] = await db<Subscription>("subscriptions")
       .where("frequency", frequency)
-      .andWhere("is_active", true);
+      .andWhere("confirmed", true);
 
     if (subscriptions.length === 0) {
       console.warn(`No active subscriptions found for frequency: ${frequency}`);
@@ -47,14 +47,14 @@ export class SubscriptionDataProvider implements DataProvider {
   async insertSubscription(
     subscription: SubscriptionInput,
     _token: string,
-    _is_active = false,
+    confirmed = false,
   ): Promise<void> {
     try {
       console.log("Inserting subscription into database:", subscription);
       await db<Subscription>("subscriptions").insert({
         ...subscription,
         token: _token,
-        is_active: _is_active,
+        confirmed,
       });
     } catch (error) {
       console.error("Error inserting subscription:", error);
@@ -65,7 +65,7 @@ export class SubscriptionDataProvider implements DataProvider {
   async updateSubscriptionStatus(token: string, isActive: boolean): Promise<boolean> {
     const updatedRows = await db<Subscription>("subscriptions")
       .where({ token })
-      .update({ is_active: true });
+      .update({ confirmed: true });
 
     if (updatedRows === 0) {
       console.warn(`No subscription found with token: ${token}`);
@@ -86,5 +86,14 @@ export class SubscriptionDataProvider implements DataProvider {
 
     console.log(`Subscription with token ${token} deleted successfully`);
     return true;
+  }
+
+  async getSubscriptionByToken(token: string): Promise<Subscription | null> {
+    const subscription = await db<Subscription>("subscriptions").where({ token }).first();
+    if (!subscription) {
+      console.warn(`No subscription found with token: ${token}`);
+      return null;
+    }
+    return subscription;
   }
 }

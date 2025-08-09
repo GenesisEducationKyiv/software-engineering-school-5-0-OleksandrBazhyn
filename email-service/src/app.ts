@@ -4,6 +4,7 @@ import express from "express";
 import cors from "cors";
 import http from "http";
 import router from "./router/index.js";
+import { startEmailEventConsumer } from "./infra/EmailEventConsumer.js";
 
 const PORT = Number(config.PORT) || 3000;
 const logger = createLogger("EmailService");
@@ -20,6 +21,10 @@ async function startEmailService() {
 
   server.listen(PORT, () => {
     logger.info(`Email service is running on port ${PORT}`);
+  });
+
+  startEmailEventConsumer().catch((err) => {
+    logger.error("Failed to start EmailEventConsumer", err);
   });
 
   process.on("SIGTERM", () => {

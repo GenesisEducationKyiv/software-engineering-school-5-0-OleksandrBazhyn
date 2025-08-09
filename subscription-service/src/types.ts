@@ -36,6 +36,7 @@ export interface DataProvider {
   deleteSubscription(token: string): Promise<boolean>;
   getActiveSubscriptions(): Promise<Subscription[]>;
   getSubscriptionsByFrequency(frequency: SubscriptionFrequency): Promise<Subscription[]>;
+  getSubscriptionByToken(token: string): Promise<Subscription | null>;
 }
 
 export interface ValidationResult {
@@ -183,4 +184,10 @@ export interface HealthResponse {
     email: ServiceHealthStatus;
   };
   timestamp: string;
+}
+
+export interface MessageBroker {
+  publish(topic: string, message: string): Promise<void>;
+  subscribe(topic: string, handler: (message: string) => Promise<void>): Promise<void>;
+  connect(): Promise<void>;
 }
