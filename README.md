@@ -1,0 +1,111 @@
+# Weather API App
+
+## Опис
+
+Сервіс для підписки на email-розсилку погоди для обраного міста (щодня або щогодини). Покритий тестами та зі спробою розгорнути на Render.
+ 
+## Як запустити локально
+
+1. Встановіть залежності для бекенду та фронтенду:
+   ```sh
+   cd server && npm install
+   cd ../client && npm install
+   ```
+2. Створіть файл `.env` у папці `server` (див. приклад у репозиторії).
+3. Запустіть міграції для бази даних:
+   ```sh
+   cd ../server
+   npx knex --knexfile ./knexfile.cjs migrate:latest
+   ```
+4. Запустіть сервер:
+   ```sh
+   npm run dev
+   ```
+5. Запустіть клієнт у новому терміналі:
+   ```sh
+   cd ../client
+   npm run dev
+   ```
+6. API буде доступне на [http://localhost:3000](http://localhost:3000), фронтенд — на [http://localhost:5173](http://localhost:5173) (або порт, який вкаже Vite).
+
+## Як запустити через Docker
+
+1. Впевніться, що у вас встановлені Docker і Docker Compose.
+2. Створіть файл `.env.docker` у папці `server` (див. приклад у репозиторії).
+3. Запустіть:
+   ```sh
+   docker-compose up --build
+   ```
+4. API буде доступне на [http://localhost:3000](http://localhost:3000), фронтенд — на [http://localhost:5180](http://localhost:5180).
+
+## Основні ендпоінти
+
+- `GET /api/weather?city={city}`  
+  Отримати поточну погоду для міста (температура, вологість, опис).
+
+- `POST /api/subscribe`  
+  Підписка на розсилку.  
+  Тіло запиту (JSON):
+  ```json
+  {
+    "email": "your@email.com",
+    "city": "Kyiv",
+    "frequency": "daily" // або "hourly"
+  }
+  ```
+
+- `GET /api/confirm/{token}`  
+  Підтвердження підписки (посилання надходить на email).
+
+- `GET /api/unsubscribe/{token}`  
+  Відписка від розсилки (посилання є у кожному листі).
+
+## Як працює email-розсилка
+
+- Після підписки користувач отримує лист з посиланням для підтвердження.
+- Після підтвердження підписки, листи з погодою надсилаються автоматично:
+  - Щогодини — якщо обрано "hourly"
+  - Щодня о 8:00 — якщо обрано "daily"
+- У кожному листі є посилання для відписки.
+
+## Тестування
+
+- Для розсилки використовується Gmail.
+- Для тестування API та функціоналу використовуйте клієнтську частину (frontend) або інструменти на кшталт Postman чи curl.
+- Для запуску тестів у бекенді перейдіть у папку `server` та виконайте:
+  ```sh
+  npm test
+  ```
+
+## Структура проекту
+
+- `server/` — основний бекенд (Node.js, Express, Knex)
+- `client/` — фронтенд (React, Vite)
+- `weather-service/` — окремий мікросервіс погоди (HTTP + gRPC)
+- `email-service/` — сервіс email розсилки
+- `weather-benchmark/` — інструменти для performance testing
+- `grpc-shared/` — централізована gRPC інфраструктура
+  - `proto/` — protobuf definitions
+  - `clients/` — reusable gRPC clients
+- `docs/` — документація та результати тестування
+- `db/migrations/` — міграції бази даних
+
+## Мікросервісна архітектура
+
+### Weather Service (порт 3000)
+- **HTTP REST API:** `/api/v1/weather`, `/api/v1/health`
+- **gRPC Server:** localhost:50051
+- **Features:** Caching, Fallback providers, Dual protocol support
+
+### Benchmark Infrastructure
+```bash
+cd weather-benchmark
+npm run quick          # 2-3 min quick test
+npm run comprehensive  # 5-10 min detailed analysis  
+npm run high-load      # 1000 concurrent requests simulation
+```
+
+### Performance Results
+- **gRPC:** 98.4% compliance with 1000 RPS requirement
+- **HTTP:** Suitable for frontend, degrades under high load
+- **Documentation:** See `docs/PERFORMANCE_SUMMARY.md`

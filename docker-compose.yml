@@ -1,0 +1,70 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:17
+    container_name: weather-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: weather_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: weather-redis
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+
+  app:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: weather-backend
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./server/.env.docker
+    depends_on:
+      - db
+      - redis
+    restart: unless-stopped
+
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    container_name: weather-frontend
+    ports:
+      - "5180:80"
+    depends_on:
+      - app
+    restart: unless-stopped
+
+  server-test-integration:
+    build:
+      context: ./server
+      dockerfile: Dockerfile.test
+    depends_on:
+      - db
+    env_file:
+      - ./server/.env.docker.test
+
+  client-test-e2e:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    container_name: weather-e2e-test
+    command: ["npm", "run", "test:e2e"]
+    depends_on:
+      - app
+      - client
+      
+volumes:
+  db_data:
+    driver: local

@@ -1,0 +1,33 @@
+name: Lint & Format
+
+on: [push, pull_request]
+
+jobs:
+  lint-and-format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies (server)
+        run: npm ci
+        working-directory: ./server
+
+      - name: Install dependencies (client)
+        run: npm ci
+        working-directory: ./client
+
+      - name: Run ESLint (server)
+        run: npm run lint
+        working-directory: ./server
+
+      - name: Run ESLint (client)
+        run: npm run lint
+        working-directory: ./client
+
+      - name: Run Prettier (all)
+        run: npx prettier --write ./
