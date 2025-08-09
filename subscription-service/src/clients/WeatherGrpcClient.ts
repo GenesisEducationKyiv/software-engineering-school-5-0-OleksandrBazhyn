@@ -12,6 +12,7 @@ import {
   GrpcHealthResponse,
   WeatherGrpcClientInterface,
 } from "../types.js";
+import { weatherRequestsTotal, weatherRequestDuration } from "../metrics/index.js";
 import { config } from "../config.js";
 import { Logger } from "winston";
 
@@ -172,18 +173,34 @@ export class WeatherGrpcClient implements WeatherGrpcClientInterface {
   }
 
   async getWeather(city: string): Promise<WeatherData> {
+    const startTime = Date.now();
+
     if (!this.isConnected || !this.client) {
+      weatherRequestsTotal.inc({ status: "failed", city: "unknown" });
       throw new Error("Weather gRPC client is not connected");
     }
 
     if (!city?.trim()) {
+      weatherRequestsTotal.inc({ status: "failed", city: "unknown" });
       throw new Error("City parameter is required and cannot be empty");
     }
 
     const normalizedCity = city.trim();
 
+    this.logger.info("Weather request started", { city: normalizedCity });
+
     return new Promise<WeatherData>((resolve, reject) => {
       const requestTimeout = setTimeout(() => {
+        const duration = (Date.now() - startTime) / 1000;
+        weatherRequestsTotal.inc({ status: "timeout", city: normalizedCity });
+        weatherRequestDuration.observe({ status: "timeout", city: normalizedCity }, duration);
+
+        this.logger.error("Weather request timeout", {
+          city: normalizedCity,
+          duration,
+          timeout: config.weather.timeout,
+        });
+
         reject(new Error(`Weather request timeout after ${config.weather.timeout}ms`));
       }, config.weather.timeout);
 
@@ -191,6 +208,9 @@ export class WeatherGrpcClient implements WeatherGrpcClientInterface {
 
       if (!this.client) {
         clearTimeout(requestTimeout);
+        const duration = (Date.now() - startTime) / 1000;
+        weatherRequestsTotal.inc({ status: "failed", city: normalizedCity });
+        weatherRequestDuration.observe({ status: "failed", city: normalizedCity }, duration);
         reject(new Error("Weather gRPC client is not connected"));
         return;
       }
@@ -199,13 +219,18 @@ export class WeatherGrpcClient implements WeatherGrpcClientInterface {
         request,
         (error: grpc.ServiceError | null, response: WeatherResponse) => {
           clearTimeout(requestTimeout);
+          const duration = (Date.now() - startTime) / 1000;
 
           if (error) {
-            this.logger.error("Weather gRPC request failed:", {
+            weatherRequestsTotal.inc({ status: "failed", city: normalizedCity });
+            weatherRequestDuration.observe({ status: "failed", city: normalizedCity }, duration);
+
+            this.logger.error("Weather gRPC request failed", {
               city: normalizedCity,
               code: error.code,
               message: error.message,
               details: error.details,
+              duration,
             });
 
             // Handle connection issues
@@ -222,10 +247,14 @@ export class WeatherGrpcClient implements WeatherGrpcClientInterface {
           }
 
           if (response.success && response.data) {
-            this.logger.debug("Weather data retrieved successfully", {
+            weatherRequestsTotal.inc({ status: "success", city: normalizedCity });
+            weatherRequestDuration.observe({ status: "success", city: normalizedCity }, duration);
+
+            this.logger.info("Weather data retrieved successfully", {
               city: normalizedCity,
               temperature: response.data.temperature,
               humidity: response.data.humidity,
+              duration,
             });
 
             resolve({
@@ -237,9 +266,13 @@ export class WeatherGrpcClient implements WeatherGrpcClientInterface {
             });
           } else {
             const errorMessage = response.error_message || "Weather data not available";
+            weatherRequestsTotal.inc({ status: "failed", city: normalizedCity });
+            weatherRequestDuration.observe({ status: "failed", city: normalizedCity }, duration);
+
             this.logger.warn("Weather service returned error response", {
               city: normalizedCity,
               error: errorMessage,
+              duration,
             });
             reject(new Error(errorMessage));
           }

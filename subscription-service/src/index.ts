@@ -7,7 +7,9 @@ import { SubscriptionService } from "./services/subscription/SubscriptionService
 import { SubscriptionDataProvider } from "./services/subscription/SubscriptionDataProvider.js";
 import { WeatherGrpcClient } from "./clients/WeatherGrpcClient.js";
 import { EmailServiceClient } from "./clients/EmailServiceClient.js";
+import { RedisMessageBroker } from "./infra/RedisMessageBroker.js";
 import { createLogger } from "./logger/index.js";
+import { metricsMiddleware } from "./middleware/metrics.js";
 import createApiRoutes from "./routes/api.js";
 import { config } from "./config.js";
 
@@ -49,12 +51,14 @@ async function checkExternalServices(
 
 function initializeServices(weatherClient: WeatherGrpcClient, emailClient: EmailServiceClient) {
   const subscriptionDataProvider = new SubscriptionDataProvider();
+  const messageBroker = new RedisMessageBroker(config.REDIS_URL);
 
   const subscriptionService = new SubscriptionService(
     subscriptionDataProvider,
     weatherClient,
     emailClient,
     createLogger("SubscriptionService"),
+    messageBroker,
   );
 
   const scheduler = new WeatherScheduler(subscriptionService, createLogger("WeatherScheduler"));
@@ -78,11 +82,17 @@ function createExpressApp(
   app.use(cors());
   app.use(express.json());
 
+  // Metrics middleware - must be before other routes
+  app.use(metricsMiddleware);
+
   // Request logging
   app.use((req, res, next) => {
-    logger.info(`${req.method} ${req.path}`, {
+    logger.info("HTTP request", {
+      method: req.method,
+      path: req.path,
       ip: req.ip,
       userAgent: req.get("User-Agent")?.substring(0, 100),
+      requestId: req.headers["x-request-id"] || "unknown",
     });
     next();
   });
@@ -93,6 +103,11 @@ function createExpressApp(
 
   // 404 handler
   app.use("*", (req, res) => {
+    logger.warn("Endpoint not found", {
+      method: req.method,
+      path: req.path,
+      ip: req.ip,
+    });
     res.status(404).json({ error: "Endpoint not found" });
   });
 

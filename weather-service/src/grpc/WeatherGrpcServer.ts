@@ -4,6 +4,12 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { WeatherProviderManagerInterface } from "../types.js";
 import { Logger } from "winston";
+import {
+  grpcRequestsTotal,
+  grpcRequestDuration,
+  weatherRequestsByCity,
+  errorRate,
+} from "../metrics/index.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -84,27 +90,52 @@ export class WeatherGrpcServer {
     call: grpc.ServerUnaryCall<WeatherGrpcRequest, WeatherGrpcResponse>,
     callback: grpc.sendUnaryData<WeatherGrpcResponse>,
   ) {
+    const startTime = Date.now();
+    const method = "GetWeather";
+
     try {
       const { city } = call.request;
 
+      grpcRequestsTotal.inc({ method, status: "attempt" });
+      weatherRequestsByCity.inc({ city: city || "unknown" });
+
       if (!city) {
+        grpcRequestsTotal.inc({ method, status: "invalid_argument" });
+        this.logger.warn("gRPC GetWeather: City parameter missing");
+
         return callback({
           code: grpc.status.INVALID_ARGUMENT,
           message: "City is required",
         });
       }
 
-      this.logger.debug(`gRPC: Getting weather for ${city}`);
+      this.logger.debug("gRPC: Getting weather", {
+        city,
+        method,
+      });
 
       const weatherData = await this.weatherManager.getWeatherData(city);
 
+      const duration = (Date.now() - startTime) / 1000;
+      grpcRequestDuration.observe({ method }, duration);
+
       if (!weatherData || !weatherData.current) {
+        grpcRequestsTotal.inc({ method, status: "not_found" });
+
+        this.logger.warn("gRPC: Weather data not found", {
+          city,
+          method,
+          duration: duration * 1000,
+        });
+
         return callback(null, {
           success: false,
           error_message: "City not found",
           data: null,
         });
       }
+
+      grpcRequestsTotal.inc({ method, status: "success" });
 
       const response = {
         success: true,
@@ -118,10 +149,28 @@ export class WeatherGrpcServer {
         },
       };
 
-      this.logger.info(`gRPC: Weather data retrieved for ${city}`);
+      this.logger.info("gRPC: Weather data retrieved successfully", {
+        city,
+        method,
+        duration: duration * 1000,
+      });
+
       callback(null, response);
     } catch (error) {
-      this.logger.error(`gRPC: Error getting weather for ${call.request.city}:`, error);
+      const duration = (Date.now() - startTime) / 1000;
+
+      grpcRequestsTotal.inc({ method, status: "error" });
+      grpcRequestDuration.observe({ method }, duration);
+      errorRate.inc({ type: "grpc", service: method });
+
+      this.logger.error("gRPC: Error getting weather", {
+        city: call.request.city,
+        method,
+        duration: duration * 1000,
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+      });
+
       callback({
         code: grpc.status.INTERNAL,
         message: "Internal server error",
